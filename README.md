@@ -4,7 +4,7 @@ Clustering code to for triggering at DUNE.
 
 To use it:
 ```
-git clone
+git clone <whatever the address of this is>
 cd Clustering
 mkdir build
 cd build
