@@ -53,5 +53,5 @@ target_link_libraries(PDSTiming ${ROOT_LIBRARIES})
 add_executable(NeutronInfo NeutronInfo.cxx)
 target_link_libraries(NeutronInfo ${ROOT_LIBRARIES})
 
-add_executable(OpHitTrigger OpHitTrigger.C)
-target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
+# add_executable(OpHitTrigger OpHitTrigger.C)
+# target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
