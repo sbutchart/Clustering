@@ -37,8 +37,10 @@
 
 # Cmake junk
 ./build
+Makefile
 
 # Images and ROOT files
 *.pdf
 *.root
 *.png
+
