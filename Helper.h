@@ -1,8 +1,6 @@
 #ifndef HELPER_HH
 #define HELPER_HH
 
-#include "/nashome/p/plasorak/plasorak_utils.h"
-
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TLatex.h"
@@ -35,7 +33,31 @@ enum GenType{
   kAllBackground,
   kAll            
 };
+static int CurrentProg=0;
 
+inline void PrintProgress(int iter, int nloop){
+
+  if(iter+1==nloop){
+    std::cout << std::endl;
+    return;
+  }
+  double progress = (double)iter/(double)nloop;
+
+  if(100.*progress >= CurrentProg)
+  {
+    CurrentProg=(int)ceil(100.*progress);
+    int barWidth = 70;
+    std::cout << "[";
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+      if (i < pos) std::cout << "=";
+      else if (i == pos) std::cout << ">";
+      else std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0) << " % (" << iter << " of " << nloop << ")\r";
+    std::cout.flush();
+  }
+};
 
 inline GenType ConvertIntToGenType(int i) {
   switch (i) {
