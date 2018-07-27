@@ -34,3 +34,11 @@
 
 # Emacs junk
 *~
+
+# Cmake junk
+./build
+
+# Images and ROOT files
+*.pdf
+*.root
+*.png
