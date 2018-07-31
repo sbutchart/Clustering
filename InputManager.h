@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <iostream>
-
+const int  nMaxColHit=2000;
 class InputManager{
 private:
   TFile* f_Input;
@@ -60,7 +60,6 @@ public:
   std::vector<float>               * Hit_True_nElec           ;
   std::vector<int>                 * Hit_True_nIDEs           ; 
   std::vector<int>                 * Hit_True_MarleyIndex     ;
-  
   std::vector<int>                 * Hit_AdjM5SADC            ;
   std::vector<int>                 * Hit_AdjM2SADC            ;
   std::vector<int>                 * Hit_AdjM1SADC            ;
@@ -73,7 +72,6 @@ public:
   std::vector<int>                 * Hit_AdjP1Chan            ;
   std::vector<int>                 * Hit_AdjP2Chan            ;
   std::vector<int>                 * Hit_AdjP5Chan            ;
-
   std::vector<int>                 * PDS_Flash_FlashID        ;
   std::vector<float>               * PDS_Flash_YCenter        ;
   std::vector<float>               * PDS_Flash_ZCenter        ;
@@ -84,7 +82,6 @@ public:
   std::vector<float>               * PDS_Flash_TotalPE        ;
   std::vector<float>               * PDS_Flash_True_Distance  ;
   std::vector<float>               * PDS_Flash_True_GenType   ;
-
   std::vector<int> 	           * PDS_OpHit_OpChannel      ;
   std::vector<double>              * PDS_OpHit_X              ;
   std::vector<double> 	           * PDS_OpHit_Y              ;
@@ -104,7 +101,6 @@ public:
   std::vector<double>              * PDS_OpHit_True_EnergyAll ;
   std::vector<int>                 * PDS_OpHit_True_TrackIDAll;
   std::vector<int>                 * PDS_OpHit_True_IndexAll  ;
-
   std::vector<int>                 * True_VertexChan          ;
   std::vector<int>                 * True_Nu_Type             ;
   std::vector<int>                 * True_Nu_Lep_Type         ;
@@ -128,7 +124,6 @@ public:
   std::vector<float>               * True_Diry                ;
   std::vector<float>               * True_Dirz                ;
   std::vector<float>               * True_Time                ;
-                                                              
   std::vector<int>                 * True_Bck_Mode            ;
   std::vector<double>              * True_Bck_VertX           ;
   std::vector<double>              * True_Bck_VertY           ;
@@ -136,7 +131,6 @@ public:
   std::vector<double>              * True_Bck_Time            ;
   std::vector<double>              * True_Bck_Energy          ;
   std::vector<int>                 * True_Bck_PDG             ;
-
   std::vector<int>                 * True_Bck_ModeAll         ;
   std::vector<double>              * True_Bck_VertXAll        ;
   std::vector<double>              * True_Bck_VertYAll        ;
@@ -150,125 +144,274 @@ public:
   std::vector<int>                 * True_Bck_PDGAll          ;
   std::vector<int>                 * True_Bck_IDAll           ;
 
+  int   HitView           [nMaxColHit];
+  int   HitSize           [nMaxColHit];
+  int   HitTPC            [nMaxColHit];
+  int   HitChan           [nMaxColHit];
+  float HitTime           [nMaxColHit];
+  float HitRMS            [nMaxColHit];
+  float HitSADC           [nMaxColHit];
+  float HitInt            [nMaxColHit];
+  float HitPeak           [nMaxColHit];
+  int   GenType           [nMaxColHit];
+  int   NCorrespondingIDEs[nMaxColHit];
+  float Hit_X             [nMaxColHit];
+  float Hit_Y             [nMaxColHit];
+  float Hit_Z             [nMaxColHit];
+  float Hit_Energy        [nMaxColHit];
+  float Hit_NumElectrons  [nMaxColHit];
+
+  int    VertexChan    ;
+  int    Nu_Type       ;
+  int    Nu_Lep_Type   ;
+  int    Mode          ;
+  int    CCNC          ;
+  int    HitNucleon    ;
+  int    Target        ;
+  int    MarlSample    ;
+  double MarlTime      ;
+  double MarlWeight    ;
+  double ENu           ;
+  double ENu_Lep       ;
+  double VertX         ;
+  double VertY         ;
+  double VertZ         ;
+  double Px            ;
+  double Py            ;
+  double Pz            ;
+  int    VertexT       ;
+
+  void InstanciateVariables(){
+    Hit_View                  = new std::vector<int>();
+    Hit_Size                  = new std::vector<int>();
+    Hit_TPC                   = new std::vector<int>();
+    Hit_Chan                  = new std::vector<int>();
+    Hit_X_start               = new std::vector<int>();
+    Hit_Y_start               = new std::vector<int>();
+    Hit_Z_start               = new std::vector<int>();
+    Hit_X_end                 = new std::vector<int>();
+    Hit_Y_end                 = new std::vector<int>();
+    Hit_Z_end                 = new std::vector<int>();
+    Hit_Time                  = new std::vector<float>();
+    Hit_RMS                   = new std::vector<float>();
+    Hit_SADC                  = new std::vector<float>();
+    Hit_Int                   = new std::vector<float>();
+    Hit_Peak                  = new std::vector<float>();
+    Hit_True_GenType          = new std::vector<int>();
+    Hit_True_MainTrID         = new std::vector<int>();
+    Hit_True_EvEnergy         = new std::vector<float>();
+    Hit_True_X                = new std::vector<float>();
+    Hit_True_Y                = new std::vector<float>();
+    Hit_True_Z                = new std::vector<float>();
+    Hit_True_Energy           = new std::vector<float>();
+    Hit_True_nElec            = new std::vector<float>();
+    Hit_True_nIDEs            = new std::vector<int>();
+    Hit_True_MarleyIndex      = new std::vector<int>();
+    Hit_AdjM5SADC             = new std::vector<int>();
+    Hit_AdjM2SADC             = new std::vector<int>();
+    Hit_AdjM1SADC             = new std::vector<int>();
+    Hit_AdjP1SADC             = new std::vector<int>();
+    Hit_AdjP2SADC             = new std::vector<int>();
+    Hit_AdjP5SADC             = new std::vector<int>();
+    Hit_AdjM5Chan             = new std::vector<int>();
+    Hit_AdjM2Chan             = new std::vector<int>();
+    Hit_AdjM1Chan             = new std::vector<int>();
+    Hit_AdjP1Chan             = new std::vector<int>();
+    Hit_AdjP2Chan             = new std::vector<int>();
+    Hit_AdjP5Chan             = new std::vector<int>();
+    PDS_Flash_FlashID         = new std::vector<int>();
+    PDS_Flash_YCenter         = new std::vector<float>();
+    PDS_Flash_ZCenter         = new std::vector<float>();
+    PDS_Flash_YWidth          = new std::vector<float>();
+    PDS_Flash_ZWidth          = new std::vector<float>();
+    PDS_Flash_Time            = new std::vector<float>();
+    PDS_Flash_TimeWidth       = new std::vector<float>();
+    PDS_Flash_TotalPE         = new std::vector<float>();
+    PDS_Flash_True_Distance   = new std::vector<float>();
+    PDS_Flash_True_GenType    = new std::vector<float>();
+    PDS_OpHit_OpChannel       = new std::vector<int>();
+    PDS_OpHit_X               = new std::vector<double>();
+    PDS_OpHit_Y               = new std::vector<double>();
+    PDS_OpHit_Z               = new std::vector<double>();
+    PDS_OpHit_PeakTimeAbs     = new std::vector<double>();
+    PDS_OpHit_PeakTime        = new std::vector<double>();
+    PDS_OpHit_Frame           = new std::vector<unsigned short>();
+    PDS_OpHit_Width           = new std::vector<double>();
+    PDS_OpHit_Area            = new std::vector<double>();
+    PDS_OpHit_Amplitude       = new std::vector<double>();
+    PDS_OpHit_PE              = new std::vector<double>();	
+    PDS_OpHit_FastToTotal     = new std::vector<double>(); 
+    PDS_OpHit_True_GenType    = new std::vector<int>();
+    PDS_OpHit_True_Energy     = new std::vector<double>();
+    PDS_OpHit_True_TrackID    = new std::vector<int>();
+    PDS_OpHit_True_GenTypeAll = new std::vector<int>();
+    PDS_OpHit_True_EnergyAll  = new std::vector<double>();
+    PDS_OpHit_True_TrackIDAll = new std::vector<int>();
+    PDS_OpHit_True_IndexAll   = new std::vector<int>();
+    True_VertexChan           = new std::vector<int>();
+    True_Nu_Type              = new std::vector<int>();
+    True_Nu_Lep_Type          = new std::vector<int>();
+    True_Mode                 = new std::vector<int>();
+    True_CCNC                 = new std::vector<int>();
+    True_HitNucleon           = new std::vector<int>();
+    True_Target               = new std::vector<int>();
+    True_MarlSample           = new std::vector<int>();
+    True_MarlTime             = new std::vector<float>();
+    True_MarlWeight           = new std::vector<float>();
+    True_ENu                  = new std::vector<float>();
+    True_ENu_Lep              = new std::vector<float>();
+    True_VertX                = new std::vector<float>();
+    True_VertY                = new std::vector<float>();
+    True_VertZ                = new std::vector<float>();
+    True_VertexT              = new std::vector<float>();
+    True_Px                   = new std::vector<float>();
+    True_Py                   = new std::vector<float>();
+    True_Pz                   = new std::vector<float>();
+    True_Dirx                 = new std::vector<float>();
+    True_Diry                 = new std::vector<float>();
+    True_Dirz                 = new std::vector<float>();
+    True_Time                 = new std::vector<float>();
+    True_Bck_Mode             = new std::vector<int>();
+    True_Bck_VertX            = new std::vector<double>();
+    True_Bck_VertY            = new std::vector<double>();
+    True_Bck_VertZ            = new std::vector<double>();
+    True_Bck_Time             = new std::vector<double>();
+    True_Bck_Energy           = new std::vector<double>();
+    True_Bck_PDG              = new std::vector<int>();
+    True_Bck_ModeAll          = new std::vector<int>();
+    True_Bck_VertXAll         = new std::vector<double>();
+    True_Bck_VertYAll         = new std::vector<double>();
+    True_Bck_VertZAll         = new std::vector<double>();
+    True_Bck_TimeAll          = new std::vector<double>();
+    True_Bck_EndVertXAll      = new std::vector<double>();
+    True_Bck_EndVertYAll      = new std::vector<double>();
+    True_Bck_EndVertZAll      = new std::vector<double>();
+    True_Bck_EndTimeAll       = new std::vector<double>();
+    True_Bck_EnergyAll        = new std::vector<double>();
+    True_Bck_PDGAll           = new std::vector<int>();
+    True_Bck_IDAll            = new std::vector<int>();
+  };
   
-  ~InputManager(){
-    delete Hit_View                 ; Hit_View                  = NULL;
-    delete Hit_Size                 ; Hit_Size                  = NULL;
-    delete Hit_TPC                  ; Hit_TPC                   = NULL;
-    delete Hit_Chan                 ; Hit_Chan                  = NULL;
-    delete Hit_X_start              ; Hit_X_start               = NULL;
-    delete Hit_Y_start              ; Hit_Y_start               = NULL;
-    delete Hit_Z_start              ; Hit_Z_start               = NULL;
-    delete Hit_X_end                ; Hit_X_end                 = NULL;
-    delete Hit_Y_end                ; Hit_Y_end                 = NULL;
-    delete Hit_Z_end                ; Hit_Z_end                 = NULL;
-    delete Hit_Time                 ; Hit_Time                  = NULL;
-    delete Hit_RMS                  ; Hit_RMS                   = NULL;
-    delete Hit_SADC                 ; Hit_SADC                  = NULL;
-    delete Hit_Int                  ; Hit_Int                   = NULL;
-    delete Hit_Peak                 ; Hit_Peak                  = NULL;
-    delete Hit_True_GenType         ; Hit_True_GenType          = NULL;
-    delete Hit_True_MainTrID        ; Hit_True_MainTrID         = NULL;
-    delete Hit_True_EvEnergy        ; Hit_True_EvEnergy         = NULL;
-    delete Hit_True_X               ; Hit_True_X                = NULL;                 
-    delete Hit_True_Y               ; Hit_True_Y                = NULL;                 
-    delete Hit_True_Z               ; Hit_True_Z                = NULL;                 
-    delete Hit_True_Energy          ; Hit_True_Energy           = NULL;            
-    delete Hit_True_nElec           ; Hit_True_nElec            = NULL;
-    delete Hit_True_nIDEs           ; Hit_True_nIDEs            = NULL;
-    delete Hit_True_MarleyIndex     ; Hit_True_MarleyIndex      = NULL;
-                                                               
-    delete Hit_AdjM5SADC            ; Hit_AdjM5SADC             = NULL;
-    delete Hit_AdjM2SADC            ; Hit_AdjM2SADC             = NULL;
-    delete Hit_AdjM1SADC            ; Hit_AdjM1SADC             = NULL;
-    delete Hit_AdjP1SADC            ; Hit_AdjP1SADC             = NULL;
-    delete Hit_AdjP2SADC            ; Hit_AdjP2SADC             = NULL;
-    delete Hit_AdjP5SADC            ; Hit_AdjP5SADC             = NULL;
-    delete Hit_AdjM5Chan            ; Hit_AdjM5Chan             = NULL;
-    delete Hit_AdjM2Chan            ; Hit_AdjM2Chan             = NULL;
-    delete Hit_AdjM1Chan            ; Hit_AdjM1Chan             = NULL;
-    delete Hit_AdjP1Chan            ; Hit_AdjP1Chan             = NULL;
-    delete Hit_AdjP2Chan            ; Hit_AdjP2Chan             = NULL;
-    delete Hit_AdjP5Chan            ; Hit_AdjP5Chan             = NULL;
-                                                               
-    delete PDS_Flash_FlashID        ; PDS_Flash_FlashID         = NULL;
-    delete PDS_Flash_YCenter        ; PDS_Flash_YCenter         = NULL;
-    delete PDS_Flash_ZCenter        ; PDS_Flash_ZCenter         = NULL;
-    delete PDS_Flash_YWidth         ; PDS_Flash_YWidth          = NULL;
-    delete PDS_Flash_ZWidth         ; PDS_Flash_ZWidth          = NULL;
-    delete PDS_Flash_Time           ; PDS_Flash_Time            = NULL;
-    delete PDS_Flash_TimeWidth      ; PDS_Flash_TimeWidth       = NULL;
-    delete PDS_Flash_TotalPE        ; PDS_Flash_TotalPE         = NULL;
-    delete PDS_Flash_True_Distance  ; PDS_Flash_True_Distance   = NULL;
-    delete PDS_Flash_True_GenType   ; PDS_Flash_True_GenType    = NULL;
+  void ResetVariables(){
+    if (Hit_View                 ) { delete Hit_View                 ; Hit_View                  = NULL; }
+    if (Hit_Size                 ) { delete Hit_Size                 ; Hit_Size                  = NULL; }
+    if (Hit_TPC                  ) { delete Hit_TPC                  ; Hit_TPC                   = NULL; }
+    if (Hit_Chan                 ) { delete Hit_Chan                 ; Hit_Chan                  = NULL; }
+    if (Hit_X_start              ) { delete Hit_X_start              ; Hit_X_start               = NULL; }
+    if (Hit_Y_start              ) { delete Hit_Y_start              ; Hit_Y_start               = NULL; }
+    if (Hit_Z_start              ) { delete Hit_Z_start              ; Hit_Z_start               = NULL; }
+    if (Hit_X_end                ) { delete Hit_X_end                ; Hit_X_end                 = NULL; }
+    if (Hit_Y_end                ) { delete Hit_Y_end                ; Hit_Y_end                 = NULL; }
+    if (Hit_Z_end                ) { delete Hit_Z_end                ; Hit_Z_end                 = NULL; }
+    if (Hit_Time                 ) { delete Hit_Time                 ; Hit_Time                  = NULL; }
+    if (Hit_RMS                  ) { delete Hit_RMS                  ; Hit_RMS                   = NULL; }
+    if (Hit_SADC                 ) { delete Hit_SADC                 ; Hit_SADC                  = NULL; }
+    if (Hit_Int                  ) { delete Hit_Int                  ; Hit_Int                   = NULL; }
+    if (Hit_Peak                 ) { delete Hit_Peak                 ; Hit_Peak                  = NULL; }
+    if (Hit_True_GenType         ) { delete Hit_True_GenType         ; Hit_True_GenType          = NULL; }
+    if (Hit_True_MainTrID        ) { delete Hit_True_MainTrID        ; Hit_True_MainTrID         = NULL; }
+    if (Hit_True_EvEnergy        ) { delete Hit_True_EvEnergy        ; Hit_True_EvEnergy         = NULL; }
+    if (Hit_True_X               ) { delete Hit_True_X               ; Hit_True_X                = NULL; }                 
+    if (Hit_True_Y               ) { delete Hit_True_Y               ; Hit_True_Y                = NULL; }                 
+    if (Hit_True_Z               ) { delete Hit_True_Z               ; Hit_True_Z                = NULL; }                 
+    if (Hit_True_Energy          ) { delete Hit_True_Energy          ; Hit_True_Energy           = NULL; }            
+    if (Hit_True_nElec           ) { delete Hit_True_nElec           ; Hit_True_nElec            = NULL; }
+    if (Hit_True_nIDEs           ) { delete Hit_True_nIDEs           ; Hit_True_nIDEs            = NULL; }
+    if (Hit_True_MarleyIndex     ) { delete Hit_True_MarleyIndex     ; Hit_True_MarleyIndex      = NULL; }
 
-    delete PDS_OpHit_OpChannel      ; PDS_OpHit_OpChannel       = NULL;
-    delete PDS_OpHit_X              ; PDS_OpHit_X               = NULL;
-    delete PDS_OpHit_Y              ; PDS_OpHit_Y               = NULL;
-    delete PDS_OpHit_Z              ; PDS_OpHit_Z               = NULL;
-    delete PDS_OpHit_PeakTimeAbs    ; PDS_OpHit_PeakTimeAbs     = NULL;
-    delete PDS_OpHit_PeakTime       ; PDS_OpHit_PeakTime        = NULL;
-    delete PDS_OpHit_Frame          ; PDS_OpHit_Frame           = NULL;
-    delete PDS_OpHit_Width          ; PDS_OpHit_Width           = NULL;
-    delete PDS_OpHit_Area           ; PDS_OpHit_Area            = NULL;
-    delete PDS_OpHit_Amplitude      ; PDS_OpHit_Amplitude       = NULL;
-    delete PDS_OpHit_PE             ; PDS_OpHit_PE              = NULL;
-    delete PDS_OpHit_FastToTotal    ; PDS_OpHit_FastToTotal     = NULL;
-    delete PDS_OpHit_True_GenType   ; PDS_OpHit_True_GenType    = NULL;
-    delete PDS_OpHit_True_Energy    ; PDS_OpHit_True_Energy     = NULL;
-    delete PDS_OpHit_True_TrackID   ; PDS_OpHit_True_TrackID    = NULL;
-    delete PDS_OpHit_True_GenTypeAll; PDS_OpHit_True_GenTypeAll = NULL;
-    delete PDS_OpHit_True_EnergyAll ; PDS_OpHit_True_EnergyAll  = NULL;
-    delete PDS_OpHit_True_TrackIDAll; PDS_OpHit_True_TrackIDAll = NULL;
-    delete PDS_OpHit_True_IndexAll  ; PDS_OpHit_True_IndexAll   = NULL;
+    if (Hit_AdjM5SADC            ) { delete Hit_AdjM5SADC            ; Hit_AdjM5SADC             = NULL; }
+    if (Hit_AdjM2SADC            ) { delete Hit_AdjM2SADC            ; Hit_AdjM2SADC             = NULL; }
+    if (Hit_AdjM1SADC            ) { delete Hit_AdjM1SADC            ; Hit_AdjM1SADC             = NULL; }
+    if (Hit_AdjP1SADC            ) { delete Hit_AdjP1SADC            ; Hit_AdjP1SADC             = NULL; }
+    if (Hit_AdjP2SADC            ) { delete Hit_AdjP2SADC            ; Hit_AdjP2SADC             = NULL; }
+    if (Hit_AdjP5SADC            ) { delete Hit_AdjP5SADC            ; Hit_AdjP5SADC             = NULL; }
+    if (Hit_AdjM5Chan            ) { delete Hit_AdjM5Chan            ; Hit_AdjM5Chan             = NULL; }
+    if (Hit_AdjM2Chan            ) { delete Hit_AdjM2Chan            ; Hit_AdjM2Chan             = NULL; }
+    if (Hit_AdjM1Chan            ) { delete Hit_AdjM1Chan            ; Hit_AdjM1Chan             = NULL; }
+    if (Hit_AdjP1Chan            ) { delete Hit_AdjP1Chan            ; Hit_AdjP1Chan             = NULL; }
+    if (Hit_AdjP2Chan            ) { delete Hit_AdjP2Chan            ; Hit_AdjP2Chan             = NULL; }
+    if (Hit_AdjP5Chan            ) { delete Hit_AdjP5Chan            ; Hit_AdjP5Chan             = NULL; }
 
-    delete True_VertexChan          ; True_VertexChan           = NULL;
-    delete True_Nu_Type             ; True_Nu_Type              = NULL;
-    delete True_Nu_Lep_Type         ; True_Nu_Lep_Type          = NULL;
-    delete True_Mode                ; True_Mode                 = NULL;
-    delete True_CCNC                ; True_CCNC                 = NULL;
-    delete True_HitNucleon          ; True_HitNucleon           = NULL;
-    delete True_Target              ; True_Target               = NULL;
-    delete True_MarlSample          ; True_MarlSample           = NULL;
-    delete True_MarlTime            ; True_MarlTime             = NULL;
-    delete True_MarlWeight          ; True_MarlWeight           = NULL;
-    delete True_ENu                 ; True_ENu                  = NULL;
-    delete True_ENu_Lep             ; True_ENu_Lep              = NULL;
-    delete True_VertX               ; True_VertX                = NULL;
-    delete True_VertY               ; True_VertY                = NULL;
-    delete True_VertZ               ; True_VertZ                = NULL;
-    delete True_VertexT             ; True_VertexT              = NULL;
-    delete True_Px                  ; True_Px                   = NULL;
-    delete True_Py                  ; True_Py                   = NULL;
-    delete True_Pz                  ; True_Pz                   = NULL;
-    delete True_Dirx                ; True_Dirx                 = NULL;
-    delete True_Diry                ; True_Diry                 = NULL;
-    delete True_Dirz                ; True_Dirz                 = NULL;
-    delete True_Time                ; True_Time                 = NULL;
-                                                               
-    delete True_Bck_Mode            ; True_Bck_Mode             = NULL;
-    delete True_Bck_VertX           ; True_Bck_VertX            = NULL;
-    delete True_Bck_VertY           ; True_Bck_VertY            = NULL;
-    delete True_Bck_VertZ           ; True_Bck_VertZ            = NULL;
-    delete True_Bck_Time            ; True_Bck_Time             = NULL;
-    delete True_Bck_Energy          ; True_Bck_Energy           = NULL;
-    delete True_Bck_PDG             ; True_Bck_PDG              = NULL;
-                                                               
-    delete True_Bck_ModeAll         ; True_Bck_ModeAll          = NULL;
-    delete True_Bck_VertXAll        ; True_Bck_VertXAll         = NULL;
-    delete True_Bck_VertYAll        ; True_Bck_VertYAll         = NULL;
-    delete True_Bck_VertZAll        ; True_Bck_VertZAll         = NULL;
-    delete True_Bck_TimeAll         ; True_Bck_TimeAll          = NULL;
-    delete True_Bck_EndVertXAll     ; True_Bck_EndVertXAll      = NULL;
-    delete True_Bck_EndVertYAll     ; True_Bck_EndVertYAll      = NULL;
-    delete True_Bck_EndVertZAll     ; True_Bck_EndVertZAll      = NULL;
-    delete True_Bck_EndTimeAll      ; True_Bck_EndTimeAll       = NULL;
-    delete True_Bck_EnergyAll       ; True_Bck_EnergyAll        = NULL;
-    delete True_Bck_PDGAll          ; True_Bck_PDGAll           = NULL;
-    delete True_Bck_IDAll           ; True_Bck_IDAll            = NULL;
+    if (PDS_Flash_FlashID        ) { delete PDS_Flash_FlashID        ; PDS_Flash_FlashID         = NULL; }
+    if (PDS_Flash_YCenter        ) { delete PDS_Flash_YCenter        ; PDS_Flash_YCenter         = NULL; }
+    if (PDS_Flash_ZCenter        ) { delete PDS_Flash_ZCenter        ; PDS_Flash_ZCenter         = NULL; }
+    if (PDS_Flash_YWidth         ) { delete PDS_Flash_YWidth         ; PDS_Flash_YWidth          = NULL; }
+    if (PDS_Flash_ZWidth         ) { delete PDS_Flash_ZWidth         ; PDS_Flash_ZWidth          = NULL; }
+    if (PDS_Flash_Time           ) { delete PDS_Flash_Time           ; PDS_Flash_Time            = NULL; }
+    if (PDS_Flash_TimeWidth      ) { delete PDS_Flash_TimeWidth      ; PDS_Flash_TimeWidth       = NULL; }
+    if (PDS_Flash_TotalPE        ) { delete PDS_Flash_TotalPE        ; PDS_Flash_TotalPE         = NULL; }
+    if (PDS_Flash_True_Distance  ) { delete PDS_Flash_True_Distance  ; PDS_Flash_True_Distance   = NULL; }
+    if (PDS_Flash_True_GenType   ) { delete PDS_Flash_True_GenType   ; PDS_Flash_True_GenType    = NULL; }
+
+    if (PDS_OpHit_OpChannel      ) { delete PDS_OpHit_OpChannel      ; PDS_OpHit_OpChannel       = NULL; }
+    if (PDS_OpHit_X              ) { delete PDS_OpHit_X              ; PDS_OpHit_X               = NULL; }
+    if (PDS_OpHit_Y              ) { delete PDS_OpHit_Y              ; PDS_OpHit_Y               = NULL; }
+    if (PDS_OpHit_Z              ) { delete PDS_OpHit_Z              ; PDS_OpHit_Z               = NULL; }
+    if (PDS_OpHit_PeakTimeAbs    ) { delete PDS_OpHit_PeakTimeAbs    ; PDS_OpHit_PeakTimeAbs     = NULL; }
+    if (PDS_OpHit_PeakTime       ) { delete PDS_OpHit_PeakTime       ; PDS_OpHit_PeakTime        = NULL; }
+    if (PDS_OpHit_Frame          ) { delete PDS_OpHit_Frame          ; PDS_OpHit_Frame           = NULL; }
+    if (PDS_OpHit_Width          ) { delete PDS_OpHit_Width          ; PDS_OpHit_Width           = NULL; }
+    if (PDS_OpHit_Area           ) { delete PDS_OpHit_Area           ; PDS_OpHit_Area            = NULL; }
+    if (PDS_OpHit_Amplitude      ) { delete PDS_OpHit_Amplitude      ; PDS_OpHit_Amplitude       = NULL; }
+    if (PDS_OpHit_PE             ) { delete PDS_OpHit_PE             ; PDS_OpHit_PE              = NULL; }
+    if (PDS_OpHit_FastToTotal    ) { delete PDS_OpHit_FastToTotal    ; PDS_OpHit_FastToTotal     = NULL; }
+    if (PDS_OpHit_True_GenType   ) { delete PDS_OpHit_True_GenType   ; PDS_OpHit_True_GenType    = NULL; }
+    if (PDS_OpHit_True_Energy    ) { delete PDS_OpHit_True_Energy    ; PDS_OpHit_True_Energy     = NULL; }
+    if (PDS_OpHit_True_TrackID   ) { delete PDS_OpHit_True_TrackID   ; PDS_OpHit_True_TrackID    = NULL; }
+    if (PDS_OpHit_True_GenTypeAll) { delete PDS_OpHit_True_GenTypeAll; PDS_OpHit_True_GenTypeAll = NULL; }
+    if (PDS_OpHit_True_EnergyAll ) { delete PDS_OpHit_True_EnergyAll ; PDS_OpHit_True_EnergyAll  = NULL; }
+    if (PDS_OpHit_True_TrackIDAll) { delete PDS_OpHit_True_TrackIDAll; PDS_OpHit_True_TrackIDAll = NULL; }
+    if (PDS_OpHit_True_IndexAll  ) { delete PDS_OpHit_True_IndexAll  ; PDS_OpHit_True_IndexAll   = NULL; }
     
-    if (f_Input) f_Input->Close();
+    if (True_VertexChan          ) { delete True_VertexChan          ; True_VertexChan           = NULL; }
+    if (True_Nu_Type             ) { delete True_Nu_Type             ; True_Nu_Type              = NULL; }
+    if (True_Nu_Lep_Type         ) { delete True_Nu_Lep_Type         ; True_Nu_Lep_Type          = NULL; }
+    if (True_Mode                ) { delete True_Mode                ; True_Mode                 = NULL; }
+    if (True_CCNC                ) { delete True_CCNC                ; True_CCNC                 = NULL; }
+    if (True_HitNucleon          ) { delete True_HitNucleon          ; True_HitNucleon           = NULL; }
+    if (True_Target              ) { delete True_Target              ; True_Target               = NULL; }
+    if (True_MarlSample          ) { delete True_MarlSample          ; True_MarlSample           = NULL; }
+    if (True_MarlTime            ) { delete True_MarlTime            ; True_MarlTime             = NULL; }
+    if (True_MarlWeight          ) { delete True_MarlWeight          ; True_MarlWeight           = NULL; }
+    if (True_ENu                 ) { delete True_ENu                 ; True_ENu                  = NULL; }
+    if (True_ENu_Lep             ) { delete True_ENu_Lep             ; True_ENu_Lep              = NULL; }
+    if (True_VertX               ) { delete True_VertX               ; True_VertX                = NULL; }
+    if (True_VertY               ) { delete True_VertY               ; True_VertY                = NULL; }
+    if (True_VertZ               ) { delete True_VertZ               ; True_VertZ                = NULL; }
+    if (True_VertexT             ) { delete True_VertexT             ; True_VertexT              = NULL; }
+    if (True_Px                  ) { delete True_Px                  ; True_Px                   = NULL; }
+    if (True_Py                  ) { delete True_Py                  ; True_Py                   = NULL; }
+    if (True_Pz                  ) { delete True_Pz                  ; True_Pz                   = NULL; }
+    if (True_Dirx                ) { delete True_Dirx                ; True_Dirx                 = NULL; }
+    if (True_Diry                ) { delete True_Diry                ; True_Diry                 = NULL; }
+    if (True_Dirz                ) { delete True_Dirz                ; True_Dirz                 = NULL; }
+    if (True_Time                ) { delete True_Time                ; True_Time                 = NULL; }
 
+    if (True_Bck_Mode            ) { delete True_Bck_Mode            ; True_Bck_Mode             = NULL; }
+    if (True_Bck_VertX           ) { delete True_Bck_VertX           ; True_Bck_VertX            = NULL; }
+    if (True_Bck_VertY           ) { delete True_Bck_VertY           ; True_Bck_VertY            = NULL; }
+    if (True_Bck_VertZ           ) { delete True_Bck_VertZ           ; True_Bck_VertZ            = NULL; }
+    if (True_Bck_Time            ) { delete True_Bck_Time            ; True_Bck_Time             = NULL; }
+    if (True_Bck_Energy          ) { delete True_Bck_Energy          ; True_Bck_Energy           = NULL; }
+    if (True_Bck_PDG             ) { delete True_Bck_PDG             ; True_Bck_PDG              = NULL; }
+
+    if (True_Bck_ModeAll         ) { delete True_Bck_ModeAll         ; True_Bck_ModeAll          = NULL; }
+    if (True_Bck_VertXAll        ) { delete True_Bck_VertXAll        ; True_Bck_VertXAll         = NULL; }
+    if (True_Bck_VertYAll        ) { delete True_Bck_VertYAll        ; True_Bck_VertYAll         = NULL; }
+    if (True_Bck_VertZAll        ) { delete True_Bck_VertZAll        ; True_Bck_VertZAll         = NULL; }
+    if (True_Bck_TimeAll         ) { delete True_Bck_TimeAll         ; True_Bck_TimeAll          = NULL; }
+    if (True_Bck_EndVertXAll     ) { delete True_Bck_EndVertXAll     ; True_Bck_EndVertXAll      = NULL; }
+    if (True_Bck_EndVertYAll     ) { delete True_Bck_EndVertYAll     ; True_Bck_EndVertYAll      = NULL; }
+    if (True_Bck_EndVertZAll     ) { delete True_Bck_EndVertZAll     ; True_Bck_EndVertZAll      = NULL; }
+    if (True_Bck_EndTimeAll      ) { delete True_Bck_EndTimeAll      ; True_Bck_EndTimeAll       = NULL; }
+    if (True_Bck_EnergyAll       ) { delete True_Bck_EnergyAll       ; True_Bck_EnergyAll        = NULL; }
+    if (True_Bck_PDGAll          ) { delete True_Bck_PDGAll          ; True_Bck_PDGAll           = NULL; }
+    if (True_Bck_IDAll           ) { delete True_Bck_IDAll           ; True_Bck_IDAll            = NULL; }
+  };
+    
+  ~InputManager(){
+    ResetVariables();
+    if (f_Input) f_Input->Close();
   };
   
   InputManager():
@@ -407,7 +550,57 @@ public:
     True_Bck_PDGAll          (NULL),
     True_Bck_IDAll           (NULL){};
   
-  int         GetEntries  ()                       const { return t_Input->GetEntries(); };
+  int GetEntries() {
+    int return_val = t_Input->GetEntries();
+    ResetVariables();
+    InstanciateVariables();
+    True_VertexChan ->push_back(VertexChan );
+    True_Nu_Type    ->push_back(Nu_Type    );
+    True_Nu_Lep_Type->push_back(Nu_Lep_Type);
+    True_Mode       ->push_back(Mode       );
+    True_CCNC       ->push_back(CCNC       );
+    True_HitNucleon ->push_back(HitNucleon );
+    True_Target     ->push_back(Target     );
+    True_MarlSample ->push_back(MarlSample );
+    True_MarlTime   ->push_back(MarlTime   );
+    True_MarlWeight ->push_back(MarlWeight );
+    True_ENu        ->push_back(ENu        );
+    True_ENu_Lep    ->push_back(ENu_Lep    );
+    True_VertX      ->push_back(VertX      );
+    True_VertY      ->push_back(VertY      );
+    True_VertZ      ->push_back(VertZ      );
+    True_VertexT    ->push_back(VertexT    );
+    True_Px         ->push_back(Px         );
+    True_Py         ->push_back(Py         );
+    True_Pz         ->push_back(Pz         );
+    for (int i=0; i<NColHit; ++i) { 
+      Hit_View        ->push_back(HitView           [i]);
+      Hit_Size        ->push_back(HitSize           [i]);
+      Hit_TPC         ->push_back(HitTPC            [i]);
+      Hit_Chan        ->push_back(HitChan           [i]);   
+      Hit_Time        ->push_back(HitTime           [i]);
+      Hit_RMS         ->push_back(HitRMS            [i]);
+      Hit_SADC        ->push_back(HitSADC           [i]);
+      Hit_Int         ->push_back(HitInt            [i]);
+      Hit_Peak        ->push_back(HitPeak           [i]);
+      Hit_True_GenType->push_back(GenType           [i]);
+      Hit_Time        ->push_back(NCorrespondingIDEs[i]);
+      Hit_True_Energy ->push_back(Hit_Energy        [i]);
+      Hit_True_nElec  ->push_back(Hit_NumElectrons  [i]);
+      Hit_True_X      ->push_back(Hit_X             [i]);
+      Hit_True_Y      ->push_back(Hit_Y             [i]);
+      Hit_True_Z      ->push_back(Hit_Z             [i]);
+      Hit_X_start     ->push_back(Hit_X             [i]);
+      Hit_Y_start     ->push_back(Hit_Y             [i]);
+      Hit_Z_start     ->push_back(Hit_Z             [i]);
+      Hit_X_end       ->push_back(Hit_X             [i]);
+      Hit_Y_end       ->push_back(Hit_Y             [i]);
+      Hit_Z_end       ->push_back(Hit_Z             [i]);
+      
+    }
+    return return_val;
+    
+  };
   void        GetEntry    (const int i=0)                { t_Input->GetEntry(i); };
   std::string GetInputFile()                       const { return filename; };
   std::string GetInputTree()                       const { return treename; };
@@ -434,139 +627,47 @@ public:
     }
     
     
-    t_Input->SetBranchAddress("Run"       , &Run       );
-    t_Input->SetBranchAddress("SubRun"    , &SubRun    );
-    t_Input->SetBranchAddress("Event"     , &Event     );
-    t_Input->SetBranchAddress("NTotHit"   , &NTotHit   );
-    t_Input->SetBranchAddress("NColHit"   , &NColHit   );
-    t_Input->SetBranchAddress("NIndHit"   , &NIndHit   );
-    t_Input->SetBranchAddress("NHitNoBT"  , &NHitNoBT  );
-    t_Input->SetBranchAddress("NFlash"    , &NFlash    );
-    t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
-
-    t_Input->SetBranchAddress("Hit_View"                 , &Hit_View                 );
-    t_Input->SetBranchAddress("Hit_Size"                 , &Hit_Size                 );
-    t_Input->SetBranchAddress("Hit_TPC"                  , &Hit_TPC                  );
-    t_Input->SetBranchAddress("Hit_Chan"                 , &Hit_Chan                 );
-    t_Input->SetBranchAddress("Hit_X_start"              , &Hit_X_start              );
-    t_Input->SetBranchAddress("Hit_Y_start"              , &Hit_Y_start              );
-    t_Input->SetBranchAddress("Hit_Z_start"              , &Hit_Z_start              );
-    t_Input->SetBranchAddress("Hit_X_end"                , &Hit_X_end                );
-    t_Input->SetBranchAddress("Hit_Y_end"                , &Hit_Y_end                );
-    t_Input->SetBranchAddress("Hit_Z_end"                , &Hit_Z_end                );
-    t_Input->SetBranchAddress("Hit_Time"                 , &Hit_Time                 );
-    t_Input->SetBranchAddress("Hit_RMS"                  , &Hit_RMS                  );
-    t_Input->SetBranchAddress("Hit_SADC"                 , &Hit_SADC                 );
-    t_Input->SetBranchAddress("Hit_Int"                  , &Hit_Int                  );
-    t_Input->SetBranchAddress("Hit_Peak"                 , &Hit_Peak                 );
-    t_Input->SetBranchAddress("Hit_True_GenType"         , &Hit_True_GenType         );
-    t_Input->SetBranchAddress("Hit_True_MainTrID"        , &Hit_True_MainTrID        );
-    t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &Hit_True_EvEnergy        );
-    t_Input->SetBranchAddress("Hit_True_X"               , &Hit_True_X               );
-    t_Input->SetBranchAddress("Hit_True_Y"               , &Hit_True_Y               );
-    t_Input->SetBranchAddress("Hit_True_Z"               , &Hit_True_Z               );
-    t_Input->SetBranchAddress("Hit_True_Energy"          , &Hit_True_Energy          );
-    t_Input->SetBranchAddress("Hit_True_nElec"           , &Hit_True_nElec           );
-    t_Input->SetBranchAddress("Hit_True_nIDEs"           , &Hit_True_nIDEs           );
-    if(t_Input->GetListOfBranches()->FindObject("Hit_True_MarleyIndex")) {
-      t_Input->SetBranchAddress("Hit_True_MarleyIndex", &Hit_True_MarleyIndex);
-    } else {
-      std::cout << "Hit_True_MarleyIndex branch doesn't exist, assigning NULL for this vector!" << std::endl;      
-      Hit_True_MarleyIndex=NULL;
-    }
-
-    // if(MyTree->GetBranch("SomeBranchName")) {
-    //   MyTree->SetBranchAddress("SomeBranchName", &SomeVabiable);
-    // }
-    t_Input->SetBranchAddress("Hit_AdjM5SADC"            , &Hit_AdjM5SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM2SADC"            , &Hit_AdjM2SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM1SADC"            , &Hit_AdjM1SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP1SADC"            , &Hit_AdjP1SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP2SADC"            , &Hit_AdjP2SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP5SADC"            , &Hit_AdjP5SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM5Chan"            , &Hit_AdjM5Chan            );
-    t_Input->SetBranchAddress("Hit_AdjM2Chan"            , &Hit_AdjM2Chan            );
-    t_Input->SetBranchAddress("Hit_AdjM1Chan"            , &Hit_AdjM1Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP1Chan"            , &Hit_AdjP1Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP2Chan"            , &Hit_AdjP2Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP5Chan"            , &Hit_AdjP5Chan            );
+    t_Input->SetBranchAddress("Run"                 , &Run              );
+    t_Input->SetBranchAddress("SubRun"              , &SubRun           );
+    t_Input->SetBranchAddress("Event"               , &Event            );
+    t_Input->SetBranchAddress("NTotHits"            , &NTotHit          );
+    t_Input->SetBranchAddress("NColHits"            , &NColHit          );
+    t_Input->SetBranchAddress("NIndHits"            , &NIndHit          );
+    t_Input->SetBranchAddress("nHitsNotBackTracked" , &NHitNoBT         );
+    t_Input->SetBranchAddress("HitView"             , HitView           );
+    t_Input->SetBranchAddress("HitSize"             , HitSize           );
+    t_Input->SetBranchAddress("HitTPC"              , HitTPC            );
+    t_Input->SetBranchAddress("HitChan"             , HitChan           );
+    t_Input->SetBranchAddress("HitTime"             , HitTime           );
+    t_Input->SetBranchAddress("HitRMS"              , HitRMS            );
+    t_Input->SetBranchAddress("HitSADC"             , HitSADC           );
+    t_Input->SetBranchAddress("HitInt"              , HitInt            );
+    t_Input->SetBranchAddress("HitPeak"             , HitPeak           );
+    t_Input->SetBranchAddress("GenType"             , GenType           );
+    t_Input->SetBranchAddress("NCorrespondingIDEs"  , NCorrespondingIDEs);
+    t_Input->SetBranchAddress("Hit_X"               , Hit_X             );
+    t_Input->SetBranchAddress("Hit_Y"               , Hit_Y             );
+    t_Input->SetBranchAddress("Hit_Z"               , Hit_Z             );
+    t_Input->SetBranchAddress("Hit_Energy"          , Hit_Energy        );
+    t_Input->SetBranchAddress("Hit_NumElectrons"    , Hit_NumElectrons  );
                                                                                      
-    t_Input->SetBranchAddress("PDS_Flash_FlashID"        , &PDS_Flash_FlashID        );
-    t_Input->SetBranchAddress("PDS_Flash_YCenter"        , &PDS_Flash_YCenter        );
-    t_Input->SetBranchAddress("PDS_Flash_ZCenter"        , &PDS_Flash_ZCenter        );
-    t_Input->SetBranchAddress("PDS_Flash_YWidth"         , &PDS_Flash_YWidth         );
-    t_Input->SetBranchAddress("PDS_Flash_ZWidth"         , &PDS_Flash_ZWidth         );
-    t_Input->SetBranchAddress("PDS_Flash_Time"           , &PDS_Flash_Time           );
-    t_Input->SetBranchAddress("PDS_Flash_TimeWidth"      , &PDS_Flash_TimeWidth      );
-    t_Input->SetBranchAddress("PDS_Flash_TotalPE"        , &PDS_Flash_TotalPE        );
-    t_Input->SetBranchAddress("PDS_Flash_True_Distance"  , &PDS_Flash_True_Distance  );
-    t_Input->SetBranchAddress("PDS_Flash_True_GenType"   , &PDS_Flash_True_GenType   );
-                                                                                     
-    t_Input->SetBranchAddress("PDS_OpHit_OpChannel"      , &PDS_OpHit_OpChannel      );
-    t_Input->SetBranchAddress("PDS_OpHit_X"              , &PDS_OpHit_X              );
-    t_Input->SetBranchAddress("PDS_OpHit_Y"              , &PDS_OpHit_Y              );
-    t_Input->SetBranchAddress("PDS_OpHit_Z"              , &PDS_OpHit_Z              );
-    t_Input->SetBranchAddress("PDS_OpHit_PeakTimeAbs"    , &PDS_OpHit_PeakTimeAbs    );
-    t_Input->SetBranchAddress("PDS_OpHit_PeakTime"       , &PDS_OpHit_PeakTime       );
-    t_Input->SetBranchAddress("PDS_OpHit_Frame"          , &PDS_OpHit_Frame          );
-    t_Input->SetBranchAddress("PDS_OpHit_Width"          , &PDS_OpHit_Width          );
-    t_Input->SetBranchAddress("PDS_OpHit_Area"           , &PDS_OpHit_Area           );
-    t_Input->SetBranchAddress("PDS_OpHit_Amplitude"      , &PDS_OpHit_Amplitude      );
-    t_Input->SetBranchAddress("PDS_OpHit_PE"             , &PDS_OpHit_PE             );
-    t_Input->SetBranchAddress("PDS_OpHit_FastToTotal"    , &PDS_OpHit_FastToTotal    );
-    t_Input->SetBranchAddress("PDS_OpHit_True_GenType"   , &PDS_OpHit_True_GenType   );
-    t_Input->SetBranchAddress("PDS_OpHit_True_Energy"    , &PDS_OpHit_True_Energy    );
-    t_Input->SetBranchAddress("PDS_OpHit_True_TrackID"   , &PDS_OpHit_True_TrackID   );
-    t_Input->SetBranchAddress("PDS_OpHit_True_GenTypeAll", &PDS_OpHit_True_GenTypeAll);
-    t_Input->SetBranchAddress("PDS_OpHit_True_EnergyAll" , &PDS_OpHit_True_EnergyAll );
-    t_Input->SetBranchAddress("PDS_OpHit_True_TrackIDAll", &PDS_OpHit_True_TrackIDAll);
-    t_Input->SetBranchAddress("PDS_OpHit_True_IndexAll"  , &PDS_OpHit_True_IndexAll  );
-                                                                                     
-    t_Input->SetBranchAddress("True_VertexChan"          , &True_VertexChan          );
-    t_Input->SetBranchAddress("True_Nu_Type"             , &True_Nu_Type             );
-    t_Input->SetBranchAddress("True_Nu_Lep_Type"         , &True_Nu_Lep_Type         );
-    t_Input->SetBranchAddress("True_Mode"                , &True_Mode                );
-    t_Input->SetBranchAddress("True_CCNC"                , &True_CCNC                );
-    t_Input->SetBranchAddress("True_HitNucleon"          , &True_HitNucleon          );
-    t_Input->SetBranchAddress("True_Target"              , &True_Target              );
-    t_Input->SetBranchAddress("True_MarlSample"          , &True_MarlSample          );
-    t_Input->SetBranchAddress("True_MarlTime"            , &True_MarlTime            );
-    t_Input->SetBranchAddress("True_MarlWeight"          , &True_MarlWeight          );
-    t_Input->SetBranchAddress("True_ENu"                 , &True_ENu                 );
-    t_Input->SetBranchAddress("True_ENu_Lep"             , &True_ENu_Lep             );
-    t_Input->SetBranchAddress("True_VertX"               , &True_VertX               );
-    t_Input->SetBranchAddress("True_VertY"               , &True_VertY               );
-    t_Input->SetBranchAddress("True_VertZ"               , &True_VertZ               );
-    t_Input->SetBranchAddress("True_VertexT"             , &True_VertexT             );
-    t_Input->SetBranchAddress("True_Px"                  , &True_Px                  );
-    t_Input->SetBranchAddress("True_Py"                  , &True_Py                  );
-    t_Input->SetBranchAddress("True_Pz"                  , &True_Pz                  );
-    t_Input->SetBranchAddress("True_Dirx"                , &True_Dirx                );
-    t_Input->SetBranchAddress("True_Diry"                , &True_Diry                );
-    t_Input->SetBranchAddress("True_Dirz"                , &True_Dirz                );
-    t_Input->SetBranchAddress("True_Time"                , &True_Time                );
-    
-    t_Input->SetBranchAddress("True_Bck_Mode"            , &True_Bck_Mode            );
-    t_Input->SetBranchAddress("True_Bck_VertX"           , &True_Bck_VertX           );
-    t_Input->SetBranchAddress("True_Bck_VertY"           , &True_Bck_VertY           );
-    t_Input->SetBranchAddress("True_Bck_VertZ"           , &True_Bck_VertZ           );
-    t_Input->SetBranchAddress("True_Bck_Time"            , &True_Bck_Time            );
-    t_Input->SetBranchAddress("True_Bck_Energy"          , &True_Bck_Energy          );
-    t_Input->SetBranchAddress("True_Bck_PDG"             , &True_Bck_PDG             );
-
-    t_Input->SetBranchAddress("True_Bck_ModeAll"         , &True_Bck_ModeAll         );
-    t_Input->SetBranchAddress("True_Bck_VertXAll"        , &True_Bck_VertXAll        );
-    t_Input->SetBranchAddress("True_Bck_VertYAll"        , &True_Bck_VertYAll        );
-    t_Input->SetBranchAddress("True_Bck_VertZAll"        , &True_Bck_VertZAll        );
-    t_Input->SetBranchAddress("True_Bck_TimeAll"         , &True_Bck_TimeAll         );
-    t_Input->SetBranchAddress("True_Bck_EndVertXAll"     , &True_Bck_EndVertXAll     );
-    t_Input->SetBranchAddress("True_Bck_EndVertYAll"     , &True_Bck_EndVertYAll     );
-    t_Input->SetBranchAddress("True_Bck_EndVertZAll"     , &True_Bck_EndVertZAll     );
-    t_Input->SetBranchAddress("True_Bck_EndTimeAll"      , &True_Bck_EndTimeAll      );
-    t_Input->SetBranchAddress("True_Bck_EnergyAll"       , &True_Bck_EnergyAll       );
-    t_Input->SetBranchAddress("True_Bck_PDGAll"          , &True_Bck_PDGAll          );
-    t_Input->SetBranchAddress("True_Bck_IDAll"           , &True_Bck_IDAll           );
-    
+    t_Input->SetBranchAddress("VertexChan"          , &True_VertexChan  );
+    t_Input->SetBranchAddress("Nu_Type"             , &True_Nu_Type     );
+    t_Input->SetBranchAddress("Nu_Lep_Type"         , &True_Nu_Lep_Type );
+    t_Input->SetBranchAddress("Mode"                , &True_Mode        );
+    t_Input->SetBranchAddress("CCNC"                , &True_CCNC        );
+    t_Input->SetBranchAddress("HitNucleon"          , &True_HitNucleon  );
+    t_Input->SetBranchAddress("Target"              , &True_Target      );
+    t_Input->SetBranchAddress("MarlSample"          , &True_MarlSample  );
+    t_Input->SetBranchAddress("MarlTime"            , &True_MarlTime    );
+    t_Input->SetBranchAddress("MarlWeight"          , &True_MarlWeight  );
+    t_Input->SetBranchAddress("ENu"                 , &True_ENu         );
+    t_Input->SetBranchAddress("ENu_Lep"             , &True_ENu_Lep     );
+    t_Input->SetBranchAddress("VertX"               , &True_VertX       );
+    t_Input->SetBranchAddress("VertY"               , &True_VertY       );
+    t_Input->SetBranchAddress("VertZ"               , &True_VertZ       );
+    t_Input->SetBranchAddress("VertexT"             , &True_VertexT     );
+        
     t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
     t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
     t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
