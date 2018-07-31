@@ -1,5 +1,6 @@
 #include "HitSimplePlot.hh"
 
+#include <unistd.h>
 
 int main(int argc, char** argv){
   int opt;

@@ -13,6 +13,7 @@
 #include "TROOT.h"
 
 #include "Clustering.hh"
+#include <unistd.h>
 
 std::map<int,double> map_TypeToWeight;
 

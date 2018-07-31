@@ -87,6 +87,7 @@ void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
       }
 
       i = i + channelCount;
+      ///
       std::sort(vec_TempHit.begin(), vec_TempHit.end(), OpticalHitOrderedInSpacePtr);
       for(size_t j = 0; j < vec_TempHit.size()-1; j++){
     

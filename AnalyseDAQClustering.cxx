@@ -1,6 +1,7 @@
 #include <algorithm>    // std::min_element, std::max_element
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 
 #include "Helper.h"
