@@ -176,10 +176,10 @@ public:
   double VertX         ;
   double VertY         ;
   double VertZ         ;
+  double VertexT       ;
   double Px            ;
   double Py            ;
   double Pz            ;
-  int    VertexT       ;
 
   void InstanciateVariables(){
     Hit_View                  = new std::vector<int>();
@@ -206,7 +206,7 @@ public:
     Hit_True_Energy           = new std::vector<float>();
     Hit_True_nElec            = new std::vector<float>();
     Hit_True_nIDEs            = new std::vector<int>();
-    Hit_True_MarleyIndex      = new std::vector<int>();
+    //Hit_True_MarleyIndex      = new std::vector<int>();
     Hit_AdjM5SADC             = new std::vector<int>();
     Hit_AdjM2SADC             = new std::vector<int>();
     Hit_AdjM1SADC             = new std::vector<int>();
@@ -552,6 +552,11 @@ public:
   
   int GetEntries() {
     int return_val = t_Input->GetEntries();
+    return return_val;
+  };
+  
+  void GetEntry (const int i=0) {
+    t_Input->GetEntry(i);
     ResetVariables();
     InstanciateVariables();
     True_VertexChan ->push_back(VertexChan );
@@ -573,35 +578,38 @@ public:
     True_Px         ->push_back(Px         );
     True_Py         ->push_back(Py         );
     True_Pz         ->push_back(Pz         );
-    for (int i=0; i<NColHit; ++i) { 
-      Hit_View        ->push_back(HitView           [i]);
-      Hit_Size        ->push_back(HitSize           [i]);
-      Hit_TPC         ->push_back(HitTPC            [i]);
-      Hit_Chan        ->push_back(HitChan           [i]);   
-      Hit_Time        ->push_back(HitTime           [i]);
-      Hit_RMS         ->push_back(HitRMS            [i]);
-      Hit_SADC        ->push_back(HitSADC           [i]);
-      Hit_Int         ->push_back(HitInt            [i]);
-      Hit_Peak        ->push_back(HitPeak           [i]);
-      Hit_True_GenType->push_back(GenType           [i]);
-      Hit_Time        ->push_back(NCorrespondingIDEs[i]);
-      Hit_True_Energy ->push_back(Hit_Energy        [i]);
-      Hit_True_nElec  ->push_back(Hit_NumElectrons  [i]);
-      Hit_True_X      ->push_back(Hit_X             [i]);
-      Hit_True_Y      ->push_back(Hit_Y             [i]);
-      Hit_True_Z      ->push_back(Hit_Z             [i]);
-      Hit_X_start     ->push_back(Hit_X             [i]);
-      Hit_Y_start     ->push_back(Hit_Y             [i]);
-      Hit_Z_start     ->push_back(Hit_Z             [i]);
-      Hit_X_end       ->push_back(Hit_X             [i]);
-      Hit_Y_end       ->push_back(Hit_Y             [i]);
-      Hit_Z_end       ->push_back(Hit_Z             [i]);
-      
+    True_Dirx       ->push_back(0          );
+    True_Diry       ->push_back(0          );
+    True_Dirz       ->push_back(0          );
+
+    for (int i=0; i<NColHit; ++i) {
+      Hit_View         ->push_back(HitView           [i]);
+      Hit_Size         ->push_back(HitSize           [i]);
+      Hit_TPC          ->push_back(HitTPC            [i]);
+      Hit_Chan         ->push_back(HitChan           [i]);   
+      Hit_Time         ->push_back(HitTime           [i]);
+      Hit_RMS          ->push_back(HitRMS            [i]);
+      Hit_SADC         ->push_back(HitSADC           [i]);
+      Hit_Int          ->push_back(HitInt            [i]);
+      Hit_Peak         ->push_back(HitPeak           [i]);
+      Hit_True_GenType ->push_back(GenType           [i]);
+      Hit_Time         ->push_back(NCorrespondingIDEs[i]);
+      Hit_True_Energy  ->push_back(Hit_Energy        [i]);
+      Hit_True_EvEnergy->push_back(Hit_Energy        [i]);
+      Hit_True_MainTrID->push_back(0);
+      Hit_True_nElec   ->push_back(Hit_NumElectrons  [i]);
+      Hit_True_X       ->push_back(Hit_X             [i]);
+      Hit_True_Y       ->push_back(Hit_Y             [i]);
+      Hit_True_Z       ->push_back(Hit_Z             [i]);
+      Hit_X_start      ->push_back(Hit_X             [i]);
+      Hit_Y_start      ->push_back(Hit_Y             [i]);
+      Hit_Z_start      ->push_back(Hit_Z             [i]);
+      Hit_X_end        ->push_back(Hit_X             [i]);
+      Hit_Y_end        ->push_back(Hit_Y             [i]);
+      Hit_Z_end        ->push_back(Hit_Z             [i]);
     }
-    return return_val;
     
   };
-  void        GetEntry    (const int i=0)                { t_Input->GetEntry(i); };
   std::string GetInputFile()                       const { return filename; };
   std::string GetInputTree()                       const { return treename; };
   void        SetInputFile(const std::string s="")       { filename=s; };
@@ -651,22 +659,22 @@ public:
     t_Input->SetBranchAddress("Hit_Energy"          , Hit_Energy        );
     t_Input->SetBranchAddress("Hit_NumElectrons"    , Hit_NumElectrons  );
                                                                                      
-    t_Input->SetBranchAddress("VertexChan"          , &True_VertexChan  );
-    t_Input->SetBranchAddress("Nu_Type"             , &True_Nu_Type     );
-    t_Input->SetBranchAddress("Nu_Lep_Type"         , &True_Nu_Lep_Type );
-    t_Input->SetBranchAddress("Mode"                , &True_Mode        );
-    t_Input->SetBranchAddress("CCNC"                , &True_CCNC        );
-    t_Input->SetBranchAddress("HitNucleon"          , &True_HitNucleon  );
-    t_Input->SetBranchAddress("Target"              , &True_Target      );
-    t_Input->SetBranchAddress("MarlSample"          , &True_MarlSample  );
-    t_Input->SetBranchAddress("MarlTime"            , &True_MarlTime    );
-    t_Input->SetBranchAddress("MarlWeight"          , &True_MarlWeight  );
-    t_Input->SetBranchAddress("ENu"                 , &True_ENu         );
-    t_Input->SetBranchAddress("ENu_Lep"             , &True_ENu_Lep     );
-    t_Input->SetBranchAddress("VertX"               , &True_VertX       );
-    t_Input->SetBranchAddress("VertY"               , &True_VertY       );
-    t_Input->SetBranchAddress("VertZ"               , &True_VertZ       );
-    t_Input->SetBranchAddress("VertexT"             , &True_VertexT     );
+    t_Input->SetBranchAddress("VertexChan"          , &VertexChan  );
+    t_Input->SetBranchAddress("Nu_Type"             , &Nu_Type     );
+    t_Input->SetBranchAddress("Nu_Lep_Type"         , &Nu_Lep_Type );
+    t_Input->SetBranchAddress("Mode"                , &Mode        );
+    t_Input->SetBranchAddress("CCNC"                , &CCNC        );
+    t_Input->SetBranchAddress("HitNucleon"          , &HitNucleon  );
+    t_Input->SetBranchAddress("Target"              , &Target      );
+    t_Input->SetBranchAddress("MarlSample"          , &MarlSample  );
+    t_Input->SetBranchAddress("MarlTime"            , &MarlTime    );
+    t_Input->SetBranchAddress("MarlWeight"          , &MarlWeight  );
+    t_Input->SetBranchAddress("ENu"                 , &ENu         );
+    t_Input->SetBranchAddress("ENu_Lep"             , &ENu_Lep     );
+    t_Input->SetBranchAddress("VertX"               , &VertX       );
+    t_Input->SetBranchAddress("VertY"               , &VertY       );
+    t_Input->SetBranchAddress("VertZ"               , &VertZ       );
+    t_Input->SetBranchAddress("VertexT"             , &VertexT     );
         
     t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
     t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );

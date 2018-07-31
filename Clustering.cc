@@ -127,13 +127,13 @@ int Clustering::ClusterAll(int inNEvent){
       out_MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
       out_ENu     .push_back((*im.True_ENu)     [MarleyEvent]);
       out_ENu_Lep .push_back((*im.True_ENu_Lep) [MarleyEvent]);
-      out_PosX    .push_back((*im.True_VertX)[MarleyEvent]);
-      out_PosY    .push_back((*im.True_VertY)[MarleyEvent]);
-      out_PosZ    .push_back((*im.True_VertY)[MarleyEvent]);
-      out_PosT    .push_back((*im.True_VertexT)[MarleyEvent]);
-      out_DirX    .push_back((*im.True_Dirx)[MarleyEvent]);
-      out_DirY    .push_back((*im.True_Diry)[MarleyEvent]);
-      out_DirZ    .push_back((*im.True_Dirz)[MarleyEvent]);
+      out_PosX    .push_back((*im.True_VertX)   [MarleyEvent]);
+      out_PosY    .push_back((*im.True_VertY)   [MarleyEvent]);
+      out_PosZ    .push_back((*im.True_VertY)   [MarleyEvent]);
+      out_PosT    .push_back((*im.True_VertexT) [MarleyEvent]);
+      out_DirX    .push_back((*im.True_Dirx)    [MarleyEvent]);
+      out_DirY    .push_back((*im.True_Diry)    [MarleyEvent]);
+      out_DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
     }
     t_Output_TrueInfo->Fill();
     if(!goodEvent) continue;
@@ -146,7 +146,6 @@ int Clustering::ClusterAll(int inNEvent){
       if (im.Hit_True_MarleyIndex != NULL) {
         marley_index=(*im.Hit_True_MarleyIndex)[j];
       }
-      
       vec_WireHit.push_back(new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
                                         (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
                                         (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
