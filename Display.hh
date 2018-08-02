@@ -1,3 +1,7 @@
+#ifndef DISPLAY_HH
+#define DISPLAY_HH
+
+
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -18,3 +22,6 @@ protected:
   TCanvas* c;
   InputManager im;
 };
+
+
+#endif

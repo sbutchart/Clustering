@@ -124,7 +124,7 @@ WireCluster::WireCluster(std::vector<WireHit*>& vec_Hits):
   
 };
 
-void WireCluster::Print() const {
+void WireCluster::Print(const bool printHit) const {
   std::cout << "*************************************" << std::endl;
   std::cout << "StartChan        " << fStartChannel    << std::endl;
   std::cout << "EndChan          " << fEndChannel      << std::endl;
@@ -144,7 +144,8 @@ void WireCluster::Print() const {
   std::cout << "fRecoPosition[0] " << fRecoPosition[0] << std::endl;
   std::cout << "fRecoPosition[1] " << fRecoPosition[1] << std::endl;
   std::cout << "fRecoPosition[2] " << fRecoPosition[2] << std::endl;
-  for(int i = 0; i < fNHits; i++)
-    fHitVector[i]->Print();
+  if(printHit)
+    for(int i = 0; i < fNHits; i++)
+      fHitVector[i]->Print();
   std::cout << "*************************************" << std::endl;
 };

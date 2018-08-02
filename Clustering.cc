@@ -162,7 +162,7 @@ int Clustering::ClusterAll(int inNEvent){
                                           (*im.PDS_OpHit_OpChannel)[j]));
     }
     
-    for(fCurrentConfig=0; fCurrentConfig<fNConfig; ++fCurrentConfig) {
+    for(fCurrentConfig=0; fCurrentConfig<1; ++fCurrentConfig) {
       
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
@@ -218,6 +218,10 @@ int Clustering::ClusterAll(int inNEvent){
     for(int j = 0; j < im.NColHit; j++) {
       delete vec_WireHit[j];
       vec_WireHit[j] = NULL;
+    }
+    for(size_t j = 0; j < vec_OptHit.size(); j++) {
+      delete vec_OptHit[j];
+      vec_OptHit[j] = NULL;
     }
     vec_WireHit.clear();
   }
@@ -322,6 +326,8 @@ void Clustering::FillClusterInfo(WireCluster* clust)
     out_E_deposited += hit->GetTrDepositedE();
   }
   if(clust->GetTriggerFlag() && clust->GetIsSelected()){
+    // std::cout << "EVENT " << out_Event << std::endl;
+    // clust->Print();
     t_Output_ClusteredWireHit->Fill();
     fvec_ClusterCount[fCurrentConfig]++;
   }

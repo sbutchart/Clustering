@@ -1,3 +1,7 @@
+#ifndef EVENTINSPECTOR_HH
+#define EVENTINSPECTOR_HH
+
+
 #include "Helper.h"
 #include "InputManager.h"
 #include <unistd.h>
@@ -97,3 +101,5 @@ public:
 
 
 
+
+#endif

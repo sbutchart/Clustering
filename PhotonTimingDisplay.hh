@@ -1,3 +1,6 @@
+#ifndef PHOTONTIMINGDISPLAY_HH
+#define PHOTONTIMINGDISPLAY_HH
+
 #include "Display.hh"
 #include "TArrow.h"
 #include "TLatex.h"
@@ -35,3 +38,6 @@ private:
   TLatex* energy;
   
 };
+
+
+#endif
