@@ -593,7 +593,6 @@ public:
       Hit_Int          ->push_back(HitInt            [i]);
       Hit_Peak         ->push_back(HitPeak           [i]);
       Hit_True_GenType ->push_back(GenType           [i]);
-      Hit_Time         ->push_back(NCorrespondingIDEs[i]);
       Hit_True_Energy  ->push_back(Hit_Energy        [i]);
       Hit_True_EvEnergy->push_back(Hit_Energy        [i]);
       Hit_True_MainTrID->push_back(0);
