@@ -61,7 +61,7 @@ public:
   void   SetIsSelected  (bool   cIsSelected  ) { fIsSelected   = cIsSelected  ; };
   void   SetFailedCut   (int    cCutN        ) { fCutN         = cCutN        ; };
 
-  void  Print() const;
+  void  Print(const bool printHit=false) const;
 
   friend bool goodClusterHits(const WireCluster*, int);
 
