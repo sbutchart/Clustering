@@ -13,22 +13,24 @@ public:
     fTimeWindow(TimeWindow),
     fMinHitADC(MinHitADC),
     fTimeWindowOpt(TimeWindowOpt),
-    fPositionOpt(PositionOpt){};
+    fPositionOpt(PositionOpt),
+    fBucketSize(0){};
 
   ClusterEngine():
     fChannelWidth(0),
     fTimeWindow(0),
     fMinHitADC(0),
     fTimeWindowOpt(0),
-    fPositionOpt(0){};
-  
+    fPositionOpt(0),
+    fBucketSize(0){};
+
   void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits2(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits3(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
 
   void ClusterOpticalHits (std::vector<OpticalHit*>&, std::vector<OpticalCluster*>&);
   void ClusterOpticalHits2(std::vector<OpticalHit*>&, std::vector<OpticalCluster*>&);
-  
+
   double GetTimeWindow() const { return fTimeWindow; };
   void   SetTimeWindow(double inTimeWindow=1) { fTimeWindow = inTimeWindow; };
 
@@ -40,15 +42,18 @@ public:
 
   double GetPositionOpt() const { return fPositionOpt; };
   void   SetPositionOpt(double inPositionOpt=300) { fPositionOpt=inPositionOpt; };
-    
+
+  double GetBucketSize() const { return fBucketSize; };
+  void   SetBucketSize(double B)  { fBucketSize = B; };
+
   ~ClusterEngine(){};
 private:
-  double fChannelWidth  = 0;
-  double fTimeWindow    = 0;
-  double fMinHitADC     = 0;
-  double fTimeWindowOpt = 0;
-  double fPositionOpt   = 0;
-
+  double fChannelWidth ;
+  double fTimeWindow   ;
+  double fMinHitADC    ;
+  double fTimeWindowOpt;
+  double fPositionOpt  ;
+  double fBucketSize   ;
 public:
 //  ClassDef(ClusterEngine,1)  //Simple event class
 };

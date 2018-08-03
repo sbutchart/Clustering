@@ -8,15 +8,15 @@ void ClusterEngine::ClusterHits2(const std::vector<WireHit*>& vec_Hits,
 {
   vec_Clusters->clear();
   (void) vec_UnusedHits;
-  
+
   if(vec_Hits.size() < 2) return;
   for(size_t i = 0; i < vec_Hits.size()-1; i++){
-    
+
     std::vector<WireHit*> vec_TempHits;
     if(std::abs(vec_Hits[i]->GetHitChan()-vec_Hits[i+1]->GetHitChan())<=fChannelWidth)
     {
       int channelCount = 1;
-      
+
       vec_TempHits.push_back(vec_Hits[i  ]);
       vec_TempHits.push_back(vec_Hits[i+1]);
 
@@ -36,11 +36,11 @@ void ClusterEngine::ClusterHits2(const std::vector<WireHit*>& vec_Hits,
         if(std::abs(vec_TempHits[j]->GetHitTime()-vec_TempHits[j+1]->GetHitTime())<=fTimeWindow)
         {
           int timeCount = 1;
-                                     
+
           vec_TempHits2.push_back(vec_TempHits[j  ]);
           vec_TempHits2.push_back(vec_TempHits[j+1]);
 
-          while((j+timeCount+1)<vec_TempHits.size() && 
+          while((j+timeCount+1)<vec_TempHits.size() &&
                 std::abs(vec_TempHits[j+timeCount]->GetHitTime()-vec_TempHits[j+timeCount+1]->GetHitTime())
                 <=fTimeWindow)
           {
@@ -67,15 +67,15 @@ void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
 
   std::sort(vec_OptHit.begin(), vec_OptHit.end(), OpticalHitOrderedInTimePtr);
   vec_OptCluster.clear();
-  
+
   if(vec_OptHit.size() < 2) return;
   for(size_t i = 0; i < vec_OptHit.size()-1; i++){
-    
+
     std::vector<OpticalHit*> vec_TempHit;
     if(std::abs(vec_OptHit[i]->GetTime()-vec_OptHit[i+1]->GetTime())<=fTimeWindowOpt)
     {
       int channelCount = 1;
-      
+
       vec_TempHit.push_back(vec_OptHit[i  ]);
       vec_TempHit.push_back(vec_OptHit[i+1]);
 
@@ -88,21 +88,45 @@ void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
 
       i = i + channelCount;
       ///
-      std::sort(vec_TempHit.begin(), vec_TempHit.end(), OpticalHitOrderedInSpacePtr);
-      for(size_t j = 0; j < vec_TempHit.size()-1; j++){
-    
+      std::map<OpticalHit*, std::vector<OpticalHit*>> bucket;
+      for (size_t ii = 0; ii < vec_TempHit.size(); ii++){
+          // bucket[vec_TempHit[ii]].push_back(vec_TempHit[0]);
+          for(size_t j = ii; j < vec_TempHit.size(); j++){
+              double time_diff = vec_TempHit[j]->GetTime() -  vec_TempHit[ii]->GetTime();
+              if (time_diff < fBucketSize)
+                  bucket[vec_TempHit[ii]].push_back(vec_TempHit[j]);
+          }
+      }
+      int max_threshold = 0;
+      OpticalHit* optical_hit_idx;
+      for (size_t iii=0; iii<vec_TempHit.size(); iii++){
+          size_t bucket_size = bucket[vec_TempHit[iii]].size();
+          if (bucket_size > max_threshold){
+              max_threshold = bucket_size;
+              optical_hit_idx = vec_TempHit[iii];
+          }
+      }
+
+      //std::sort(vec_TempHit.begin(), vec_TempHit.end(), OpticalHitOrderedInSpacePtr);
+      //if(bucket[optical_hit_idx].size() > 4 )
+      // std::cout << "vec_TempHit " << vec_TempHit.size() << "\t" ;
+      // std::cout << "bucket size " << bucket[optical_hit_idx].size() << std::endl;
+
+      std::sort(bucket[optical_hit_idx].begin(), bucket[optical_hit_idx].end(), OpticalHitOrderedInSpacePtr);
+      for(size_t j = 0; j < bucket[optical_hit_idx].size()-1; j++){
+
         std::vector<OpticalHit*> vec_TempHit2;
-        if(std::abs(vec_TempHit[j]->GetRecoPosition(2)-vec_TempHit[j+1]->GetRecoPosition(2))<=fPositionOpt)
+        if(std::abs(bucket[optical_hit_idx][j]->GetRecoPosition(2)-bucket[optical_hit_idx][j+1]->GetRecoPosition(2))<=fPositionOpt)
         {
           int PosCount = 1;
-      
-          vec_TempHit2.push_back(vec_TempHit[j  ]);
-          vec_TempHit2.push_back(vec_TempHit[j+1]);
 
-          while((j+PosCount+1)<vec_TempHit.size() &&
-                std::abs(vec_TempHit[j+PosCount]->GetRecoPosition(2)-vec_TempHit[j+PosCount+1]->GetRecoPosition(2))<=fPositionOpt)
+          vec_TempHit2.push_back(bucket[optical_hit_idx][j  ]);
+          vec_TempHit2.push_back(bucket[optical_hit_idx][j+1]);
+
+          while((j+PosCount+1)<bucket[optical_hit_idx].size() &&
+                std::abs(bucket[optical_hit_idx][j+PosCount]->GetRecoPosition(2)-bucket[optical_hit_idx][j+PosCount+1]->GetRecoPosition(2))<=fPositionOpt)
           {
-            vec_TempHit2.push_back(vec_TempHit[j + PosCount + 1]);
+            vec_TempHit2.push_back(bucket[optical_hit_idx][j + PosCount + 1]);
             PosCount++;
           }
 
@@ -120,15 +144,15 @@ void ClusterEngine::ClusterOpticalHits2(std::vector<OpticalHit*>& vec_OptHit,
 
   std::sort(vec_OptHit.begin(), vec_OptHit.end(), OpticalHitOrderedInTimePtr);
   vec_OptCluster.clear();
-  
+
   if(vec_OptHit.size() < 2) return;
   for(size_t i = 0; i < vec_OptHit.size()-1; i++){
-    
+
     std::vector<OpticalHit*> vec_TempHit;
     if(std::abs(vec_OptHit[i]->GetTime()-vec_OptHit[i+1]->GetTime())<=fTimeWindowOpt)
     {
       int channelCount = 1;
-      
+
       vec_TempHit.push_back(vec_OptHit[i  ]);
       vec_TempHit.push_back(vec_OptHit[i+1]);
 
@@ -142,12 +166,12 @@ void ClusterEngine::ClusterOpticalHits2(std::vector<OpticalHit*>& vec_OptHit,
       i = i + channelCount;
       std::sort(vec_TempHit.begin(), vec_TempHit.end(), OpticalHitOrderedInSpacePtr);
       for(size_t j = 0; j < vec_TempHit.size()-1; j++){
-    
+
         std::vector<OpticalHit*> vec_TempHit2;
         if(std::abs(vec_TempHit[j]->GetRecoPosition(2)-vec_TempHit[j+1]->GetRecoPosition(2))<=fPositionOpt)
         {
           int PosCount = 1;
-      
+
           vec_TempHit2.push_back(vec_TempHit[j  ]);
           vec_TempHit2.push_back(vec_TempHit[j+1]);
 
@@ -175,13 +199,13 @@ void ClusterEngine::ClusterHits3(const std::vector<WireHit*>& vec_Hits,
   (void) vec_UnusedHits;
   if(vec_Hits.size() < 2) return;
   for(size_t i = 0; i < vec_Hits.size()-1; i++){
-    
+
     std::vector<WireHit*> vec_TempHits;
     if(std::abs(vec_Hits[i]->GetHitChan()-vec_Hits[i+1]->GetHitChan())<=fChannelWidth &&
        std::abs(vec_Hits[i]->GetHitTime()-vec_Hits[i+1]->GetHitTime())<=fTimeWindow)
     {
       int channelCount = 1;
-      
+
       vec_TempHits.push_back(vec_Hits[i  ]);
       vec_TempHits.push_back(vec_Hits[i+1]);
 
@@ -198,7 +222,7 @@ void ClusterEngine::ClusterHits3(const std::vector<WireHit*>& vec_Hits,
       vec_TempHits.clear();
     }
   }
-  
+
 };
 
 
@@ -209,7 +233,7 @@ void ClusterEngine::ClusterHits(const std::vector<WireHit*>& vec_Hits,
 {
   vec_Clusters->clear();
   vec_UnusedHits->clear();
-  
+
   std::vector<WireHit*> LocalHits = vec_Hits;
   std::sort(LocalHits.begin(), LocalHits.end(), WireHitOrderedInSpacePtr);
 
@@ -238,11 +262,11 @@ void ClusterEngine::ClusterHits(const std::vector<WireHit*>& vec_Hits,
          std::find(vec_ClusteredHits.begin(), vec_ClusteredHits.end(), hit2) == vec_ClusteredHits.end())
       {
         hit1InACluster = true;
-        
+
         vec_ClusteredHits.push_back(hit2);
       }
     }
-    
+
     if(hit1InACluster &&
        std::find(vec_ClusteredHits.begin(), vec_ClusteredHits.end(), hit1) == vec_ClusteredHits.end()){
       vec_ClusteredHits.push_back(hit1);
@@ -250,7 +274,7 @@ void ClusterEngine::ClusterHits(const std::vector<WireHit*>& vec_Hits,
     }else{
       vec_UnusedHits->push_back(hit1);
     }
-    
+
   }
 
 };

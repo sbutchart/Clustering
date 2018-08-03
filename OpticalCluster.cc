@@ -8,7 +8,7 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   fType          (0),
   fHitSPE        (0),
   fFirstHitTime  (100000),
-  fLastHitTime   (0),
+  fLastHitTime   (-100000),
   fTimeWidth     (0),
   fHitVector     (),
   fPurity        (){
@@ -37,12 +37,12 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   std::map<int,int> map_marleyevent_number;
   for(size_t i = 0; i < vec_Hits.size(); ++i) {
     fHitVector.push_back(vec_Hits[i]);
-    fHitSPE   += vec_Hits[i]->GetSPE (); 
+    fHitSPE   += vec_Hits[i]->GetSPE ();
     int   chan = vec_Hits[i]->GetChannel();
-    float time = vec_Hits[i]->GetTime(); 
+    float time = vec_Hits[i]->GetTime();
     map_marleyevent_number[vec_Hits[i]->GetMarleyIndex()]++;
     channels.insert(chan);
-    
+
     // if(chan<fStartChannel) fStartChannel=chan;
     // if(chan>fEndChannel)   fEndChannel=chan;
     if(time<fFirstHitTime) fFirstHitTime=time;
@@ -86,7 +86,7 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   fTimeWidth = std::abs(fLastHitTime-fFirstHitTime);
   fNHit = fHitVector.size();
   fNChannel = channels.size();
-  
+
   double maxPur=0;
   int gen=-1;
   for (auto& it:fPurity) {
@@ -99,7 +99,7 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   //CALL THE CLUSTER MARLEY IF THERE ARE MORE THAN TWO MARLEY HITS IN IT.
   if (gen==1) { fType = 1; }
   else        { fType = 0; }
-  
+
 
 };
 

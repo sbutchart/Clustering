@@ -6,7 +6,7 @@ int Clustering::ClusterAll(int inNEvent){
   im.SetInputFile(fInputFileName);
   im.SetInputTree(fInputTreeName);
   im.LoadTree();
-  
+
   f_Output = new TFile(fOutputFileName.c_str(), "RECREATE");
 
   t_Output_ClusteredWireHit = new TTree("ClusteredWireHit", "ClusteredWireHit");
@@ -51,7 +51,7 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredWireHit->Branch("TrPosX",         &out_TrPosX );
   t_Output_ClusteredWireHit->Branch("TrPosY",         &out_TrPosY );
   t_Output_ClusteredWireHit->Branch("TrPosZ",         &out_TrPosZ );
-  
+
   t_Output_ClusteredOpticalHit = new TTree("ClusteredOpticalHit", "ClusteredOpticalHit");
   t_Output_ClusteredOpticalHit->Branch("Config",         &out_Config,         "Config/I"        );
   t_Output_ClusteredOpticalHit->Branch("Cluster",        &out_Cluster,        "Cluster/I"       );
@@ -91,12 +91,12 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_TrueInfo->Branch("DirY",     &out_DirY    );
   t_Output_TrueInfo->Branch("DirZ",     &out_DirZ    );
 
-  
+
   h_ENu_MC      = new TH1D("h_ENu_MC",      "h_ENu_MC",       35,    0, 50  );
   h_MarlTime_MC = new TH1D("h_MarlTime_MC", "h_MarlTime_MC", 100, -0.1, 10.5);
   h_TimeElapsed = new TH1D("h_TimeElapsed", "h_TimeElapsed", 100,    0,  5  );
   h_ENu_MC->Sumw2();
-  
+
   if (inNEvent!=-1) {
     fNEvent = std::min(inNEvent,(int)im.GetEntries());
   } else {
@@ -107,7 +107,7 @@ int Clustering::ClusterAll(int inNEvent){
   TH1I *hNEvents = new TH1I("hNEvents", "hNEvents", 100,0,10e6);
   hNEvents->Fill(fNEvent);
   hNEvents->Write();
-  TH1I *hNConfigs = new TH1I("hNConfigs", "hNConfigs", 50,0,50); 
+  TH1I *hNConfigs = new TH1I("hNConfigs", "hNConfigs", 50,0,50);
   hNConfigs->Fill(fNConfig);
   hNConfigs->Write();
 
@@ -118,9 +118,9 @@ int Clustering::ClusterAll(int inNEvent){
 
   std::map<std::pair<int,int>, std::vector<WireHit*>* >     map_unusedHits;
   std::map<std::pair<int,int>, std::vector<WireCluster*>* > map_clusters;
-  
+
   for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
-    
+
     PrintProgress(iEvent,fNEvent);
     im.GetEntry(iEvent);
     out_Event = im.Event;
@@ -150,7 +150,7 @@ int Clustering::ClusterAll(int inNEvent){
       if (im.Hit_True_MarleyIndex != NULL) {
         marley_index=(*im.Hit_True_MarleyIndex)[j];
       }
-      
+
       vec_WireHit.push_back(new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
                                         (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
                                         (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
@@ -168,12 +168,13 @@ int Clustering::ClusterAll(int inNEvent){
                                           (*im.PDS_OpHit_OpChannel)[j]));
       vec_OptHit.back()->SetMarleyIndex(marley_index);
     }
-    
+
     for(fCurrentConfig=0; fCurrentConfig<fNConfig; ++fCurrentConfig) {
-      
+
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
       fClustEng  ->SetPositionOpt    (300);
+      fClustEng  ->SetBucketSize     (2000);
       fClustEng  ->SetChannelWidth   (fvec_cut_AdjChanTolerance[fCurrentConfig]);
       fClustSelec->SetMinChannel     (fvec_cut_MinChannels     [fCurrentConfig]);
       fClustSelec->SetMinChannelWidth(fvec_cut_MinChanWidth    [fCurrentConfig]);
@@ -191,7 +192,7 @@ int Clustering::ClusterAll(int inNEvent){
         fClustSelec->SetSelectionFlag  (aCluster);
         fTrigger   ->SetTriggerStateFor(aCluster);
       }
-      
+
       h_TimeElapsed->Fill(timeElapsed->RealTime()*1000);
 
       for(size_t i=0; i<vec_UnusedHits->size();++i)
@@ -207,7 +208,7 @@ int Clustering::ClusterAll(int inNEvent){
         std::cout << "----------------------------------------------" << std::endl;
         std::cout << "Config           " << fCurrentConfig            << std::endl;
         std::cout << "nWireClusters    " << vec_Clusters->size()      << std::endl;
-        std::cout << "nOpticalClusters " << vec_OpticalCluster.size() << std::endl;  
+        std::cout << "nOpticalClusters " << vec_OpticalCluster.size() << std::endl;
       }
 
       std::sort(vec_OpticalCluster.begin(), vec_OpticalCluster.end(), OpticalClusterOrderedInTimePtr);
@@ -217,11 +218,11 @@ int Clustering::ClusterAll(int inNEvent){
         delete vec_OpticalCluster[i];
         vec_OpticalCluster[i]=NULL;
       }
-    
+
       delete timeElapsed;
       timeElapsed = NULL;
     }
-      
+
     for(int j = 0; j < im.NColHit; j++) {
       delete vec_WireHit[j];
       vec_WireHit[j] = NULL;
@@ -265,27 +266,27 @@ void Clustering::FillClusterInfo(OpticalCluster* clust)
   out_RecClusterPosX = clust->GetRecoPosition(0);
   out_RecClusterPosY = clust->GetRecoPosition(1);
   out_RecClusterPosZ = clust->GetRecoPosition(2);
-  
+
   if(fPrintLevel == 1 || fPrintLevel > 2)
     clust->Print();
-  
+
   for(auto const& hit : clust->GetHitVector()) {
-    out_PDSHit_GenType  .push_back(hit->GetGenType());  
-    out_PDSHit_X        .push_back(hit->GetRecoPosition(0));  
-    out_PDSHit_Y        .push_back(hit->GetRecoPosition(1));  
-    out_PDSHit_Z        .push_back(hit->GetRecoPosition(2));  
-    out_PDSHit_PeakTime .push_back(hit->GetTime   ());  
+    out_PDSHit_GenType  .push_back(hit->GetGenType());
+    out_PDSHit_X        .push_back(hit->GetRecoPosition(0));
+    out_PDSHit_Y        .push_back(hit->GetRecoPosition(1));
+    out_PDSHit_Z        .push_back(hit->GetRecoPosition(2));
+    out_PDSHit_PeakTime .push_back(hit->GetTime   ());
     out_PDSHit_Width    .push_back(hit->GetWidth  ());
-    out_PDSHit_PE       .push_back(hit->GetSPE    ());  
-    out_PDSHit_OpChannel.push_back(hit->GetChannel());  
+    out_PDSHit_PE       .push_back(hit->GetSPE    ());
+    out_PDSHit_OpChannel.push_back(hit->GetChannel());
   }
   t_Output_ClusteredOpticalHit->Fill();
-  
+
 };
 
 void Clustering::FillClusterInfo(WireCluster* clust)
 {
-  
+
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
   out_Event = im.Event;
@@ -320,17 +321,17 @@ void Clustering::FillClusterInfo(WireCluster* clust)
   out_pur_Radon      = clust->GetPurity(kRadon   );
   out_pur_Ar42       = clust->GetPurity(kAr42    );
   if(fPrintLevel > 1)
-    clust->Print(); 
-  
+    clust->Print();
+
   std::vector<WireHit*> hits = clust->GetHitVector();
   out_E_deposited=0.;
   for(auto const& hit : clust->GetHitVector())
   {
-    out_HitView.push_back(hit->GetHitView());  
-    out_GenType.push_back(hit->GetGenType());  
-    out_HitChan.push_back(hit->GetHitChan());  
-    out_HitTime.push_back(hit->GetHitTime());  
-    out_HitSADC.push_back(hit->GetHitSADC());  
+    out_HitView.push_back(hit->GetHitView());
+    out_GenType.push_back(hit->GetGenType());
+    out_HitChan.push_back(hit->GetHitChan());
+    out_HitTime.push_back(hit->GetHitTime());
+    out_HitSADC.push_back(hit->GetHitSADC());
     out_HitRMS .push_back(hit->GetHitRMS ());
     out_TrPosX .push_back(hit->GetTruePosition(0));
     out_TrPosY .push_back(hit->GetTruePosition(1));
@@ -401,8 +402,8 @@ void Clustering::ResetFillVariable(){
   out_HitSPE  .clear();
   out_HitRMS  .clear();
   out_HitWidth.clear();
-  out_TrPosX  .clear(); 
-  out_TrPosY  .clear(); 
+  out_TrPosX  .clear();
+  out_TrPosY  .clear();
   out_TrPosZ  .clear();
   out_PDSHit_GenType  .clear();
   out_PDSHit_X        .clear();
