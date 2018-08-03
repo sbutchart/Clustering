@@ -8,7 +8,7 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   fType          (0),
   fHitSPE        (0),
   fFirstHitTime  (100000),
-  fLastHitTime   (0),
+  fLastHitTime   (-100000),
   fTimeWidth     (0),
   fHitVector     (),
   fPurity        (){
