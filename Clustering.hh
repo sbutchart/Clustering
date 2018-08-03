@@ -24,6 +24,7 @@
 #include "OpticalCluster.hh"
 #include "WireCluster.hh"
 #include "ClusterSelector.hh"
+#include "ClusterEnergyEstimator.hh"
 #include "ClusterEngine.hh"
 #include "Trigger.hh"
 
@@ -39,6 +40,7 @@ public:
     fTrigger       (NULL),
     fClustSelec    (NULL),
     fClustEng      (NULL),
+    fEReco         (NULL),
     fPrintLevel    (-1),
     t_Output_ClusteredWireHit   (NULL),
     t_Output_ClusteredOpticalHit(NULL),
@@ -103,14 +105,17 @@ public:
       }
     };
 
-  int         GetPrintLevel() const { return fPrintLevel;     };
-  std::string GetInputFile () const { return fInputFileName;  };
-  std::string GetInputTree () const { return fInputTreeName;  };
-  std::string GetOutputFile() const { return fOutputFileName; };
-  void        SetPrintLevel(const int p=-1)         { fPrintLevel     = p; };
-  void        SetInputFile (const std::string s="") { fInputFileName  = s; };
-  void        SetInputTree (const std::string s="") { fInputTreeName  = s; };
-  void        SetOutputFile(const std::string s="") { fOutputFileName = s; };
+  int GetPrintLevel() const { return fPrintLevel; };
+  std::string GetInputFile   () const { return fInputFileName;  };
+  std::string GetInputTree   () const { return fInputTreeName;  };
+  std::string GetOutputFile  () const { return fOutputFileName; };
+  std::string GetERecoXMLFile() const { return fERecoXMLFile;   };
+
+  void SetPrintLevel(const int p=-1) { fPrintLevel     = p; };
+  void SetInputFile   (const std::string s="") { fInputFileName  = s; };
+  void SetInputTree   (const std::string s="") { fInputTreeName  = s; };
+  void SetOutputFile  (const std::string s="") { fOutputFileName = s; };
+  void SetERecoXMLFile(const std::string s="") { fERecoXMLFile   = s; };
     
   void SetupConfigurations_AdjChanTolerance(const std::vector<float> vec_cut_AdjChanTolerance = {1,2,2,2,2,2}          )
     { fvec_cut_AdjChanTolerance = vec_cut_AdjChanTolerance; };
@@ -165,13 +170,13 @@ public:
       fvec_ClusterCount.clear();
       fvec_OptClusterCount.clear();
       
-      fvec_cut_MinHitADC.clear();
+      fvec_cut_MinHitADC       .clear();
       fvec_cut_AdjChanTolerance.clear();
-      fvec_cut_HitsInWindow.clear();
-      fvec_cut_MinChannels.clear();
-      fvec_cut_MinChanWidth.clear();
-      fvec_cut_TimeWindowSize.clear();
-      fvec_cut_TotalADC.clear();
+      fvec_cut_HitsInWindow    .clear();
+      fvec_cut_MinChannels     .clear();
+      fvec_cut_MinChanWidth    .clear();
+      fvec_cut_TimeWindowSize  .clear();
+      fvec_cut_TotalADC        .clear();
       fvec_OptClusterCount.clear();
 
       t_Output_ClusteredWireHit    = NULL;
@@ -188,16 +193,21 @@ public:
       if(f_Output) f_Output->Close();
       f_Output = NULL;
 
+      if (fEReco) delete fEReco;
+      fEReco = NULL;
     };
   
 private:
   std::string fInputFileName ;
   std::string fInputTreeName ;
   std::string fOutputFileName;
+  std::string fERecoXMLFile  ;
   TFile *f_Output;
   Trigger* fTrigger;
   ClusterSelector* fClustSelec;
   ClusterEngine* fClustEng;
+  ClusterEnergyEstimator* fEReco;
+  
   std::vector<float> fvec_ClusterCount   ;
   std::vector<float> fvec_OptClusterCount;
 

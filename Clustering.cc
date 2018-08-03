@@ -6,6 +6,12 @@ int Clustering::ClusterAll(int inNEvent){
   im.SetInputFile(fInputFileName);
   im.SetInputTree(fInputTreeName);
   im.LoadTree();
+
+  if (fERecoXMLFile == "") {
+    std::cout << "Not using energy reconstruction!!" << std::endl;
+  } else {
+    fEReco = new ClusterEnergyEstimator(fERecoXMLFile);
+  }
   
   f_Output = new TFile(fOutputFileName.c_str(), "RECREATE");
 
@@ -178,7 +184,7 @@ int Clustering::ClusterAll(int inNEvent){
       std::vector<OpticalCluster*> vec_OpticalCluster;
       fClustEng->ClusterOpticalHits(vec_OptHit,vec_OpticalCluster);
       fClustEng->ClusterHits2(vec_WireHit, vec_Clusters, vec_UnusedHits);
-
+      fEReco   ->EstimateEnergy(vec_Clusters);
       for(unsigned int k = 0; k < vec_Clusters->size(); k++) {
         WireCluster* aCluster = vec_Clusters->at(k);
         fClustSelec->SetSelectionFlag  (aCluster);

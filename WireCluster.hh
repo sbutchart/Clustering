@@ -20,6 +20,7 @@ public:
     fFirstHitTime  (0),
     fLastHitTime   (0),
     fTimeWidth     (0),
+    fEReco         (0),
     fMC_UnderlyingE(0),
     fMarleyIndex   (0),
     fHitVector     (),
@@ -51,17 +52,18 @@ public:
   float  GetTimeWidth     () const { return fTimeWidth     ; };
   int    GetMarleyIndex   () const { return fMarleyIndex   ; };
   double GetMC_UnderlyingE() const { return fMC_UnderlyingE; };
+  double GetEReco         () const { return fEReco         ; };
   double GetTruePosition(const int index=0) const { return fTruePosition[index]; };
   double GetRecoPosition(const int index=0) const { return fRecoPosition[index]; };
   double GetPurity      (GenType gen=kSNnu) const { return fPurity.at(gen); };
   std::vector<WireHit*> GetHitVector() const { return fHitVector; };
 
-  void   SetHitSADC     (float  cHitSADC     ) { fHitSADC      = cHitSADC     ; };
-  void   SetTriggerFlag (int    cTriggerFlag ) { fTriggerFlag  = cTriggerFlag ; };
-  void   SetIsSelected  (bool   cIsSelected  ) { fIsSelected   = cIsSelected  ; };
-  void   SetFailedCut   (int    cCutN        ) { fCutN         = cCutN        ; };
-
-  void  Print(const bool printHit=false) const;
+  void SetHitSADC     (const float  cHitSADC     ) { fHitSADC      = cHitSADC     ; };
+  void SetTriggerFlag (const int    cTriggerFlag ) { fTriggerFlag  = cTriggerFlag ; };
+  void SetIsSelected  (const bool   cIsSelected  ) { fIsSelected   = cIsSelected  ; };
+  void SetFailedCut   (const int    cCutN        ) { fCutN         = cCutN        ; };
+  void SetEReco       (const double cE           ) { fEReco        = cE           ; };
+  void Print(const bool printHit=false) const;
 
   friend bool goodClusterHits(const WireCluster*, int);
 
@@ -81,6 +83,7 @@ private:
   float                    fLastHitTime    ;
   float                    fTimeWidth      ;
   double                   fMC_UnderlyingE ;
+  double                   fEReco          ;
   double                   fTruePosition[3];
   double                   fRecoPosition[3];
   std::vector<WireHit*>    fHitVector      ;

@@ -8,9 +8,11 @@ project(DAQWork)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS RIO Net)
+find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
+
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11" )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # ROOT_GENERATE_DICTIONARY(G__OpticalHit      OpticalHit.hh)
@@ -21,7 +23,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # ROOT_GENERATE_DICTIONARY(G__ClusterEngine   ClusterEngine.hh)
 # ROOT_GENERATE_DICTIONARY(G__Trigger         Trigger.hh)
 
-add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc Clustering.cc)
+add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
 add_library(Display SHARED PhotonTimingDisplay.cc)
 target_link_libraries(Display ${ROOT_LIBRARIES})
