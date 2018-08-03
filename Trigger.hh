@@ -18,12 +18,12 @@ public:
           it_clust!=clusters.end(); ++it_clust)
         (*it_clust)->SetTriggerFlag(goodClusterHits((*it_clust), fNHitsMin));
     };
-  
+
   int  GetNHitsMin() const { return fNHitsMin;  };
   void SetNHitsMin(int inNHitsMin=1) { fNHitsMin = inNHitsMin; };
   ~Trigger(){};
-  
-private:  
+
+private:
   int fNHitsMin;
 
 public:
