@@ -69,10 +69,14 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosX", &out_RecClusterPosX, "RecClusterPosX/D");
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosY", &out_RecClusterPosY, "RecClusterPosY/D");
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosZ", &out_RecClusterPosZ, "RecClusterPosZ/D");
-  t_Output_ClusteredOpticalHit->Branch("GenType",        &out_GenType);
-  t_Output_ClusteredOpticalHit->Branch("HitTime",        &out_HitTime);
-  t_Output_ClusteredOpticalHit->Branch("HitSADC",        &out_HitSADC);
-  t_Output_ClusteredOpticalHit->Branch("HitRMS",         &out_HitRMS );
+  t_Output_ClusteredOpticalHit->Branch("Hit_GenType"     , &out_PDSHit_GenType  );
+  t_Output_ClusteredOpticalHit->Branch("Hit_X"           , &out_PDSHit_X        );
+  t_Output_ClusteredOpticalHit->Branch("Hit_Y"           , &out_PDSHit_Y        );
+  t_Output_ClusteredOpticalHit->Branch("Hit_Z"           , &out_PDSHit_Z        );
+  t_Output_ClusteredOpticalHit->Branch("Hit_PeakTime"    , &out_PDSHit_PeakTime );
+  t_Output_ClusteredOpticalHit->Branch("Hit_Width"       , &out_PDSHit_Width    );
+  t_Output_ClusteredOpticalHit->Branch("Hit_PE"          , &out_PDSHit_PE       );
+  t_Output_ClusteredOpticalHit->Branch("Hit_OpChannel"   , &out_PDSHit_OpChannel);
 
   t_Output_TrueInfo = new TTree("TrueInfo", "TrueInfo");
   t_Output_TrueInfo->Branch("Event",    &out_Event, "Event/I");
@@ -157,13 +161,15 @@ int Clustering::ClusterAll(int inNEvent){
                                         marley_index));
     }
     for(size_t j = 0; j < im.PDS_OpHit_OpChannel->size(); j++) {
+      int marley_index=0;
       vec_OptHit.push_back(new OpticalHit((*im.PDS_OpHit_True_GenType)[j],
                                           (*im.PDS_OpHit_X)[j],        (*im.PDS_OpHit_Y)[j],     (*im.PDS_OpHit_Z)[j],
                                           (*im.PDS_OpHit_PeakTime)[j], (*im.PDS_OpHit_Width)[j], (*im.PDS_OpHit_PE)[j],
                                           (*im.PDS_OpHit_OpChannel)[j]));
+      vec_OptHit.back()->SetMarleyIndex(marley_index);
     }
     
-    for(fCurrentConfig=0; fCurrentConfig<1; ++fCurrentConfig) {
+    for(fCurrentConfig=0; fCurrentConfig<fNConfig; ++fCurrentConfig) {
       
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
@@ -246,6 +252,7 @@ void Clustering::FillClusterInfo(OpticalCluster* clust)
   out_Config         = fCurrentConfig;
   out_Cluster        = fvec_OptClusterCount[0];
   out_Event          = im.Event;
+  out_MarleyIndex    = clust->GetMarleyIndex();
   out_YWidth         = clust->GetRecoWidth(1);
   out_ZWidth         = clust->GetRecoWidth(2);
   out_NChan          = clust->GetNChannel();
@@ -263,10 +270,14 @@ void Clustering::FillClusterInfo(OpticalCluster* clust)
     clust->Print();
   
   for(auto const& hit : clust->GetHitVector()) {
-    out_GenType .push_back(hit->GetGenType());  
-    out_HitTime .push_back(hit->GetTime   ());  
-    out_HitSPE  .push_back(hit->GetSPE    ());  
-    out_HitWidth.push_back(hit->GetWidth  ());
+    out_PDSHit_GenType  .push_back(hit->GetGenType());  
+    out_PDSHit_X        .push_back(hit->GetRecoPosition(0));  
+    out_PDSHit_Y        .push_back(hit->GetRecoPosition(1));  
+    out_PDSHit_Z        .push_back(hit->GetRecoPosition(2));  
+    out_PDSHit_PeakTime .push_back(hit->GetTime   ());  
+    out_PDSHit_Width    .push_back(hit->GetWidth  ());
+    out_PDSHit_PE       .push_back(hit->GetSPE    ());  
+    out_PDSHit_OpChannel.push_back(hit->GetChannel());  
   }
   t_Output_ClusteredOpticalHit->Fill();
   
@@ -393,4 +404,13 @@ void Clustering::ResetFillVariable(){
   out_TrPosX  .clear(); 
   out_TrPosY  .clear(); 
   out_TrPosZ  .clear();
+  out_PDSHit_GenType  .clear();
+  out_PDSHit_X        .clear();
+  out_PDSHit_Y        .clear();
+  out_PDSHit_Z        .clear();
+  out_PDSHit_PeakTime .clear();
+  out_PDSHit_Width    .clear();
+  out_PDSHit_PE       .clear();
+  out_PDSHit_OpChannel.clear();
+
 };

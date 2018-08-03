@@ -35,6 +35,9 @@ link_directories(build)
 add_executable(RunDAQClustering RunDAQClustering.cxx)
 target_link_libraries(RunDAQClustering Clustering)
 
+add_executable(AnalyseOpticalCluster AnalyseOpticalCluster.cxx)
+target_link_libraries(AnalyseOpticalCluster Clustering)
+
 add_executable(GetEffBackRate GetEffBackRate.cxx)
 target_link_libraries(GetEffBackRate Clustering)
 

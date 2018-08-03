@@ -15,6 +15,7 @@ public:
     fNChannel      (0),
     fNHit          (0),
     fType          (0),
+    fMarleyIndex   (0),
     fHitSPE        (0),
     fFirstHitTime  (0),
     fLastHitTime   (0),
@@ -50,6 +51,7 @@ public:
   int                      GetNHit        ()              const { return fNHit            ; };
   int                      GetType        ()              const { return fType            ; };
   int                      GetHitSPE      ()              const { return fHitSPE          ; };
+  int                      GetMarleyIndex ()              const { return fMarleyIndex     ; };
   float                    GetFirstHitTime()              const { return fFirstHitTime    ; };
   float                    GetLastHitTime ()              const { return fLastHitTime     ; };
   float                    GetTimeWidth   ()              const { return fTimeWidth       ; };
@@ -68,6 +70,7 @@ private:
   int    fNHit            ;
   int    fType            ;
   int    fHitSPE          ;
+  int    fMarleyIndex     ;
   float  fFirstHitTime    ;
   float  fLastHitTime     ;
   float  fTimeWidth       ;

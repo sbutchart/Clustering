@@ -13,6 +13,7 @@ public:
     fTime   (0),
     fWidth  (0),
     fPE     (0),
+    fMarleyIndex(-1),
     fChannel(0)
     {
       fRecoPosition[0]=0;
@@ -28,6 +29,8 @@ public:
   double GetChannel     () const { return fChannel     ; };
   double GetSPE         () const { return fPE          ; };
   double GetRecoPosition(const int i=0) const { return fRecoPosition[i]; };
+  void   SetMarleyIndex (const int i=0) { fMarleyIndex = i;};
+  int    GetMarleyIndex () const { return fMarleyIndex;};
   
   friend bool OpticalHitOrderedInTimePtr (const OpticalHit*, const OpticalHit*);
   friend bool OpticalHitOrderedInSpacePtr(const OpticalHit*, const OpticalHit*);
@@ -40,6 +43,7 @@ private:
   double fTime;
   double fWidth;
   double fPE;
+  int    fMarleyIndex;
   int    fChannel;
 public:
   // ClassDef(OpticalHit,1)

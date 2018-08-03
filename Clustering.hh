@@ -273,6 +273,15 @@ private:
   std::vector<double> out_TrPosY; 
   std::vector<double> out_TrPosZ; 
 
+  std::vector<int>    out_PDSHit_GenType  ;
+  std::vector<double> out_PDSHit_X        ;
+  std::vector<double> out_PDSHit_Y        ;
+  std::vector<double> out_PDSHit_Z        ;
+  std::vector<double> out_PDSHit_PeakTime ;
+  std::vector<double> out_PDSHit_Width    ;
+  std::vector<double> out_PDSHit_PE       ;
+  std::vector<double> out_PDSHit_OpChannel;
+ 
   std::vector<double> out_MarlTime;
   std::vector<double> out_ENu;
   std::vector<double> out_ENu_Lep;

@@ -34,12 +34,13 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   fPurity[kAr42    ] = 0;
   std::set<int> channels;
   fHitVector.clear();
+  std::map<int,int> map_marleyevent_number;
   for(size_t i = 0; i < vec_Hits.size(); ++i) {
     fHitVector.push_back(vec_Hits[i]);
     fHitSPE   += vec_Hits[i]->GetSPE (); 
     int   chan = vec_Hits[i]->GetChannel();
     float time = vec_Hits[i]->GetTime(); 
-
+    map_marleyevent_number[vec_Hits[i]->GetMarleyIndex()]++;
     channels.insert(chan);
     
     // if(chan<fStartChannel) fStartChannel=chan;
@@ -61,7 +62,14 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
     if(vec_Hits[i]->GetRecoPosition(1) > maxPos[1]) maxPos[1] = vec_Hits[i]->GetRecoPosition(1);
     if(vec_Hits[i]->GetRecoPosition(2) > maxPos[2]) maxPos[2] = vec_Hits[i]->GetRecoPosition(2);
   }
-
+  int max=0;
+  fMarleyIndex=0;
+  for (auto const & it : map_marleyevent_number) {
+    if (it.second>max) {
+      fMarleyIndex=it.first;
+      max = it.second;
+    }
+  }
   fRecoWidth[0] = std::abs(minPos[0] - maxPos[0]);
   fRecoWidth[1] = std::abs(minPos[1] - maxPos[1]);
   fRecoWidth[2] = std::abs(minPos[2] - maxPos[2]);
@@ -78,7 +86,7 @@ OpticalCluster::OpticalCluster(std::vector<OpticalHit*>& vec_Hits):
   fTimeWidth = std::abs(fLastHitTime-fFirstHitTime);
   fNHit = fHitVector.size();
   fNChannel = channels.size();
-
+  
   double maxPur=0;
   int gen=-1;
   for (auto& it:fPurity) {
