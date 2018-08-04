@@ -128,7 +128,7 @@ int main(int argc, char** argv){
   TTree* t_ClusteredOptHit = (TTree*)f_Input->Get("ClusteredOpticalHit");
   t_ClusteredOptHit->SetBranchAddress("Cluster",        &Cluster       );
   t_ClusteredOptHit->SetBranchAddress("Config",         &Config        );
-  t_ClusteredOptHit->SetBranchAddress("Event",          &EventTrue     );
+  t_ClusteredOptHit->SetBranchAddress("Event",          &Event         );
   t_ClusteredOptHit->SetBranchAddress("MarleyIndex",    &MarleyIndex   );
   t_ClusteredOptHit->SetBranchAddress("YWidth",         &YWidth        );
   t_ClusteredOptHit->SetBranchAddress("ZWidth",         &ZWidth        );
@@ -313,6 +313,8 @@ int main(int argc, char** argv){
   int nEventOpti=0;
   int nDetectedSignalEventOpti=0;
   int nBackgroundEventOpti=0;
+  std::cout << "map_event_entry_opti " << map_event_entry_opti.size() << std::endl;
+  
   for(auto const& it : map_event_entry_opti) {
     int ncluster_sign=0;
     int ncluster_back=0;
@@ -338,7 +340,6 @@ int main(int argc, char** argv){
     if(SignDetected)
       ++nDetectedSignalEventOpti;
     t_TrueInfo->GetEntry(map_Event_TrueEntry[Event]);
-    std::cout <<MarleyIndex << std::endl;
     double Energy_Neutrino = ENu->at(MarleyIndex);
     eff_enu_opti->Fill(SignDetected, Energy_Neutrino*1000.);
     h_ncluster_sign_opti->Fill(ncluster_sign);
