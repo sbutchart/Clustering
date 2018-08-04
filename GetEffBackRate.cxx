@@ -56,7 +56,11 @@ void FillEventCountMap(TTree* ClusteredHit,
   ClusteredHit->SetBranchAddress("Config",       &in_Config     );
   ClusteredHit->SetBranchAddress("Type",         &in_Type       );
   ClusteredHit->SetBranchAddress("MarleyIndex",  &in_MarleyIndex);
-  ClusteredHit->SetBranchAddress("GenType",      &in_GenType    );
+  if (ClusteredHit->GetListOfBranches()->FindObject("GenType")) {
+    ClusteredHit->SetBranchAddress("GenType", &in_GenType);
+  } else {
+    ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
+  }
   
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
@@ -231,14 +235,17 @@ int main(int argc, char** argv) {
     std::cout  << "Config (Wire) " << c
                << ", SN efficiency: " << it.second.first << " +/- " << it.second.second
                << " Background rate in 10kt (Hz): " << map_Config_WireBackRate[c].first << " +/- " << map_Config_WireBackRate[c].second << std::endl;
-    // std::cout  << "CONFIG (Opti) " << c
-    //            << ", SN EFFICIENCY: " << map_Config_OpticalEff[c]
-    //            << " BKGD RATE IN 10kt (Hz): " << map_Config_OpticalBackRate[c] << std::endl;
     txt_Result << c
                << ", " << it.second.first << ", " << it.second.second
                << ", " << map_Config_WireBackRate[c].first
                << ", " << map_Config_WireBackRate[c].second << std::endl; 
   }
-
+  
+  for(auto const& it : map_Config_WireEff) {
+    int c = it.first;
+    std::cout  << "Config (Opti) " << c
+               << ", SN efficiency: " << map_Config_OpticalEff[c].first << " +/- " << map_Config_OpticalEff[c].second
+               << " Background rate in 10kt (Hz): " << map_Config_OpticalBackRate[c].first << " +/- " << map_Config_OpticalBackRate[c].second << std::endl;
+  }
   return 0;
 }
