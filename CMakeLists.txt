@@ -23,7 +23,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc Clustering.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
-add_library(Display SHARED PhotonTimingDisplay.cc)
+add_library(Display SHARED PhotonTimingDisplay.cc PhotonWirePositionDisplay.cc)
 target_link_libraries(Display ${ROOT_LIBRARIES})
 add_library(SimpleOptHit SHARED HitSimplePlot.cc)
 target_link_libraries(SimpleOptHit ${ROOT_LIBRARIES})

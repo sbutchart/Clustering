@@ -1,14 +1,10 @@
 #include "PhotonTimingDisplay.hh"
 
-PhotonTimingDisplay::PhotonTimingDisplay() {
+PhotonTimingDisplay::PhotonTimingDisplay(std::string F, std::string T): Display(F,T) {
   fPE_Mode = false;
   position = NULL;
   energy   = NULL;
   f_map_gen_th1_timing = GetHistos("timing", ";Time [#mus];n Hits", 140, -4, 10);
-  c = new TCanvas();
-  im.SetInputFile("/dune/app/users/plasorak/workspace/SNAna.root");
-  im.SetInputTree("snanagaushit/SNSimTree");
-  im.LoadTree();
 };
 
 

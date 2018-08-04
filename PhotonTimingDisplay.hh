@@ -12,7 +12,7 @@
 class PhotonTimingDisplay : public Display {
 
 public:
-  PhotonTimingDisplay();
+  PhotonTimingDisplay(std::string F, std::string T);
   void DisplayEvent(int event,    int type, double time);
   void DisplayEvent(int event=-1, int type=-1) { DisplayEvent(event,type,0); };
   ~PhotonTimingDisplay();

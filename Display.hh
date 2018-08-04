@@ -12,7 +12,13 @@
 
 class Display {
 public:
-  Display(){c = new TCanvas(); };
+  Display(std::string F,std::string T):FileName(F), TreeName(T){
+    c = new TCanvas();
+    im.SetInputFile(FileName.c_str());
+    im.SetInputTree(TreeName.c_str());
+    im.LoadTree();
+
+  };
   virtual void DisplayEvent(int, int)=0;
   ~Display(){
     delete c;
@@ -21,6 +27,8 @@ public:
 protected:
   TCanvas* c;
   InputManager im;
+  std::string FileName;
+  std::string TreeName;
 };
 
 
