@@ -35,7 +35,7 @@ public:
   Clustering():
     fInputFileName ("/dune/app/users/plasorak/workspace/SNAna.root"),
     fInputTreeName (""),
-    fOutputFileName(""),    
+    fOutputFileName(""),
     f_Output       (NULL),
     fTrigger       (NULL),
     fClustSelec    (NULL),
@@ -45,6 +45,7 @@ public:
     t_Output_ClusteredWireHit   (NULL),
     t_Output_ClusteredOpticalHit(NULL),
     t_Output_TrueInfo           (NULL),
+    t_Output_TimingInfo         (NULL),
     h_ENu_MC     (NULL),
     h_MarlTime_MC(NULL),
     h_TimeElapsed(NULL),
@@ -154,6 +155,7 @@ public:
       if(t_Output_ClusteredWireHit   ) delete t_Output_ClusteredWireHit   ;
       if(t_Output_ClusteredOpticalHit) delete t_Output_ClusteredOpticalHit;
       if(t_Output_TrueInfo           ) delete t_Output_TrueInfo           ;
+      if(t_Output_TimingInfo         ) delete t_Output_TimingInfo         ;
       
       for(size_t i = 0; i < fvec_g_config.size(); i++){
         if(fvec_g_config[i]) delete fvec_g_config[i];
@@ -182,7 +184,8 @@ public:
       t_Output_ClusteredWireHit    = NULL;
       t_Output_ClusteredOpticalHit = NULL;
       t_Output_TrueInfo            = NULL;
-
+      t_Output_TimingInfo          = NULL;
+      
       if(h_ENu_MC)      delete h_ENu_MC;
       if(h_MarlTime_MC) delete h_MarlTime_MC;
       if(h_TimeElapsed) delete h_TimeElapsed;
@@ -229,6 +232,7 @@ private:
   TTree* t_Output_ClusteredWireHit;
   TTree* t_Output_ClusteredOpticalHit;
   TTree* t_Output_TrueInfo;
+  TTree* t_Output_TimingInfo;
 
   TH1D* h_ENu_MC     ;
   TH1D* h_MarlTime_MC;
@@ -270,7 +274,13 @@ private:
   double out_YWidth        ;
   double out_ZWidth        ;
   double out_SumPE         ;
-  
+
+  double TimeOrdering_Time        ;
+  double SpaceOrdering_Time       ;
+  double Clustering_Time          ;
+  double EnergyReconstruction_Time;
+
+    
   std::vector<int>    out_HitView;
   std::vector<int>    out_GenType;
   std::vector<int>    out_HitChan;

@@ -93,6 +93,12 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_TrueInfo->Branch("DirY",     &out_DirY    );
   t_Output_TrueInfo->Branch("DirZ",     &out_DirZ    );
 
+  t_Output_TimingInfo = new TTree("TimingInfo", "TimingInfo");
+  t_Output_TimingInfo->Branch("Event",                     &out_Event, "Event/I");
+  t_Output_TimingInfo->Branch("TimeOrdering_Time",         &TimeOrdering_Time        , "TimeOrdering_Time/D");
+  t_Output_TimingInfo->Branch("SpaceOrdering_Time",        &SpaceOrdering_Time       , "SpaceOrdering_Time/D");
+  t_Output_TimingInfo->Branch("Clustering_Time",           &Clustering_Time          , "Clustering_Time/D");
+  t_Output_TimingInfo->Branch("EnergyReconstruction_Time", &EnergyReconstruction_Time, "EnergyReconstruction_Time/D");
   
   h_ENu_MC      = new TH1D("h_ENu_MC",      "h_ENu_MC",       35,    0, 50  );
   h_MarlTime_MC = new TH1D("h_MarlTime_MC", "h_MarlTime_MC", 100, -0.1, 10.5);
@@ -167,9 +173,10 @@ int Clustering::ClusterAll(int inNEvent){
                                           (*im.PDS_OpHit_PeakTime)[j], (*im.PDS_OpHit_Width)[j], (*im.PDS_OpHit_PE)[j],
                                           (*im.PDS_OpHit_OpChannel)[j]));
     }
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
     
     for(fCurrentConfig=0; fCurrentConfig<1; ++fCurrentConfig) {
-      
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
       fClustEng  ->SetPositionOpt    (300);
