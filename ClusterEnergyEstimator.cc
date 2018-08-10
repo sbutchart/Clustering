@@ -50,10 +50,10 @@ double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const 
 vector<double> ClusterEnergyEstimator::NeuralNetwork(const vector<double>& Feature) const {
 
   vector<double> layer_1(100);
-  layer_1 = prod(Feature,Weight_h1)+Bias_b1;
+  // layer_1 = prod(Feature,Weight_h1)+Bias_b1;
   ActivationFunctionRelu(layer_1);
   vector<double> output_layer(nOutput);
-  output_layer = prod(layer_1,Weight_out)+Bias_out;
+  // output_layer = prod(layer_1,Weight_out)+Bias_out;
   return output_layer;
 };
 

@@ -13,13 +13,14 @@
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
+
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 #include "InputManager.h"
 #include "Helper.h"
-
 
 #include "OpticalCluster.hh"
 #include "WireCluster.hh"
@@ -146,8 +147,12 @@ public:
   void FillClusterInfo(WireCluster* clust);
   void FillClusterInfo(OpticalCluster* clust);
   void FillUnusedHitInfo(WireHit* hit){ ResetFillVariable(); };
-  // void DisplayAndSaveHits(const std::vector<WireHit*>&  cHitVector,
-  //                         unsigned int index);
+
+  void FillClusterEngineTimingInfo_Opti(ClusterEngine* clusterEngine);
+  void FillClusterEngineTimingInfo_Wire(ClusterEngine* clusterEngine);
+  void FillClusterERecoTimingInfo_Wire (ClusterEnergyEstimator* clusterEReco);
+  void FillClusterERecoTimingInfo_Opti (ClusterEnergyEstimator* clusterEReco);
+
   void ResetFillVariable();
 
   ~Clustering()
@@ -275,11 +280,15 @@ private:
   double out_ZWidth        ;
   double out_SumPE         ;
 
-  double TimeOrdering_Time        ;
-  double SpaceOrdering_Time       ;
-  double Clustering_Time          ;
-  double EnergyReconstruction_Time;
-
+  std::vector<double> TimeOrdering_WireClustTime        ;
+  std::vector<double> SpaceOrdering_WireClustTime       ;
+  std::vector<double> Clustering_WireClustTime          ;
+  std::vector<double> EnergyReconstruction_WireClustTime;
+  std::vector<double> TimeOrdering_OptClustTime         ;
+  std::vector<double> SpaceOrdering_OptClustTime        ;
+  std::vector<double> Clustering_OptClustTime           ;
+  std::vector<double> EnergyReconstruction_OptClustTime ;
+  
     
   std::vector<int>    out_HitView;
   std::vector<int>    out_GenType;

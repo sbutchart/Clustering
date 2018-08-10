@@ -57,6 +57,7 @@ private:
   boost::numeric::ublas::vector<double> InputData_StdDev ;
   boost::numeric::ublas::vector<double> OutputData_Mean  ;
   boost::numeric::ublas::vector<double> OutputData_StdDev;
+  TStopwatch *fStopwatch;
   
 
 };

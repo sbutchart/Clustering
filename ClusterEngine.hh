@@ -1,5 +1,8 @@
 #ifndef CLUSTERENGINE_HH
 #define CLUSTERENGINE_HH
+#include "TStopwatch.h"
+
+
 #include "WireCluster.hh"
 #include "OpticalCluster.hh"
 
@@ -13,14 +16,26 @@ public:
     fTimeWindow(TimeWindow),
     fMinHitADC(MinHitADC),
     fTimeWindowOpt(TimeWindowOpt),
-    fPositionOpt(PositionOpt){};
-
+    fPositionOpt(PositionOpt),
+    TimeOrdering_Time (),
+    SpaceOrdering_Time(),
+    Clustering_Time   (),
+    fStopwatch(NULL) {
+    fStopwatch = new TStopwatch();
+  };
+  
   ClusterEngine():
     fChannelWidth(0),
     fTimeWindow(0),
     fMinHitADC(0),
     fTimeWindowOpt(0),
-    fPositionOpt(0){};
+    fPositionOpt(0),
+    TimeOrdering_Time (),
+    SpaceOrdering_Time(),
+    Clustering_Time   (),
+    fStopwatch(NULL) {
+    fStopwatch = new TStopwatch();
+  };
   
   void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits2(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
@@ -40,18 +55,33 @@ public:
 
   double GetPositionOpt() const { return fPositionOpt; };
   void   SetPositionOpt(double inPositionOpt=300) { fPositionOpt=inPositionOpt; };
-    
-  ~ClusterEngine(){};
+
+
+  std::vector<double> GetElapsedTime_TimeOrdering () { return TimeOrdering_Time;  } ;
+  std::vector<double> GetElapsedTime_SpaceOrdering() { return SpaceOrdering_Time; } ;
+  std::vector<double> GetElapsedTime_Clustering   () { return Clustering_Time;    } ;
+  
+  ~ClusterEngine(){
+    if (fStopwatch) delete fStopwatch;
+    fStopwatch = NULL;
+    TimeOrdering_Time .clear();
+    SpaceOrdering_Time.clear();
+    Clustering_Time   .clear();
+  };
+  
 private:
-  double fChannelWidth  = 0;
-  double fTimeWindow    = 0;
-  double fMinHitADC     = 0;
-  double fTimeWindowOpt = 0;
-  double fPositionOpt   = 0;
+  TStopwatch *fStopwatch;
 
-public:
-//  ClassDef(ClusterEngine,1)  //Simple event class
+  double fChannelWidth;
+  double fTimeWindow;
+  double fMinHitADC;
+  double fTimeWindowOpt;
+  double fPositionOpt;
+
+  std::vector<double> TimeOrdering_Time;
+  std::vector<double> SpaceOrdering_Time;
+  std::vector<double> Clustering_Time;   
+ 
 };
-
 
 #endif
