@@ -22,19 +22,28 @@ public:
   
 private:
   void ParseXMLFile();
-  double ActivationFunctionRelu   (const double v) const { return TMath::Max(0.,v);   };
-  double ActivationFunctionSigmoid(const double v) const { return 1. / (1. + TMath::Exp(-v)); };
+  void ActivationFunctionRelu(boost::numeric::ublas::vector<double>& v) const {
+    for (size_t i=0; i<v.size(); ++i) {
+      v[i] = TMath::Max(0.,v[i]);
+    }
+  };
+  void ActivationFunctionSigmoid(boost::numeric::ublas::vector<double>& v) const {
+    for (size_t i=0; i<v.size(); ++i) {
+      v[i] = 1. / (1. + TMath::Exp(-v[i]));
+    }
+  };
+  
   void LoadChildAndAssertExistance(const XMLNodePointer_t a,
                                    std::map<std::string,XMLNodePointer_t>& b,
                                    const std::vector<std::string>& c,
                                    const int i=1) const;
-  double NeuralNetwork(const ublas::vector<double>&) const;
-  void NormaliseFeature(ublas::vector<double>& ,
-                        const ublas::vector<double>,
-                        const ublas::vector<double>) const;
-  void RecoverFeature(ublas::vector<double>&,
-                      const ublas::vector<double>,
-                      const ublas::vector<double>) const;
+  boost::numeric::ublas::vector<double> NeuralNetwork(const boost::numeric::ublas::vector<double>&) const;
+  void NormaliseFeature(boost::numeric::ublas::vector<double>& ,
+                        const boost::numeric::ublas::vector<double>,
+                        const boost::numeric::ublas::vector<double>) const;
+  void RecoverFeature(boost::numeric::ublas::vector<double>&,
+                      const boost::numeric::ublas::vector<double>,
+                      const boost::numeric::ublas::vector<double>) const;
   TXMLEngine* xml;
   std::string filename;
   int nNeuron;

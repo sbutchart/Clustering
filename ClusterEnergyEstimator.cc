@@ -15,7 +15,7 @@ ClusterEnergyEstimator::ClusterEnergyEstimator(std::string f):
   InputData_Mean   (),
   InputData_StdDev (),
   OutputData_Mean  (),
-  OutputData_StdDev(),
+  OutputData_StdDev()
 {
   ParseXMLFile();
 };
@@ -35,40 +35,41 @@ ClusterEnergyEstimator::~ClusterEnergyEstimator() {
 
 double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const {
 
-  ublas::vector<double> Feature = {static_cast<double>(cluster.GetChannelWidth()),
-                                   static_cast<double>(cluster.GetNHit()),
-                                   cluster.GetHitSumADC(),
-                                   cluster.GetTimeWidth()};
+  vector<double> Feature(nParam);
+  Feature[0] = static_cast<double>(cluster.GetChannelWidth());
+  Feature[1] = static_cast<double>(cluster.GetNHit());
+  Feature[2] = cluster.GetHitSumADC();
+  Feature[3] = cluster.GetTimeWidth();
   NormaliseFeature(Feature, InputData_Mean, InputData_StdDev);
-  ublas::vector<double> ereco = {NeuralNetwork(Feature)};
+  vector<double> ereco(1);
+  ereco = NeuralNetwork(Feature);
   RecoverFeature(ereco, OutputData_Mean, OutputData_StdDev);
   return ereco(0);
 };
 
-double ClusterEnergyEstimator::NeuralNetwork(const ublas::vector<double>& Feature) const {
-  (void) Feature;
-  double result=0;
-  return result;
+vector<double> ClusterEnergyEstimator::NeuralNetwork(const vector<double>& Feature) const {
+
+  vector<double> layer_1(100);
+  layer_1 = prod(Feature,Weight_h1)+Bias_b1;
+  ActivationFunctionRelu(layer_1);
+  vector<double> output_layer(nOutput);
+  output_layer = prod(layer_1,Weight_out)+Bias_out;
+  return output_layer;
 };
 
-void ClusterEnergyEstimator::NormaliseFeature(ublas::vector<double>& Feature,
-                                              const ublas::vector<double> Mean,
-                                              const ublas::vector<double> StdDev) const {
-  
+void ClusterEnergyEstimator::NormaliseFeature(vector<double>& Feature,
+                                              const vector<double> Mean,
+                                              const vector<double> StdDev) const {
 
-
-  
-  (void) Feature;    
+  Feature = element_div(Feature - Mean,StdDev);
 };
 
-void ClusterEnergyEstimator::RecoverFeature(ublas::vector<double>& Feature,
-                                            const ublas::vector<double> Mean,
-                                            const ublas::vector<double> StdDev) const {
+void ClusterEnergyEstimator::RecoverFeature(vector<double>& Feature,
+                                            const vector<double> Mean,
+                                            const vector<double> StdDev) const {
   
 
-
-  
-  (void) Feature;    
+  Feature = element_prod(Feature, StdDev) + Mean;
 };
 
 
