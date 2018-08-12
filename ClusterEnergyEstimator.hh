@@ -19,7 +19,7 @@ public:
   double EstimateEnergy(const WireCluster&) const;
   void   EstimateEnergy(const std::vector<WireCluster*>&) const;
   void   EstimateEnergy(const std::vector<WireCluster*>*) const;
-  
+  std::vector<double> GetElapsedTime() const { return {0}; };
 private:
   void ParseXMLFile();
   void ActivationFunctionRelu(boost::numeric::ublas::vector<double>& v) const {
@@ -57,8 +57,10 @@ private:
   boost::numeric::ublas::vector<double> InputData_StdDev ;
   boost::numeric::ublas::vector<double> OutputData_Mean  ;
   boost::numeric::ublas::vector<double> OutputData_StdDev;
+  TStopwatch *fStopwatch;
   
-
+  std::vector<double> TimeElapsed;
+  
 };
 
 #endif
