@@ -1,7 +1,6 @@
 #ifndef CLUSTERENGINE_HH
 #define CLUSTERENGINE_HH
-#include "TStopwatch.h"
-
+#include <time.h>
 
 #include "WireCluster.hh"
 #include "OpticalCluster.hh"
@@ -20,8 +19,9 @@ public:
     TimeOrdering_Time (),
     SpaceOrdering_Time(),
     Clustering_Time   (),
-    fStopwatch(NULL) {
-    fStopwatch = new TStopwatch();
+    fStopwatch0(0),
+    fStopwatch1(0),
+    fSorting(0){
   };
   
   ClusterEngine():
@@ -33,12 +33,27 @@ public:
     TimeOrdering_Time (),
     SpaceOrdering_Time(),
     Clustering_Time   (),
-    fStopwatch(NULL) {
-    fStopwatch = new TStopwatch();
+    fStopwatch0(0),
+    fStopwatch1(0),
+    fSorting(0){
   };
   
   void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
-  void ClusterHits2(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
+  void ClusterHits2(std::vector<WireHit*>&vec_wirehit,
+                    std::vector<WireCluster*>*vec_cluster,
+                    std::vector<WireHit*>*vec_wirehit_unused) {
+    if (fSorting==1) {
+      ClusterHits2_stable_sort(vec_wirehit,
+                               vec_cluster,
+                               vec_wirehit_unused);
+    } else {
+      ClusterHits2_sort(vec_wirehit,
+                        vec_cluster,
+                        vec_wirehit_unused);
+    }
+  }
+  void ClusterHits2_stable_sort(std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
+  void ClusterHits2_sort(std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits3(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
 
   void ClusterOpticalHits (std::vector<OpticalHit*>&, std::vector<OpticalCluster*>&);
@@ -55,23 +70,25 @@ public:
 
   double GetPositionOpt() const { return fPositionOpt; };
   void   SetPositionOpt(double inPositionOpt=300) { fPositionOpt=inPositionOpt; };
-
-
-  std::vector<double> GetElapsedTime_TimeOrdering () { return TimeOrdering_Time;  } ;
-  std::vector<double> GetElapsedTime_SpaceOrdering() { return SpaceOrdering_Time; } ;
-  std::vector<double> GetElapsedTime_Clustering   () { return Clustering_Time;    } ;
+  
+  void SetSorting(const int i=0) { fSorting = i; };
+  
+  std::vector<double> GetElapsedTime_TimeOrdering () const { return TimeOrdering_Time;  } ;
+  std::vector<double> GetElapsedTime_SpaceOrdering() const { return SpaceOrdering_Time; } ;
+  std::vector<double> GetElapsedTime_Clustering   () const { return Clustering_Time;    } ;
   
   ~ClusterEngine(){
-    if (fStopwatch) delete fStopwatch;
-    fStopwatch = NULL;
     TimeOrdering_Time .clear();
     SpaceOrdering_Time.clear();
     Clustering_Time   .clear();
   };
   
 private:
-  TStopwatch *fStopwatch;
+  clock_t fStopwatch0;
+  clock_t fStopwatch1;
 
+  int fSorting;
+  
   double fChannelWidth;
   double fTimeWindow;
   double fMinHitADC;
@@ -81,7 +98,14 @@ private:
   std::vector<double> TimeOrdering_Time;
   std::vector<double> SpaceOrdering_Time;
   std::vector<double> Clustering_Time;   
- 
+
+  void ResetTime() {
+    TimeOrdering_Time .clear();
+    SpaceOrdering_Time.clear();
+    Clustering_Time   .clear();   
+  };
+
+  
 };
 
 #endif

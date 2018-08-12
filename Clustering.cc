@@ -96,6 +96,7 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_TimingInfo = new TTree("TimingInfo", "TimingInfo");
   t_Output_TimingInfo->Branch("Event",  &out_Event,  "Event/I" );
   t_Output_TimingInfo->Branch("Config", &out_Config, "Config/I");
+  t_Output_TimingInfo->Branch("nHit",   &out_NHits,  "nHit/I");
   t_Output_TimingInfo->Branch("TimeOrdering_WireClustTime",         &TimeOrdering_WireClustTime        );
   t_Output_TimingInfo->Branch("SpaceOrdering_WireClustTime",        &SpaceOrdering_WireClustTime       );
   t_Output_TimingInfo->Branch("Clustering_WireClustTime",           &Clustering_WireClustTime          );
@@ -124,6 +125,7 @@ int Clustering::ClusterAll(int inNEvent){
   hNConfigs->Write();
 
   fClustEng   = new ClusterEngine();
+  fClustEng->SetSorting(fSorting);
   fTrigger    = new Trigger();
   fClustSelec = new ClusterSelector();
   fNConfig = (int)fvec_cut_AdjChanTolerance.size();
@@ -131,6 +133,12 @@ int Clustering::ClusterAll(int inNEvent){
   std::map<std::pair<int,int>, std::vector<WireHit*>* >     map_unusedHits;
   std::map<std::pair<int,int>, std::vector<WireCluster*>* > map_clusters;
   
+  int ConfigBegin = 0;
+  int ConfigEnd   = fNConfig;
+  if (fConfig != -1) {
+    ConfigBegin = fConfig;
+    ConfigEnd   = fConfig+1;
+  }
   for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
     
     PrintProgress(iEvent,fNEvent);
@@ -162,6 +170,9 @@ int Clustering::ClusterAll(int inNEvent){
       if (im.Hit_True_MarleyIndex != NULL) {
         marley_index=(*im.Hit_True_MarleyIndex)[j];
       }
+      if((*im.Hit_Chan)[j] > fmap_APA_Channel[fNAPA])
+        continue;
+      
       vec_WireHit.push_back(new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
                                         (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
                                         (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
@@ -171,16 +182,22 @@ int Clustering::ClusterAll(int inNEvent){
                                         (*im.Hit_True_X)[j],      (*im.Hit_True_Y)[j],        (*im.Hit_True_Z)[j],
                                         marley_index));
     }
+    out_NHits = vec_WireHit.size();
     for(size_t j = 0; j < im.PDS_OpHit_OpChannel->size(); j++) {
       vec_OptHit.push_back(new OpticalHit((*im.PDS_OpHit_True_GenType)[j],
                                           (*im.PDS_OpHit_X)[j],        (*im.PDS_OpHit_Y)[j],     (*im.PDS_OpHit_Z)[j],
                                           (*im.PDS_OpHit_PeakTime)[j], (*im.PDS_OpHit_Width)[j], (*im.PDS_OpHit_PE)[j],
                                           (*im.PDS_OpHit_OpChannel)[j]));
     }
+
     std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
-    
-    for(fCurrentConfig=0; fCurrentConfig<1; ++fCurrentConfig) {
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+
+    for(fCurrentConfig=ConfigBegin; fCurrentConfig<ConfigEnd; ++fCurrentConfig) {
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
       fClustEng  ->SetPositionOpt    (300);
@@ -199,7 +216,7 @@ int Clustering::ClusterAll(int inNEvent){
       FillClusterERecoTimingInfo_Opti (fEReco);
 
       fClustEng->ClusterHits2(vec_WireHit, vec_Clusters, vec_UnusedHits);
-      fEReco   ->EstimateEnergy(vec_Clusters);
+      fEReco->EstimateEnergy(vec_Clusters);
       FillClusterEngineTimingInfo_Wire(fClustEng);
       FillClusterERecoTimingInfo_Wire (fEReco);
 
@@ -237,7 +254,7 @@ int Clustering::ClusterAll(int inNEvent){
     
     }
       
-    for(int j = 0; j < im.NColHit; j++) {
+    for(size_t j = 0; j < vec_WireHit.size(); j++) {
       delete vec_WireHit[j];
       vec_WireHit[j] = NULL;
     }
@@ -287,7 +304,7 @@ void Clustering::FillClusterEngineTimingInfo_Wire(ClusterEngine* clusterEngine) 
 
 void Clustering::FillClusterERecoTimingInfo_Wire(ClusterEnergyEstimator* clusterEReco) {
   EnergyReconstruction_WireClustTime.clear();
-  EnergyReconstruction_WireClustTime = clusterEReco->EstimateEnergy(vec_Clusters);
+  EnergyReconstruction_WireClustTime = clusterEReco->GetElapsedTime();
 };
 
 void Clustering::FillClusterERecoTimingInfo_Opti(ClusterEnergyEstimator* clusterEReco) {

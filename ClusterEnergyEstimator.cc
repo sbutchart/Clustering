@@ -15,7 +15,8 @@ ClusterEnergyEstimator::ClusterEnergyEstimator(std::string f):
   InputData_Mean   (),
   InputData_StdDev (),
   OutputData_Mean  (),
-  OutputData_StdDev()
+  OutputData_StdDev(),
+  TimeElapsed()
 {
   ParseXMLFile();
 };
@@ -31,6 +32,7 @@ ClusterEnergyEstimator::~ClusterEnergyEstimator() {
   InputData_StdDev .clear();
   OutputData_Mean  .clear();
   OutputData_StdDev.clear();
+  TimeElapsed.clear();
 };
 
 double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const {
@@ -81,7 +83,8 @@ void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>& clu
 
 void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>* clusters) const{
   for (auto& it : (*clusters))
-    it->SetEReco(EstimateEnergy(*it));
+    //it->SetEReco(EstimateEnergy(*it));
+    it->SetEReco(0);
   return;
 };
 
