@@ -30,6 +30,7 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredWireHit->Branch("FirstTimeHit",   &out_FirstTimeHit,   "FirstTimeHit/F"  );
   t_Output_ClusteredWireHit->Branch("LastTimeHit",    &out_LastTimeHit,    "LastTimeHit/F"   );
   t_Output_ClusteredWireHit->Branch("TimeWidth",      &out_TimeWidth,      "TimeWidth/F"     );
+  t_Output_ClusteredWireHit->Branch("EReco",          &out_EReco,          "EReco/D"         );
   t_Output_ClusteredWireHit->Branch("E_deposited",    &out_E_deposited,    "E_deposited/D"   );
   t_Output_ClusteredWireHit->Branch("MC_UnderlyingE", &out_MC_UnderlyingE, "MC_UnderlyingE/D");
   t_Output_ClusteredWireHit->Branch("RecClusterPosX", &out_RecClusterPosX, "RecClusterPosX/D");
@@ -216,7 +217,7 @@ int Clustering::ClusterAll(int inNEvent){
       FillClusterERecoTimingInfo_Opti (fEReco);
 
       fClustEng->ClusterHits2(vec_WireHit, vec_Clusters, vec_UnusedHits);
-      fEReco->EstimateEnergy(vec_Clusters);
+      if (fEReco) fEReco->EstimateEnergy(vec_Clusters);
       FillClusterEngineTimingInfo_Wire(fClustEng);
       FillClusterERecoTimingInfo_Wire (fEReco);
 
@@ -361,6 +362,7 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
   out_FirstTimeHit   = clust->GetFirstTimeHit();
   out_LastTimeHit    = clust->GetLastTimeHit();
   out_TimeWidth      = clust->GetTimeWidth();
+  out_EReco          = clust->GetEReco();
   out_MC_UnderlyingE = clust->GetMC_UnderlyingE();
   out_TrClusterPosX  = clust->GetTruePosition(0);
   out_TrClusterPosY  = clust->GetTruePosition(1);
@@ -440,6 +442,7 @@ void Clustering::ResetFillVariable(){
   out_YWidth         = 0;
   out_ZWidth         = 0;
   out_SumPE          = 0;
+  out_EReco          = 0;
   out_MarleyIndex    =-1;
   out_MarlTime.clear();
   out_ENu     .clear();

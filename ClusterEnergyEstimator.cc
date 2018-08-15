@@ -46,6 +46,7 @@ double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const 
   vector<double> ereco(1);
   ereco = NeuralNetwork(Feature);
   RecoverFeature(ereco, OutputData_Mean, OutputData_StdDev);
+  
   return ereco(0);
 };
 
@@ -53,11 +54,10 @@ vector<double> ClusterEnergyEstimator::NeuralNetwork(const vector<double>& Featu
 
   vector<double> layer_1(100);
   layer_1 = prod(Feature,Weight_h1);
-  layer_1 += Bias_b1;
+  layer_1 += column(Bias_b1,0);
   ActivationFunctionRelu(layer_1);
-  vector<double> output_layer(nOutput);
-  output_layer = prod(layer_1,Weight_out);
-  output_layer += Bias_out;
+  vector<double> output_layer = prod(layer_1,Weight_out);
+  output_layer += row(Bias_out,0);
   return output_layer;
 };
 
@@ -65,7 +65,7 @@ void ClusterEnergyEstimator::NormaliseFeature(vector<double>& Feature,
                                               const vector<double> Mean,
                                               const vector<double> StdDev) const {
 
-  Feature = element_div(Feature - Mean,StdDev);
+  Feature = element_div(Feature-Mean, StdDev);
 };
 
 void ClusterEnergyEstimator::RecoverFeature(vector<double>& Feature,
@@ -85,8 +85,8 @@ void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>& clu
 
 void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>* clusters) const{
   for (auto& it : (*clusters))
-    //it->SetEReco(EstimateEnergy(*it));
-    it->SetEReco(0);
+    it->SetEReco(EstimateEnergy(*it));
+  //it->SetEReco(0);
   return;
 };
 
@@ -157,53 +157,53 @@ void ClusterEnergyEstimator::ParseXMLFile() {
   requiredchild = {"b1","out"};
   LoadChildAndAssertExistance(map_main["Bias"], map_bias, requiredchild);
 
-  std::map<std::string,XMLNodePointer_t> map_bias_b1_param;
-  requiredchild = {"Param"};
-  LoadChildAndAssertExistance(map_bias["b1"], map_bias_b1_param, requiredchild, nParam);
-
-  std::map<std::string,std::map<std::string,XMLNodePointer_t>> map_bias_b1_param_layer;
+  std::map<std::string,XMLNodePointer_t> map_bias_b1;
   requiredchild = {"Layer_1"};
-  for(int i=0; i<nParam; ++i) {
-    std::map<std::string,XMLNodePointer_t> dummy;
-    LoadChildAndAssertExistance(map_bias_b1_param.at(Form("Param_%i",i)),
-                                 dummy, requiredchild, nNeuron);
-    map_bias_b1_param_layer[Form("Param_%i",i)] = dummy;
-  }
+  LoadChildAndAssertExistance(map_bias["b1"], map_bias_b1, requiredchild, nNeuron);
 
-  std::map<std::string,XMLNodePointer_t> map_bias_out_param;
-  requiredchild = {"Layer_1"};
-  LoadChildAndAssertExistance(map_bias["out"], map_bias_out_param, requiredchild, nNeuron);
+  std::map<std::string,XMLNodePointer_t> map_bias_out;
+  requiredchild = {"Layer_1_0"};
+  LoadChildAndAssertExistance(map_bias["out"], map_bias_out, requiredchild);
 
   std::map<std::string,XMLNodePointer_t> map_weight;
   requiredchild = {"h1","out"};
   LoadChildAndAssertExistance(map_main["Weight"], map_weight, requiredchild);
 
   std::map<std::string,XMLNodePointer_t> map_weight_h1_param;
+  requiredchild = {"Param"};
+  LoadChildAndAssertExistance(map_weight["h1"], map_weight_h1_param, requiredchild, nParam);
+  
+  std::map<std::string,std::map<std::string,XMLNodePointer_t>> map_weight_h1_param_layer;
   requiredchild = {"Layer_1"};
-  LoadChildAndAssertExistance(map_weight["h1"], map_weight_h1_param, requiredchild, nNeuron);
+  for(int i=0; i<nParam; ++i) {
+    std::map<std::string,XMLNodePointer_t> dummy;
+    LoadChildAndAssertExistance(map_weight_h1_param.at(Form("Param_%i",i)),
+                                dummy, requiredchild, nNeuron);
+    map_weight_h1_param_layer[Form("Param_%i",i)] = dummy;
+  }
+  
+  std::map<std::string,XMLNodePointer_t> map_weight_out;
+  requiredchild = {"Layer_1"};
+  LoadChildAndAssertExistance(map_weight["out"], map_weight_out, requiredchild, nNeuron);
 
-  std::map<std::string,XMLNodePointer_t> map_weight_out_param;
-  requiredchild = {"Layer_1_0"};
-  LoadChildAndAssertExistance(map_weight["out"], map_weight_out_param, requiredchild);
-
-  Weight_h1   = vector<double>(nNeuron);
-  Weight_out  = vector<double>(nOutput);
-  Bias_b1     = matrix<double>(nParam,nNeuron);
-  Bias_out    = vector<double>(nNeuron);
-
+  Weight_h1  = matrix<double>(nParam,nNeuron);
+  Weight_out = matrix<double>(nNeuron,1);
+  Bias_b1    = matrix<double>(nNeuron,1);
+  Bias_out   = matrix<double>(nOutput,1);
+  
   for (int param=0; param<nParam; ++param) {
     std::string paramstr= Form("Param_%i",param);
     
-    if (map_bias_b1_param_layer.find(paramstr) != map_bias_b1_param_layer.end()) {
+    if (map_weight_h1_param_layer.find(paramstr) != map_weight_h1_param_layer.end()) {
       
       for (int neur=0; neur<nNeuron; ++neur) {
         
         std::string neurstr = Form("Layer_1_%i",neur);
 
-        if (map_bias_b1_param_layer.at(paramstr).at(neurstr)) {
-          content = xml->GetNodeContent(map_bias_b1_param_layer.at(paramstr).at(neurstr));
+        if (map_weight_h1_param_layer.at(paramstr).at(neurstr)) {
+          content = xml->GetNodeContent(map_weight_h1_param_layer.at(paramstr).at(neurstr));
           double d = stod(content);
-          Bias_b1(param,neur) = d;
+          Weight_h1(param,neur) = d;
         }
       }
     }
@@ -211,25 +211,39 @@ void ClusterEnergyEstimator::ParseXMLFile() {
   
   for (int neur=0; neur<nNeuron; ++neur) {
     std::string neurstr = Form("Layer_1_%i",neur);
-    content = xml->GetNodeContent(map_bias_out_param.at(neurstr));
+    content = xml->GetNodeContent(map_weight_out.at(neurstr));
     double d = stod(content);
-    Bias_out(neur)=d;
+    Weight_out(neur,0)=d;
   }
   
   for (int neur=0; neur<nNeuron; ++neur) {
     std::string neurstr = Form("Layer_1_%i",neur);
-    content = xml->GetNodeContent(map_weight_h1_param.at(neurstr));
+    content = xml->GetNodeContent(map_bias_b1.at(neurstr));
     double d = stod(content);
-    Weight_h1(neur) = d;
+    Bias_b1(neur,0) = d;
   }
 
-  for (auto const& it: map_weight_out_param) {
+  for (auto const& it: map_bias_out) {
     content = xml->GetNodeContent(it.second);
     double d = stod(content);
-    Weight_out(0) = d;
+    Bias_out(0,0) = d;
   }
 
   xml->FreeDoc(xmldoc);
+
+
+  vector<double> Feature(nParam);
+  Feature[0] = 8;
+  Feature[1] = 7;
+  Feature[2] = 1000;
+  Feature[3] = 1;
+  
+  NormaliseFeature(Feature, InputData_Mean, InputData_StdDev);
+
+  vector<double> ereco(1);
+  ereco = NeuralNetwork(Feature);
+  RecoverFeature(ereco, OutputData_Mean, OutputData_StdDev);
+  std::cout << "EReco on test cluster: "  << ereco(0) << std::endl;
 };
 
 

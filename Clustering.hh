@@ -279,6 +279,7 @@ private:
   float  out_LastTimeHit   ;
   float  out_TimeWidth     ;
   double out_E_deposited   ;
+  double out_EReco         ;
   double out_MC_UnderlyingE;
   double out_TrClusterPosX ;
   double out_TrClusterPosY ;

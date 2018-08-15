@@ -10,6 +10,9 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 class ClusterEnergyEstimator {
 
@@ -49,10 +52,10 @@ private:
   int nNeuron;
   int nParam;
   int nOutput;
-  boost::numeric::ublas::vector<double> Weight_h1        ;
-  boost::numeric::ublas::vector<double> Weight_out       ;
+  boost::numeric::ublas::matrix<double> Weight_h1        ;
+  boost::numeric::ublas::matrix<double> Weight_out       ;
   boost::numeric::ublas::matrix<double> Bias_b1          ;
-  boost::numeric::ublas::vector<double> Bias_out         ;
+  boost::numeric::ublas::matrix<double> Bias_out         ;
   boost::numeric::ublas::vector<double> InputData_Mean   ;
   boost::numeric::ublas::vector<double> InputData_StdDev ;
   boost::numeric::ublas::vector<double> OutputData_Mean  ;
