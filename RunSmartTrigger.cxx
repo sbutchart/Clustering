@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "THn.h"
+#include "TH1D.h"
 #include "TCanvas.h"
 
 #include "SmartTrigger.hh"
@@ -78,8 +79,14 @@ int main(int argc, char** argv) {
   strig.ConstructLikelihood(InputFile, OutputFile);
   THnD* Likelihood_Sign = strig.GetLikelihood_Signal    ();
   THnD* Likelihood_Back = strig.GetLikelihood_Background();
-  
-  
+  TH1D* Likelihood_Sign_TH1 = Likelihood_Sign->Projection(0);
+  TH1D* Likelihood_Back_TH1 = Likelihood_Back->Projection(0);
+  TCanvas c;
+  Likelihood_Sign_TH1->SetLineColor(kRed);
+  Likelihood_Back_TH1->SetLineColor(kBlue);
+  Likelihood_Sign_TH1->Draw();
+  Likelihood_Back_TH1->Draw("SAME");
+  c.SaveAs("likelihoods.pdf");
 }
 
 

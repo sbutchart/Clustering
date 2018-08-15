@@ -1,5 +1,6 @@
 #include "SmartTrigger.hh"
 
+#include "Helper.h"
 
 SmartTrigger::SmartTrigger(const std::vector<std::string> f):
   fLikelihood_Sign(NULL),
@@ -84,36 +85,46 @@ void SmartTrigger::ConstructLikelihood(const std::string InputFile,
   //   Tree->Project(fLikelihood_Back->GetName(), feat.c_str(), Form("Type==0 && Config==%i",fConfig));
 
   // } else {
-    float* feature = new float[fFeature.size()];
-    int i=0;
-    for (auto const& it : fFeature)
-      Tree->SetBranchAddress(it.c_str(), &feature[i++]);
-    int gentype = 0;
-    int config = 0;
-    Tree->SetBranchAddress("Type",   &gentype);
-    Tree->SetBranchAddress("Config", &config);
-      
-    for (int i=0; i<Tree->GetEntries(); ++i){
-      Tree->GetEntry(i);
-      if (config != fConfig) continue;
-      double* feature_d = new double[fFeature.size()];
-      for (int f=0; f<fFeature.size(); ++f) {
-        feature_d[f] = feature[f];
-        std::cout << feature[f] << std::endl;
-      }
-      if (gentype == 1) {
-        fLikelihood_Sign->Fill(feature_d);
-      } else {
-        fLikelihood_Back->Fill(feature_d);
-      }
+
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  float* feature = new float[fFeature.size()];
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  int i=0;
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  for (auto const& it : fFeature)
+    Tree->SetBranchAddress(it.c_str(), &feature[i++]);
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  int gentype = 0;
+  int config = 0;
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  Tree->SetBranchAddress("Type",   &gentype);
+  Tree->SetBranchAddress("Config", &config);
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+
+  for (int i=0; i<Tree->GetEntries(); ++i){
+    PrintProgress(i,Tree->GetEntries());
+    Tree->GetEntry(i);
+    if (config != fConfig) continue;
+    double* feature_d = new double[fFeature.size()];
+    for (int f=0; f<fFeature.size(); ++f) {
+      feature_d[f] = feature[f];
     }
+    if (gentype == 1) {
+      fLikelihood_Sign->Fill(feature_d);
+    } else {
+      fLikelihood_Back->Fill(feature_d);
+    }
+  }
 //}
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
   InFile ->Close();
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
 
   TFile* OutFile = new TFile(OutputFile.c_str(), "RECREATE");
   fLikelihood_Sign->Write();
   fLikelihood_Back->Write();
   OutFile->Close();
+  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
 
 };
 
