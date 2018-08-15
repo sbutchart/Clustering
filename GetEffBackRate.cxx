@@ -42,6 +42,7 @@ int getClusterType(const std::vector<int>* vec_GenType) {
 
 
 void FillEventCountMap(TTree* ClusteredHit,
+                       size_t nHitCut,
                        std::map<int,double>& map_Config_nBackCluster,
                        std::map<int,std::map<int,std::map<int,int>>>& map_ConfigEventIndex_nSignCluster){
   
@@ -56,15 +57,16 @@ void FillEventCountMap(TTree* ClusteredHit,
   ClusteredHit->SetBranchAddress("Config",       &in_Config     );
   ClusteredHit->SetBranchAddress("Type",         &in_Type       );
   ClusteredHit->SetBranchAddress("MarleyIndex",  &in_MarleyIndex);
+  ClusteredHit->SetBranchAddress("MarleyIndex",  &in_MarleyIndex);
   if (ClusteredHit->GetListOfBranches()->FindObject("GenType")) {
     ClusteredHit->SetBranchAddress("GenType", &in_GenType);
   } else {
     ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
   }
-  
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
-    if(in_Type == 1) {
+    if (in_GenType->size() <= nHitCut) continue;
+    if (in_Type == 1) {
       map_ConfigEventIndex_nSignCluster[in_Config][in_Event][in_MarleyIndex]++;
     } else {
       int    ClusterType = getClusterType(in_GenType);
@@ -129,8 +131,9 @@ int main(int argc, char** argv) {
   std::string InputFile  = "";
   std::string OutputFile = "";
   int Config = -1;
+  int nHitCut = 0;
   double DetectorScaling = 0.12;
-  while ( (opt = getopt(argc, argv, "i:o:c:s:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "i:o:c:s:h:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile  = std::string(optarg);
@@ -143,6 +146,10 @@ int main(int argc, char** argv) {
       break;
     case 's':
       DetectorScaling = atoi(optarg);
+      break;
+    case 'h':
+      std::cout << optarg<< std::endl;
+      nHitCut = atoi(optarg);
       break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
@@ -197,12 +204,14 @@ int main(int argc, char** argv) {
   std::map<int,double> map_Config_nWireBackCluster;
   std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nWireSignCluster;
   FillEventCountMap(ClusteredWireHit,
+                    nHitCut,
                     map_Config_nWireBackCluster,
                     map_ConfigEventIndex_nWireSignCluster);
 
   std::map<int,double> map_Config_nOpticalBackCluster;
   std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nOpticalSignCluster;
   FillEventCountMap(ClusteredOpticalHit,
+                    nHitCut,
                     map_Config_nOpticalBackCluster,
                     map_ConfigEventIndex_nOpticalSignCluster);
 
