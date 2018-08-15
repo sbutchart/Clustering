@@ -25,10 +25,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
+
 add_library(Display SHARED PhotonTimingDisplay.cc)
 target_link_libraries(Display ${ROOT_LIBRARIES})
+
 add_library(SimpleOptHit SHARED HitSimplePlot.cc)
 target_link_libraries(SimpleOptHit ${ROOT_LIBRARIES})
+
+add_library(SmartTrigger SHARED SmartTrigger.cc)
+target_link_libraries(SmartTrigger ${ROOT_LIBRARIES})
 
 link_directories(build)
 #---Create  a main program using the library
@@ -54,6 +59,9 @@ target_link_libraries(PDSTiming ${ROOT_LIBRARIES})
 
 add_executable(NeutronInfo NeutronInfo.cxx)
 target_link_libraries(NeutronInfo ${ROOT_LIBRARIES})
+
+add_executable(RunSmartTrigger RunSmartTrigger.cxx)
+target_link_libraries(RunSmartTrigger SmartTrigger)
 
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
