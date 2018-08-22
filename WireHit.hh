@@ -9,17 +9,18 @@ public:
           float cTrDepositedE, float cTrEPart, int   cTrIDPart,
           float cRecPosX,      float cRecPosY, float cRecPosZ,
           float cTrPosX,       float cTrPosY,  float cTrPosZ,
-          int   cMarleyIndex):
+          int   cMarleyIndex,  float cNelec):
     fHitView(cHitView),
     fGenType(cGenType),
     fHitChan(cHitChan),
     fHitSADC(cHitSADC),
     fHitRMS (cHitRMS ),
     fHitTime(cHitTime),
+    fMarleyIndex(cMarleyIndex),
     fTrDepositedE(cTrDepositedE),
+    fNElectron(cNelec),
     fTrEPart(cTrEPart),
     fTrIDPart(cTrIDPart),
-    fMarleyIndex(cMarleyIndex),
     fHitChanNorm(0),
     fHitTimeNorm(0){
     fTruePosition[0] = cTrPosX;
@@ -37,10 +38,11 @@ public:
     fHitSADC(0),
     fHitRMS (0),
     fHitTime(0),
+    fMarleyIndex(0),
     fTrDepositedE(0),
+    fNElectron(0),
     fTrEPart (0),
     fTrIDPart(0),
-    fMarleyIndex(0),
     fHitChanNorm(0),
     fHitTimeNorm(0){
     fTruePosition[0] = (0);
@@ -58,10 +60,11 @@ public:
     fHitSADC(hit.fHitSADC),
     fHitRMS (hit.fHitRMS ),
     fHitTime(hit.fHitTime),
+    fMarleyIndex (hit.fMarleyIndex),
     fTrDepositedE(hit.fTrDepositedE),
+    fNElectron(hit.fNElectron),
     fTrEPart     (hit.fTrEPart ),
     fTrIDPart    (hit.fTrIDPart),
-    fMarleyIndex(hit.fMarleyIndex),
     fHitChanNorm(hit.fHitChanNorm),
     fHitTimeNorm(hit.fHitTimeNorm){
     fTruePosition[0] = hit.fTruePosition[0];
@@ -96,6 +99,7 @@ public:
   float GetHitSADC     () const { return fHitSADC;      };
   float GetHitRMS      () const { return fHitRMS;       };
   float GetTrDepositedE() const { return fTrDepositedE; };
+  float GetNElectron   () const { return fNElectron;    };
   float GetTrEPart     () const { return fTrEPart;      };
   float GetTrIDPart    () const { return fTrIDPart;     };
   float GetHitChanNorm () const { return fHitChanNorm;  };
@@ -114,8 +118,9 @@ private:
   float fHitRMS ;
   float fHitTime;
   float fRecoPosition[3];
-  int   fMarleyIndex;
+  int   fMarleyIndex ;
   float fTrDepositedE;
+  float fNElectron   ;
   float fTrEPart     ;
   int   fTrIDPart    ;
   float fTruePosition[3];

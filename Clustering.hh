@@ -52,10 +52,8 @@ public:
     t_Output_TimingInfo         (NULL),
     h_ENu_MC     (NULL),
     h_MarlTime_MC(NULL),
-    im(),
-    fmap_APA_Channel()
-
-    {
+    fmap_APA_Channel(),
+    im()    {
       for(size_t i = 0; i < fvec_g_config.size(); i++){
         if(fvec_g_config[i]) delete fvec_g_config[i];
         fvec_g_config[i] = NULL;
@@ -138,19 +136,19 @@ public:
   void SetConfig      (const int n=-1)         { fConfig         = n; };
   void SetSorting     (const int n=0)          { fSorting        = n; };
     
-  void SetupConfigurations_AdjChanTolerance(const std::vector<float> vec_cut_AdjChanTolerance = {1,2,2,2,2,2}          )
+  void SetupConfigurations_AdjChanTolerance(const std::vector<float> vec_cut_AdjChanTolerance = {1,2,2,2,2,2,2}          )
     { fvec_cut_AdjChanTolerance = vec_cut_AdjChanTolerance; };
-  void SetupConfigurations_MinHitADC       (const std::vector<float> vec_cut_MinHitADC        = {0,0,0,0,0,0}          )
+  void SetupConfigurations_MinHitADC       (const std::vector<float> vec_cut_MinHitADC        = {0,0,0,0,0,0,0}          )
     { fvec_cut_MinHitADC = vec_cut_MinHitADC; };
-  void SetupConfigurations_HitsInWindow    (const std::vector<float> vec_cut_HitsInWindow     = {2,3,3,4,5,6}          )
+  void SetupConfigurations_HitsInWindow    (const std::vector<float> vec_cut_HitsInWindow     = {2,3,3,4,5,6,5}          )
     { fvec_cut_HitsInWindow  = vec_cut_HitsInWindow; };
-  void SetupConfigurations_MinChannels     (const std::vector<float> vec_cut_MinChannels      = {2,2,2,2,2,2}          )
+  void SetupConfigurations_MinChannels     (const std::vector<float> vec_cut_MinChannels      = {2,2,2,2,2,2,2}          )
     { fvec_cut_MinChannels = vec_cut_MinChannels; };
-  void SetupConfigurations_MinChanWidth    (const std::vector<float> vec_cut_MinChanWidth     = {0,0,0,0,0,0}          )
+  void SetupConfigurations_MinChanWidth    (const std::vector<float> vec_cut_MinChanWidth     = {0,0,0,0,0,0,0}          )
     { fvec_cut_MinChanWidth = vec_cut_MinChanWidth; };
-  void SetupConfigurations_TimeWindowSize  (const std::vector<float> vec_cut_TimeWindowSize   = {20,20,20,20,20,20}    )
+  void SetupConfigurations_TimeWindowSize  (const std::vector<float> vec_cut_TimeWindowSize   = {20,20,20,20,20,20,20}   )
     { fvec_cut_TimeWindowSize = vec_cut_TimeWindowSize; };
-  void SetupConfigurations_TotalADC        (const std::vector<float> vec_cut_TotalADC         = {350,400,450,400,400,0})
+  void SetupConfigurations_TotalADC        (const std::vector<float> vec_cut_TotalADC         = {350,400,450,400,400,0,0})
     { fvec_cut_TotalADC =vec_cut_TotalADC; };
  
   int GetNConfig() const { return fNConfig; };
@@ -268,17 +266,18 @@ private:
   int    out_MarleyIndex   ;
   int    out_Cluster       ;
   int    out_Config        ;
-  int    out_StartChan     ;
-  int    out_EndChan       ;
-  int    out_ChanWidth     ;
-  int    out_NChan         ;
-  int    out_Type          ;
-  int    out_NHits         ;
-  float  out_SumADC        ;
-  float  out_FirstTimeHit  ;
-  float  out_LastTimeHit   ;
-  float  out_TimeWidth     ;
+  double out_StartChan     ;
+  double out_EndChan       ;
+  double out_ChanWidth     ;
+  double out_NChan         ;
+  double out_Type          ;
+  double out_NHits         ;
+  double out_SumADC        ;
+  double out_FirstTimeHit  ;
+  double out_LastTimeHit   ;
+  double out_TimeWidth     ;
   double out_E_deposited   ;
+  double out_NElectron     ;
   double out_EReco         ;
   double out_MC_UnderlyingE;
   double out_TrClusterPosX ;
