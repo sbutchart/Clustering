@@ -2,129 +2,102 @@
 
 #include "Helper.h"
 
-SmartTrigger::SmartTrigger(const std::vector<std::string> f):
+SmartTrigger::SmartTrigger(const std::string f):
   fLikelihood_Sign(NULL),
   fLikelihood_Back(NULL),
+  fLookupDiscriminator(NULL),
   fFeature(f),
-  fConfig(-1){
-  int dim = fFeature.size();
-  double* min = new double[dim];
-  double* max = new double[dim];
-  int* nbin = new int[dim];
+  fConfig(-1) {
   
-  for (int i=0; i<dim; ++i) {
-    min [i] = 0;
-    max [i] = 1;
-    nbin[i] = 1;
-  }
-  
-  std::string title = "Likelihood";
-  for (auto const& it : fFeature) title += ";"+it;
-  fLikelihood_Sign = new THnD("Likelihood_Sign", title.c_str(), dim, nbin, min, max);
-  fLikelihood_Back = new THnD("Likelihood_Back", title.c_str(), dim, nbin, min, max);
-
-  delete [] min;  min  = NULL; 
-  delete [] max;  max  = NULL; 
-  delete [] nbin; nbin = NULL;
 };
 
 
-void SmartTrigger::SetBinning(const std::string feat,
-                              const std::vector<double> binning){
+void SmartTrigger::SetResultFromCache(const std::string f) {
+  TFile* file = new TFile(f.c_str(), "READ");
+  fLikelihood_Sign = (TH1D*)file->Get("Likelihood_Sign");
+  fLikelihood_Back = (TH1D*)file->Get("Likelihood_Back");
+  fLookupDiscriminator = (TH1D*)file->Get("LookupDiscriminator");
 
-  if (std::find(fFeature.begin(), fFeature.end(), feat) == fFeature.end()) {
-    std::cout << "Error, this feature is not included in the current definition of the smart trigger" << std::endl;
-    exit(1);
+  fLikelihood_Sign    ->SetDirectory(NULL);
+  fLikelihood_Back    ->SetDirectory(NULL);
+  fLookupDiscriminator->SetDirectory(NULL);
+
+  file->Close();
+};
+
+
+void SmartTrigger::SetBinning(const std::vector<double> binning) {
+
+  int nbin = (int)binning.size()-1;
+  if (nbin <= 0) {
+    exit(0);
   }
 
-  int i = 0;
-  for (auto const& it : fFeature) {
-    if(feat == it) break;
-    i++;
+  double* bin_d = new double[nbin+1];
+  int i=0;
+  for (auto const& b : binning) {
+    bin_d[i++] = b;
   }
-  int nfeature = i;
-  
-  int nbin = binning.size()-1;
-  double* bin = new double[nbin+1];
-  
-  i = 0;
-  for (auto const& it : binning) bin[i++] = it;
 
-  fLikelihood_Sign->GetAxis(nfeature)->Set(nbin,bin);
-  fLikelihood_Back->GetAxis(nfeature)->Set(nbin,bin);
-  
+  fLikelihood_Sign = new TH1D("Likelihood_Sign", (";"+fFeature).c_str(),nbin, bin_d);
+  fLikelihood_Back = new TH1D("Likelihood_Back", (";"+fFeature).c_str(),nbin, bin_d);
+  fLookupDiscriminator = new TH1D("LookupDiscriminator", (";"+fFeature).c_str(),nbin, bin_d);
+  fLikelihood_Sign->Sumw2();
+  fLikelihood_Back->Sumw2();
+  fLookupDiscriminator->Sumw2();
 };
 
 
 void SmartTrigger::ConstructLikelihood(const std::string InputFile,
-                                       const std::string OutputFile){
-
+                                       const std::string OutputFile) {
+  
   if (fConfig == -1) {
     std::cout << "Configuration wasn't set" << std::endl;
     exit(0);
   }
 
-  TFile* InFile = new TFile(InputFile.c_str(), "READ");
-  TTree* Tree = (TTree*)InFile->Get("ClusteredWireHit");
+  TFile InFile(InputFile.c_str(), "READ");
+  TTree* Tree = (TTree*)InFile.Get("ClusteredWireHit");
 
-  
-  //std::string feat = "";
-  // if (fFeature.size() == 1) {
-  //   feat = fFeature[0];
-  //   Tree->Project(fLikelihood_Sign->GetName(), feat.c_str(), Form("Type==1 && Config == %i",fConfig));
-  //   Tree->Project(fLikelihood_Back->GetName(), feat.c_str(), Form("Type==0 && Config == %i",fConfig));
-    
-  // } else if (fFeature.size() == 2) {
-  //   feat = fFeature[0]+":"+fFeature[1];
-  //   Tree->Project(fLikelihood_Sign->GetName(), feat.c_str(), Form("Type==1 && Config == %i",fConfig));
-  //   Tree->Project(fLikelihood_Back->GetName(), feat.c_str(), Form("Type==0 && Config == %i",fConfig));
-
-  // } else if (fFeature.size() == 3) {
-  //   feat = fFeature[0]+":"+fFeature[1]+":"+fFeature[2];
-  //   Tree->Project(fLikelihood_Sign->GetName(), feat.c_str(), Form("Type==1 && Config==%i",fConfig));
-  //   Tree->Project(fLikelihood_Back->GetName(), feat.c_str(), Form("Type==0 && Config==%i",fConfig));
-
-  // } else {
-
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  float* feature = new float[fFeature.size()];
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  int i=0;
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  for (auto const& it : fFeature)
-    Tree->SetBranchAddress(it.c_str(), &feature[i++]);
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  int gentype = 0;
-  int config = 0;
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  Tree->SetBranchAddress("Type",   &gentype);
+  //TBranch** br = nullptr;
+  double feat, type;
+  int config;
+  Tree->SetBranchAddress(fFeature.c_str(), &feat);
   Tree->SetBranchAddress("Config", &config);
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  Tree->SetBranchAddress("Type",   &type);
 
-  for (int i=0; i<Tree->GetEntries(); ++i){
+  for (int i=0; i<Tree->GetEntries(); ++i) {
     PrintProgress(i,Tree->GetEntries());
     Tree->GetEntry(i);
+
     if (config != fConfig) continue;
-    double* feature_d = new double[fFeature.size()];
-    for (int f=0; f<fFeature.size(); ++f) {
-      feature_d[f] = feature[f];
+    if (type == 1) { fLikelihood_Sign->Fill(feat); }
+    else           { fLikelihood_Back->Fill(feat); }
+  }
+
+  fLikelihood_Sign->Scale(1./fLikelihood_Sign->Integral());
+  fLikelihood_Back->Scale(1./fLikelihood_Back->Integral());
+
+  for(int i=0; i<=fLikelihood_Sign->GetXaxis()->GetNbins(); ++i){
+    double Back     = fLikelihood_Back->GetBinContent(i);
+    double SignBack = fLikelihood_Sign->GetBinContent(i)+Back;
+    if (Back > 0) {
+      fLookupDiscriminator->SetBinContent(i, 2.*(Back + SignBack * (-1 + TMath::Log(SignBack / Back))));
     }
-    if (gentype == 1) {
-      fLikelihood_Sign->Fill(feature_d);
-    } else {
-      fLikelihood_Back->Fill(feature_d);
+    else if (Back <= 0 && SignBack <= 0) {
+      fLookupDiscriminator->SetBinContent(i, 0);
+    }
+    else if (Back <= 0) {
+      fLookupDiscriminator->SetBinContent(i, 10000);
     }
   }
-//}
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-  InFile ->Close();
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
-
-  TFile* OutFile = new TFile(OutputFile.c_str(), "RECREATE");
+  std::cout << "Creating " << OutputFile << std::endl;
+  TFile OutFile(OutputFile.c_str(), "RECREATE");
   fLikelihood_Sign->Write();
   fLikelihood_Back->Write();
-  OutFile->Close();
-  std::cout << "NDIM " << fLikelihood_Sign->GetNdimensions() << std::endl;
+  fLookupDiscriminator->Write();
+  OutFile.Close();
+  InFile .Close();
 
 };
 
