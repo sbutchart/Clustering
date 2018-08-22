@@ -47,8 +47,7 @@ void FillEventCountMap(TTree* ClusteredHit,
   
   int               in_Event;
   int               in_Config;
-  int               in_Type;
-  int               in_NHits;
+  double            in_Type;
   int               in_MarleyIndex;
   std::vector<int>* in_GenType = NULL;
   
