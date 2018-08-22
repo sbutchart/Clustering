@@ -89,7 +89,6 @@ void PhotonTimingDisplay::DisplayEvent(int event, int type, double time) {
 
   int requestedEvent = event;
   if (requestedEvent<0) requestedEvent=0;
-  int nEvent = std::min(requestedEvent, (int)im.GetEntries());
   c->Print("PhotonTimingDisplay.pdf[");
   bool  found=false;
 

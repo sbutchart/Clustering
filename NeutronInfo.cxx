@@ -114,10 +114,6 @@ private:
 };
 
 void NeutronInspector::ExecuteInLoop(){
-  double VertX   = im.True_VertX  ->back();
-  double VertY   = im.True_VertY  ->back();
-  double VertZ   = im.True_VertZ  ->back();
-  double VertexT = im.True_VertexT->back();
   double ENu     = im.True_ENu    ->back()*1000.;
 
   for(size_t part=0; part<im.True_Bck_Mode->size(); ++part) {

@@ -7,6 +7,12 @@ int Clustering::ClusterAll(int inNEvent){
   im.SetInputTree(fInputTreeName);
   im.LoadTree();
 
+  if (fERecoXMLFile == "") {
+    std::cout << "Not using energy reconstruction!!" << std::endl;
+  } else {
+    fEReco = new ClusterEnergyEstimator(fERecoXMLFile);
+  }
+  
   f_Output = new TFile(fOutputFileName.c_str(), "RECREATE");
 
   t_Output_ClusteredWireHit = new TTree("ClusteredWireHit", "ClusteredWireHit");
@@ -15,16 +21,18 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredWireHit->Branch("Config",         &out_Config,         "Config/I"        );
   t_Output_ClusteredWireHit->Branch("MarleyIndex",    &out_MarleyIndex,    "MarleyIndex/I"   );
   t_Output_ClusteredWireHit->Branch("StartChan",      &out_StartChan,      "StartChan/I"     );
-  t_Output_ClusteredWireHit->Branch("EndChan",        &out_EndChan,        "EndChan/I"       );
-  t_Output_ClusteredWireHit->Branch("ChanWidth",      &out_ChanWidth,      "ChanWidth/I"     );
-  t_Output_ClusteredWireHit->Branch("NChan",          &out_NChan,          "NChan/I"         );
-  t_Output_ClusteredWireHit->Branch("Type",           &out_Type,           "Type/I"          );
-  t_Output_ClusteredWireHit->Branch("NHits",          &out_NHits,          "NHits/I"         );
-  t_Output_ClusteredWireHit->Branch("SumADC",         &out_SumADC,         "SumADC/F"        );
-  t_Output_ClusteredWireHit->Branch("FirstTimeHit",   &out_FirstTimeHit,   "FirstTimeHit/F"  );
-  t_Output_ClusteredWireHit->Branch("LastTimeHit",    &out_LastTimeHit,    "LastTimeHit/F"   );
-  t_Output_ClusteredWireHit->Branch("TimeWidth",      &out_TimeWidth,      "TimeWidth/F"     );
+  t_Output_ClusteredWireHit->Branch("EndChan",        &out_EndChan,        "EndChan/D"       );
+  t_Output_ClusteredWireHit->Branch("ChanWidth",      &out_ChanWidth,      "ChanWidth/D"     );
+  t_Output_ClusteredWireHit->Branch("NChan",          &out_NChan,          "NChan/D"         );
+  t_Output_ClusteredWireHit->Branch("Type",           &out_Type,           "Type/D"          );
+  t_Output_ClusteredWireHit->Branch("NHits",          &out_NHits,          "NHits/D"         );
+  t_Output_ClusteredWireHit->Branch("SumADC",         &out_SumADC,         "SumADC/D"        );
+  t_Output_ClusteredWireHit->Branch("FirstTimeHit",   &out_FirstTimeHit,   "FirstTimeHit/D"  );
+  t_Output_ClusteredWireHit->Branch("LastTimeHit",    &out_LastTimeHit,    "LastTimeHit/D"   );
+  t_Output_ClusteredWireHit->Branch("TimeWidth",      &out_TimeWidth,      "TimeWidth/D"     );
+  t_Output_ClusteredWireHit->Branch("EReco",          &out_EReco,          "EReco/D"         );
   t_Output_ClusteredWireHit->Branch("E_deposited",    &out_E_deposited,    "E_deposited/D"   );
+  t_Output_ClusteredWireHit->Branch("NElectron",      &out_NElectron,      "NElectron/D"     );
   t_Output_ClusteredWireHit->Branch("MC_UnderlyingE", &out_MC_UnderlyingE, "MC_UnderlyingE/D");
   t_Output_ClusteredWireHit->Branch("RecClusterPosX", &out_RecClusterPosX, "RecClusterPosX/D");
   t_Output_ClusteredWireHit->Branch("RecClusterPosY", &out_RecClusterPosY, "RecClusterPosY/D");
@@ -59,13 +67,13 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredOpticalHit->Branch("Event",          &out_Event,          "Event/I"         );
   t_Output_ClusteredOpticalHit->Branch("YWidth",         &out_YWidth,         "YWidth/D"        );
   t_Output_ClusteredOpticalHit->Branch("ZWidth",         &out_ZWidth,         "ZWidth/D"        );
-  t_Output_ClusteredOpticalHit->Branch("NChan",          &out_NChan,          "NChan/I"         );
-  t_Output_ClusteredOpticalHit->Branch("Type",           &out_Type,           "Type/I"          );
-  t_Output_ClusteredOpticalHit->Branch("NHits",          &out_NHits,          "NHits/I"         );
+  t_Output_ClusteredOpticalHit->Branch("NChan",          &out_NChan,          "NChan/D"         );
+  t_Output_ClusteredOpticalHit->Branch("Type",           &out_Type,           "Type/D"          );
+  t_Output_ClusteredOpticalHit->Branch("NHits",          &out_NHits,          "NHits/D"         );
   t_Output_ClusteredOpticalHit->Branch("SumPE",          &out_SumPE,          "SumPE/D"         );
-  t_Output_ClusteredOpticalHit->Branch("FirstTimeHit",   &out_FirstTimeHit,   "FirstTimeHit/F"  );
-  t_Output_ClusteredOpticalHit->Branch("LastTimeHit",    &out_LastTimeHit,    "LastTimeHit/F"   );
-  t_Output_ClusteredOpticalHit->Branch("TimeWidth",      &out_TimeWidth,      "TimeWidth/F"     );
+  t_Output_ClusteredOpticalHit->Branch("FirstTimeHit",   &out_FirstTimeHit,   "FirstTimeHit/D"  );
+  t_Output_ClusteredOpticalHit->Branch("LastTimeHit",    &out_LastTimeHit,    "LastTimeHit/D"   );
+  t_Output_ClusteredOpticalHit->Branch("TimeWidth",      &out_TimeWidth,      "TimeWidth/D"     );
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosX", &out_RecClusterPosX, "RecClusterPosX/D");
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosY", &out_RecClusterPosY, "RecClusterPosY/D");
   t_Output_ClusteredOpticalHit->Branch("RecClusterPosZ", &out_RecClusterPosZ, "RecClusterPosZ/D");
@@ -91,10 +99,21 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_TrueInfo->Branch("DirY",     &out_DirY    );
   t_Output_TrueInfo->Branch("DirZ",     &out_DirZ    );
 
-
+  t_Output_TimingInfo = new TTree("TimingInfo", "TimingInfo");
+  t_Output_TimingInfo->Branch("Event",  &out_Event,  "Event/I" );
+  t_Output_TimingInfo->Branch("Config", &out_Config, "Config/I");
+  t_Output_TimingInfo->Branch("nHit",   &out_NHits,  "nHit/I");
+  t_Output_TimingInfo->Branch("TimeOrdering_WireClustTime",         &TimeOrdering_WireClustTime        );
+  t_Output_TimingInfo->Branch("SpaceOrdering_WireClustTime",        &SpaceOrdering_WireClustTime       );
+  t_Output_TimingInfo->Branch("Clustering_WireClustTime",           &Clustering_WireClustTime          );
+  t_Output_TimingInfo->Branch("EnergyReconstruction_WireClustTime", &EnergyReconstruction_WireClustTime);
+  t_Output_TimingInfo->Branch("TimeOrdering_OptClustTime",          &TimeOrdering_OptClustTime         );
+  t_Output_TimingInfo->Branch("SpaceOrdering_OptClustTime",         &SpaceOrdering_OptClustTime        );
+  t_Output_TimingInfo->Branch("Clustering_OptClustTime",            &Clustering_OptClustTime           );
+  t_Output_TimingInfo->Branch("EnergyReconstruction_OptClustTime",  &EnergyReconstruction_OptClustTime );
+  
   h_ENu_MC      = new TH1D("h_ENu_MC",      "h_ENu_MC",       35,    0, 50  );
   h_MarlTime_MC = new TH1D("h_MarlTime_MC", "h_MarlTime_MC", 100, -0.1, 10.5);
-  h_TimeElapsed = new TH1D("h_TimeElapsed", "h_TimeElapsed", 100,    0,  5  );
   h_ENu_MC->Sumw2();
 
   if (inNEvent!=-1) {
@@ -102,8 +121,7 @@ int Clustering::ClusterAll(int inNEvent){
   } else {
     fNEvent = (int)im.GetEntries();
   }
-//fNEvent = (int)(fNEvent/20);
-  //fNEvent = 20;
+
   TH1I *hNEvents = new TH1I("hNEvents", "hNEvents", 100,0,10e6);
   hNEvents->Fill(fNEvent);
   hNEvents->Write();
@@ -112,13 +130,20 @@ int Clustering::ClusterAll(int inNEvent){
   hNConfigs->Write();
 
   fClustEng   = new ClusterEngine();
+  fClustEng->SetSorting(fSorting);
   fTrigger    = new Trigger();
   fClustSelec = new ClusterSelector();
   fNConfig = (int)fvec_cut_AdjChanTolerance.size();
 
   std::map<std::pair<int,int>, std::vector<WireHit*>* >     map_unusedHits;
   std::map<std::pair<int,int>, std::vector<WireCluster*>* > map_clusters;
-
+  
+  int ConfigBegin = 0;
+  int ConfigEnd   = fNConfig;
+  if (fConfig != -1) {
+    ConfigBegin = fConfig;
+    ConfigEnd   = fConfig+1;
+  }
   for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
 
     PrintProgress(iEvent,fNEvent);
@@ -131,13 +156,13 @@ int Clustering::ClusterAll(int inNEvent){
       out_MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
       out_ENu     .push_back((*im.True_ENu)     [MarleyEvent]);
       out_ENu_Lep .push_back((*im.True_ENu_Lep) [MarleyEvent]);
-      out_PosX    .push_back((*im.True_VertX)[MarleyEvent]);
-      out_PosY    .push_back((*im.True_VertY)[MarleyEvent]);
-      out_PosZ    .push_back((*im.True_VertY)[MarleyEvent]);
-      out_PosT    .push_back((*im.True_VertexT)[MarleyEvent]);
-      out_DirX    .push_back((*im.True_Dirx)[MarleyEvent]);
-      out_DirY    .push_back((*im.True_Diry)[MarleyEvent]);
-      out_DirZ    .push_back((*im.True_Dirz)[MarleyEvent]);
+      out_PosX    .push_back((*im.True_VertX)   [MarleyEvent]);
+      out_PosY    .push_back((*im.True_VertY)   [MarleyEvent]);
+      out_PosZ    .push_back((*im.True_VertY)   [MarleyEvent]);
+      out_PosT    .push_back((*im.True_VertexT) [MarleyEvent]);
+      out_DirX    .push_back((*im.True_Dirx)    [MarleyEvent]);
+      out_DirY    .push_back((*im.True_Diry)    [MarleyEvent]);
+      out_DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
     }
     t_Output_TrueInfo->Fill();
     if(!goodEvent) continue;
@@ -150,7 +175,9 @@ int Clustering::ClusterAll(int inNEvent){
       if (im.Hit_True_MarleyIndex != NULL) {
         marley_index=(*im.Hit_True_MarleyIndex)[j];
       }
-
+      if((*im.Hit_Chan)[j] > fmap_APA_Channel[fNAPA])
+        continue;
+      
       vec_WireHit.push_back(new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
                                         (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
                                         (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
@@ -158,8 +185,9 @@ int Clustering::ClusterAll(int inNEvent){
                                         0.5*((*im.Hit_Y_start)[j]+(*im.Hit_Y_end)[j]),
                                         0.5*((*im.Hit_Z_start)[j]+(*im.Hit_Z_end)[j]),
                                         (*im.Hit_True_X)[j],      (*im.Hit_True_Y)[j],        (*im.Hit_True_Z)[j],
-                                        marley_index));
+                                        marley_index,             (*im.Hit_True_nElec)[j]));
     }
+    out_NHits = vec_WireHit.size();
     for(size_t j = 0; j < im.PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
       vec_OptHit.push_back(new OpticalHit((*im.PDS_OpHit_True_GenType)[j],
@@ -169,8 +197,14 @@ int Clustering::ClusterAll(int inNEvent){
       vec_OptHit.back()->SetMarleyIndex(marley_index);
     }
 
-    for(fCurrentConfig=0; fCurrentConfig<fNConfig; ++fCurrentConfig) {
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
 
+    for(fCurrentConfig=ConfigBegin; fCurrentConfig<ConfigEnd; ++fCurrentConfig) {
       fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
       fClustEng  ->SetTimeWindowOpt  (0.8);
       fClustEng  ->SetPositionOpt    (300);
@@ -180,20 +214,27 @@ int Clustering::ClusterAll(int inNEvent){
       fClustSelec->SetMinChannelWidth(fvec_cut_MinChanWidth    [fCurrentConfig]);
       fClustSelec->SetTotalADC       (fvec_cut_TotalADC        [fCurrentConfig]);
       fTrigger   ->SetNHitsMin       (fvec_cut_HitsInWindow    [fCurrentConfig]);
-      TStopwatch *timeElapsed = new TStopwatch();
+
       std::vector<WireCluster*>*   vec_Clusters       = new std::vector<WireCluster*>();
       std::vector<WireHit*>*       vec_UnusedHits     = new std::vector<WireHit*>();
       std::vector<OpticalCluster*> vec_OpticalCluster;
+
       fClustEng->ClusterOpticalHits(vec_OptHit,vec_OpticalCluster);
+      FillClusterEngineTimingInfo_Opti(fClustEng);
+      FillClusterERecoTimingInfo_Opti (fEReco);
+
       fClustEng->ClusterHits2(vec_WireHit, vec_Clusters, vec_UnusedHits);
+      if (fEReco) fEReco->EstimateEnergy(vec_Clusters);
+      FillClusterEngineTimingInfo_Wire(fClustEng);
+      FillClusterERecoTimingInfo_Wire (fEReco);
+
+      t_Output_TimingInfo->Fill();
 
       for(unsigned int k = 0; k < vec_Clusters->size(); k++) {
         WireCluster* aCluster = vec_Clusters->at(k);
         fClustSelec->SetSelectionFlag  (aCluster);
         fTrigger   ->SetTriggerStateFor(aCluster);
       }
-
-      h_TimeElapsed->Fill(timeElapsed->RealTime()*1000);
 
       for(size_t i=0; i<vec_UnusedHits->size();++i)
         FillUnusedHitInfo((*vec_UnusedHits)[i]);
@@ -218,12 +259,9 @@ int Clustering::ClusterAll(int inNEvent){
         delete vec_OpticalCluster[i];
         vec_OpticalCluster[i]=NULL;
       }
-
-      delete timeElapsed;
-      timeElapsed = NULL;
     }
-
-    for(int j = 0; j < im.NColHit; j++) {
+      
+    for(size_t j = 0; j < vec_WireHit.size(); j++) {
       delete vec_WireHit[j];
       vec_WireHit[j] = NULL;
     }
@@ -237,17 +275,50 @@ int Clustering::ClusterAll(int inNEvent){
   std::cout << "Writing all the trees and closing." << std::endl;
   h_ENu_MC     ->Write();
   h_MarlTime_MC->Write();
-  h_TimeElapsed->Write();
 
   t_Output_ClusteredWireHit   ->Write();
   t_Output_ClusteredOpticalHit->Write();
   t_Output_TrueInfo           ->Write();
+  t_Output_TimingInfo         ->Write();
+  
   return 0;
 
 };
 
-void Clustering::FillClusterInfo(OpticalCluster* clust)
-{
+void Clustering::FillClusterEngineTimingInfo_Opti(ClusterEngine* clusterEngine) {
+  TimeOrdering_OptClustTime .clear();
+  SpaceOrdering_OptClustTime.clear();
+  Clustering_OptClustTime   .clear();
+  out_Config = fCurrentConfig;
+  out_Event  = im.Event;
+  TimeOrdering_OptClustTime  = clusterEngine->GetElapsedTime_TimeOrdering ();
+  SpaceOrdering_OptClustTime = clusterEngine->GetElapsedTime_SpaceOrdering();
+  Clustering_OptClustTime    = clusterEngine->GetElapsedTime_Clustering   ();
+  
+};
+
+void Clustering::FillClusterEngineTimingInfo_Wire(ClusterEngine* clusterEngine) {
+  TimeOrdering_WireClustTime .clear();
+  SpaceOrdering_WireClustTime.clear();
+  Clustering_WireClustTime   .clear();
+  out_Config = fCurrentConfig;
+  out_Event  = im.Event;
+  TimeOrdering_WireClustTime  = clusterEngine->GetElapsedTime_TimeOrdering ();
+  SpaceOrdering_WireClustTime = clusterEngine->GetElapsedTime_SpaceOrdering();
+  Clustering_WireClustTime    = clusterEngine->GetElapsedTime_Clustering   ();
+  
+};
+
+void Clustering::FillClusterERecoTimingInfo_Wire(ClusterEnergyEstimator* clusterEReco) {
+  EnergyReconstruction_WireClustTime.clear();
+  EnergyReconstruction_WireClustTime = clusterEReco->GetElapsedTime();
+};
+
+void Clustering::FillClusterERecoTimingInfo_Opti(ClusterEnergyEstimator* clusterEReco) {
+  EnergyReconstruction_OptClustTime = {0};
+};
+
+void Clustering::FillClusterInfo(OpticalCluster* clust) {
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
   out_Config         = fCurrentConfig;
@@ -284,9 +355,8 @@ void Clustering::FillClusterInfo(OpticalCluster* clust)
 
 };
 
-void Clustering::FillClusterInfo(WireCluster* clust)
-{
-
+void Clustering::FillClusterInfo(WireCluster* clust) {
+  
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
   out_Event = im.Event;
@@ -303,7 +373,9 @@ void Clustering::FillClusterInfo(WireCluster* clust)
   out_FirstTimeHit   = clust->GetFirstTimeHit();
   out_LastTimeHit    = clust->GetLastTimeHit();
   out_TimeWidth      = clust->GetTimeWidth();
+  out_EReco          = clust->GetEReco();
   out_MC_UnderlyingE = clust->GetMC_UnderlyingE();
+  out_NElectron      = clust->GetNElectron();
   out_TrClusterPosX  = clust->GetTruePosition(0);
   out_TrClusterPosY  = clust->GetTruePosition(1);
   out_TrClusterPosZ  = clust->GetTruePosition(2);
@@ -362,6 +434,7 @@ void Clustering::ResetFillVariable(){
   out_LastTimeHit    = 0;
   out_TimeWidth      = 0;
   out_E_deposited    = 0;
+  out_NElectron      = 0;
   out_MC_UnderlyingE = 0;
   out_TrClusterPosX  = 0;
   out_TrClusterPosY  = 0;
@@ -382,6 +455,7 @@ void Clustering::ResetFillVariable(){
   out_YWidth         = 0;
   out_ZWidth         = 0;
   out_SumPE          = 0;
+  out_EReco          = 0;
   out_MarleyIndex    =-1;
   out_MarlTime.clear();
   out_ENu     .clear();
@@ -413,5 +487,14 @@ void Clustering::ResetFillVariable(){
   out_PDSHit_Width    .clear();
   out_PDSHit_PE       .clear();
   out_PDSHit_OpChannel.clear();
+
+  TimeOrdering_WireClustTime        .clear();
+  SpaceOrdering_WireClustTime       .clear();
+  Clustering_WireClustTime          .clear();
+  EnergyReconstruction_WireClustTime.clear();
+  TimeOrdering_OptClustTime         .clear();
+  SpaceOrdering_OptClustTime        .clear();
+  Clustering_OptClustTime           .clear();
+  EnergyReconstruction_OptClustTime .clear();
 
 };

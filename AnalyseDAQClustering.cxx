@@ -98,9 +98,7 @@ int main(int argc, char** argv){
   std::vector<int>    * HitChan  = NULL;
   std::vector<double> * HitTime  = NULL;
   std::vector<double> * HitSADC  = NULL;
-  std::vector<double> * HitSPE   = NULL;
   std::vector<double> * HitRMS   = NULL;
-  std::vector<double> * HitWidth = NULL;
   std::vector<double> * TrPosX   = NULL; 
   std::vector<double> * TrPosY   = NULL; 
   std::vector<double> * TrPosZ   = NULL;

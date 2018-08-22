@@ -13,6 +13,7 @@ WireCluster::WireCluster(std::vector<WireHit*>& vec_Hits):
   fNHits         (0),
   fType          (0),
   fTriggerFlag   (0),
+  fMarleyIndex   (-1),
   fCutN          (0),
   fIsSelected    (0),
   fHitSADC       (0),
@@ -20,7 +21,7 @@ WireCluster::WireCluster(std::vector<WireHit*>& vec_Hits):
   fLastHitTime   (0),
   fTimeWidth     (0),
   fMC_UnderlyingE(0),
-  fMarleyIndex   (-1),
+  fNElectron     (0),
   fHitVector     (),
   fPurity        (){
   
@@ -53,7 +54,7 @@ WireCluster::WireCluster(std::vector<WireHit*>& vec_Hits):
     fHitSADC  += vec_Hits[i]->GetHitSADC(); 
     int   chan = vec_Hits[i]->GetHitChan();
     float time = vec_Hits[i]->GetHitTime(); 
-
+    fNElectron += vec_Hits[i]->GetNElectron();
     channels.insert(chan);
     map_index_number[vec_Hits[i]->GetMarleyIndex()]++;
     if(chan<fStartChannel) fStartChannel=chan;
