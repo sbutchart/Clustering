@@ -10,7 +10,7 @@ class PhotonWirePositionDisplay: public Display {
 
 public:
   PhotonWirePositionDisplay(std::string, std::string);
-  void DisplayEvent(int event=-1, int type=-1);
+  void DisplayEvent(const int event=-1, const int type=-1);
   ~PhotonWirePositionDisplay();
   void CreateGraphHit(std::map<int,TGraph*>&, int);
   std::map<GenType, TGraph*> SetUpGraph(const std::string);

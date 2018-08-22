@@ -1,6 +1,6 @@
 #include "PhotonTimingDisplay.hh"
 #include "PhotonWirePositionDisplay.hh"
-// #include "WirePositionTimingDisplay.hh"
+#include "WirePositionTimingDisplay.hh"
 // #include "WireTimingDisplay.hh"
 #include <iostream>
 
@@ -72,6 +72,11 @@ int main(int argc, char** argv){
   case 1:{
     PhotonWirePositionDisplay pwpd(FileName,TreeName);
     pwpd.DisplayEvent(nEvent,Type);
+    return 0;
+  }
+  case 2:{
+    WirePositionTimingDisplay wptd(FileName,TreeName);
+    wptd.DisplayEvent(nEvent,Type);
     return 0;
   }
   default:

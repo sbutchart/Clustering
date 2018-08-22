@@ -12,14 +12,14 @@
 
 class Display {
 public:
-  Display(std::string F,std::string T):FileName(F), TreeName(T){
+  Display(const std::string F, const std::string T):FileName(F), TreeName(T){
     c = new TCanvas();
     im.SetInputFile(FileName.c_str());
     im.SetInputTree(TreeName.c_str());
     im.LoadTree();
 
   };
-  virtual void DisplayEvent(int, int)=0;
+  virtual void DisplayEvent(const int, const int)=0;
   ~Display(){
     delete c;
     c = NULL;
