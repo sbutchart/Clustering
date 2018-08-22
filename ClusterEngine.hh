@@ -9,21 +9,36 @@ class ClusterEngine{
 public:
   ClusterEngine(double ChannelWidth,  double TimeWindow, double MinHitADC,
                 double TimeWindowOpt, double PositionOpt):
+    fStopwatch0(0),
+    fStopwatch1(0),
+    fSorting(0),
     fChannelWidth(ChannelWidth),
     fTimeWindow(TimeWindow),
     fMinHitADC(MinHitADC),
     fTimeWindowOpt(TimeWindowOpt),
     fPositionOpt(PositionOpt),
-    fBucketSize(0){};
-
+    fBucketSize(0),
+    TimeOrdering_Time (),
+    SpaceOrdering_Time(),
+    Clustering_Time   (){
+  };
+  
+>>>>>>> Stashed changes
   ClusterEngine():
+    fStopwatch0(0),
+    fStopwatch1(0),
+    fSorting(0),
     fChannelWidth(0),
     fTimeWindow(0),
     fMinHitADC(0),
     fTimeWindowOpt(0),
     fPositionOpt(0),
-    fBucketSize(0){};
-
+    fBucketSize(0),
+    TimeOrdering_Time (),
+    SpaceOrdering_Time(),
+    Clustering_Time   (){
+  };
+  
   void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits2(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
   void ClusterHits3(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);

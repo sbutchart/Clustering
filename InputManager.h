@@ -399,11 +399,11 @@ public:
     True_Bck_VertYAll        (NULL),
     True_Bck_VertZAll        (NULL),
     True_Bck_TimeAll         (NULL),
-    True_Bck_EnergyAll       (NULL),
     True_Bck_EndVertXAll     (NULL),
     True_Bck_EndVertYAll     (NULL),
     True_Bck_EndVertZAll     (NULL),
     True_Bck_EndTimeAll      (NULL),
+    True_Bck_EnergyAll       (NULL),
     True_Bck_PDGAll          (NULL),
     True_Bck_IDAll           (NULL){};
   

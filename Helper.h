@@ -423,7 +423,6 @@ inline std::map<GenType,TH2D*> Get2DHistos(std::string name, std::string title,
                                            int nbinsx, double xbinmin, double xbinmax,
                                            int nbinsy, double ybinmin, double ybinmax){
   std::map<GenType,TH2D*> map_h;
-  int i=0;
   Helper h;
   for(auto& it : h.ShortGenName){
     map_h[it.first] = new TH2D(Form("%s_%s",it.second.c_str(), name.c_str()),
