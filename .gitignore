@@ -44,5 +44,8 @@ Makefile
 *.root
 *.png
 
+*.xml
+
 build/
+build*/
 .DS_Store

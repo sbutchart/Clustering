@@ -70,7 +70,7 @@ public:
   SmartTrigger& GetSmartTrigger() { return fSmTrig; };
 
 private:
-  SmartTrigger fSmTrig;
+  SmartERecoWireClusterTrigger fSmTrig;
   bool fToyThrown;
   size_t fNToys;
   size_t fSeed;

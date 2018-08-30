@@ -1,6 +1,6 @@
 #include "PhotonTimingDisplay.hh"
 
-PhotonTimingDisplay::PhotonTimingDisplay(std::string F, std::string T): Display(F,T) {
+PhotonTimingDisplay::PhotonTimingDisplay(const std::string F, const std::string T): Display(F,T) {
   fPE_Mode = false;
   position = NULL;
   energy   = NULL;
@@ -13,7 +13,7 @@ PhotonTimingDisplay::~PhotonTimingDisplay() {
 };
 
 
-void PhotonTimingDisplay::AddArrow(double time, GenType gen) {
+void PhotonTimingDisplay::AddArrow(const double time, const GenType gen) {
   TArrow* ar = new TArrow(time, 0.2, time, 0, 0.05,"|>");
   std::vector<int>vec_colors = getColors(0);
   ar->SetLineWidth(1);
@@ -85,7 +85,7 @@ void PhotonTimingDisplay::PlotAll(){
 };
 
 
-void PhotonTimingDisplay::DisplayEvent(int event, int type, double time) {
+void PhotonTimingDisplay::DisplayEvent(const int event, const int type, const double time) {
 
   int requestedEvent = event;
   if (requestedEvent<0) requestedEvent=0;

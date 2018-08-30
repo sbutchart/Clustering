@@ -100,13 +100,7 @@ void ClusterEnergyEstimator::RecoverFeature(vector<double>& Feature,
 
 void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>& clusters) const {
   for (auto& it : clusters)
-    it->SetEReco(EstimateEnergy(*it));
-  return;
-};
-
-void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>* clusters) const{
-  for (auto& it : (*clusters))
-    it->SetEReco(EstimateEnergy(*it));
+    it->SetRecoEnergy(EstimateEnergy(*it));
   return;
 };
 

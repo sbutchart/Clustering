@@ -7,8 +7,8 @@ SmartTrigger::SmartTrigger(const std::string f):
   fLikelihood_Back(NULL),
   fLookupDiscriminator(NULL),
   fFeature(f),
-  fConfig(-1) {
-  
+  fConfig(-1),
+  fThreshold(0) {
 };
 
 
@@ -23,6 +23,18 @@ void SmartTrigger::SetResultFromCache(const std::string f) {
   fLookupDiscriminator->SetDirectory(NULL);
 
   file->Close();
+};
+
+
+void SmartTrigger::SetIsSelected(const std::vector<Cluster*>& c) const {
+  double disc_val = 0;
+  for (auto const& it: c) disc_val += GetDiscriminator(*it);
+
+  if (disc_val>fThreshold) {
+    for (auto const& it: c) it->SetIsSelected(true);
+  } else {
+    for (auto const& it: c) it->SetIsSelected(false);
+  }
 };
 
 

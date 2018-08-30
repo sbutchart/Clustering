@@ -1,35 +1,111 @@
 #ifndef TRIGGER_HH
 #define TRIGGER_HH
+
+#include "Cluster.hh"
 #include "WireCluster.hh"
 
 class Trigger {
-public:
-  Trigger(int inNHitsMin): fNHitsMin(inNHitsMin){};
-  Trigger(): fNHitsMin(0){};
-
-  bool GetTriggerStateFor(WireCluster* clust){ return goodClusterHits(clust, fNHitsMin); }
-  void SetTriggerStateFor(WireCluster* clust)
-    {
-      clust->SetTriggerFlag(goodClusterHits(clust, fNHitsMin));
-    };
-  void SetTriggerStateFor(std::vector<WireCluster*> clusters)
-    {
-      for(std::vector<WireCluster*>::iterator it_clust=clusters.begin();
-          it_clust!=clusters.end(); ++it_clust)
-        (*it_clust)->SetTriggerFlag(goodClusterHits((*it_clust), fNHitsMin));
-    };
-
-  int  GetNHitsMin() const { return fNHitsMin;  };
-  void SetNHitsMin(int inNHitsMin=1) { fNHitsMin = inNHitsMin; };
+protected:
+  Trigger (){};
   ~Trigger(){};
 
-private:
-  int fNHitsMin;
+  virtual void SetIsSelected(Cluster*) const = 0;
+  virtual void SetIsSelected(const std::vector<Cluster*>& clust) const {
+    for(auto const& it: clust)
+      SetIsSelected(it);
+  };
+  virtual void SetIsSelected(const std::vector<Cluster*>* clust) const {
+    SetIsSelected(*clust);
+  };
 
-public:
-//  ClassDef(Trigger,1)  //Simple event class
+
+  virtual size_t CountAreSelected(const std::vector<Cluster*>& clust) const {
+    size_t count = 0;
+    for (auto const& it:clust)
+      count += it->GetIsSelected();
+    return count;
+  };
+  virtual size_t CountAreSelected(const std::vector<Cluster*>* clust) const {
+    return CountAreSelected(*clust);
+  };
+
+  virtual size_t CountAreNotSelected(const std::vector<Cluster*>& clust) const {
+    return clust.size() - CountAreSelected(clust);
+  };
+  
+  virtual size_t CountAreNotSelected(const std::vector<Cluster*>* clust) const {
+    return CountAreNotSelected(*clust);
+  };
 
 };
 
+
+class SimpleWireTrigger: public Trigger {
+public:
+  SimpleWireTrigger(const int hit=0,
+                    const int chan=0,
+                    const double chanwidth=0,
+                    const double sadc=0):
+    Trigger(),
+    fNHitsMin(hit),
+    fNChanMin(chan),
+    fChanWidthMin(chanwidth),
+    fSADCMin(sadc) {};
+  
+  ~SimpleWireTrigger(){};
+  
+  void SetNHitsMin    (const int    i) { fNHitsMin     = i; };
+  void SetNChanMin    (const int    i) { fNChanMin     = i; };
+  void SetChanWidthMin(const double i) { fChanWidthMin = i; };
+  void SetSADCMin     (const double i) { fSADCMin      = i; };
+
+  int    GetNHitsMin    () const { return fNHitsMin    ; };
+  int    GetNChanMin    () const { return fNChanMin    ; };
+  double GetChanWidthMin() const { return fChanWidthMin; };
+  double GetSADCMin     () const { return fSADCMin     ; };
+
+  
+  void SetIsSelected(Cluster* c) const {
+    WireCluster* wc = (WireCluster*)c;
+    c->SetIsSelected(true);
+    if (wc->GetNHit()         < fNHitsMin    ) { c->SetIsSelected(false); return; }
+    if (wc->GetNChannel()     < fNChanMin    ) { c->SetIsSelected(false); return; }
+    if (wc->GetChannelWidth() < fChanWidthMin) { c->SetIsSelected(false); return; }
+    if (wc->GetHitSumADC()    < fSADCMin     ) { c->SetIsSelected(false); return; }
+  };
+  
+  void SetIsSelected(const std::vector<WireCluster*>& clust) const {
+    for(auto const& it: clust) {
+      SetIsSelected(it);
+    }
+  };
+  
+  void SetIsSelected(const std::vector<WireCluster*>* clust) const {
+    SetIsSelected(*clust);
+  };
+
+  virtual size_t CountAreSelected(const std::vector<WireCluster*>& clust) const {
+    size_t count = 0;
+    for (auto const& it:clust)
+      count += it->GetIsSelected();
+    return count;
+  };
+  virtual size_t CountAreSelected(const std::vector<WireCluster*>* clust) const {
+    return CountAreSelected(*clust);
+  };
+
+  virtual size_t CountAreNotSelected(const std::vector<WireCluster*>& clust) const {
+    return clust.size() - CountAreSelected(clust);
+  };
+  
+  virtual size_t CountAreNotSelected(const std::vector<WireCluster*>* clust) const {
+    return CountAreNotSelected(*clust);
+  };
+private:
+  int    fNHitsMin;
+  int    fNChanMin;
+  double fChanWidthMin;
+  double fSADCMin;
+};
 
 #endif

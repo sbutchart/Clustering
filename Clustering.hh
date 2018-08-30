@@ -24,7 +24,6 @@
 
 #include "OpticalCluster.hh"
 #include "WireCluster.hh"
-#include "ClusterSelector.hh"
 #include "ClusterEnergyEstimator.hh"
 #include "ClusterEngine.hh"
 #include "Trigger.hh"
@@ -39,7 +38,6 @@ public:
     fOutputFileName(""),
     f_Output       (NULL),
     fTrigger       (NULL),
-    fClustSelec    (NULL),
     fClustEng      (NULL),
     fEReco         (NULL),
     fPrintLevel    (-1),
@@ -185,10 +183,8 @@ public:
       }
       fvec_g_config.clear();
       if(fTrigger)    delete fTrigger;
-      if(fClustSelec) delete fClustSelec;
       if(fClustEng)   delete fClustEng;  
       fTrigger = NULL;
-      fClustSelec = NULL;
       fClustEng = NULL;
 
       fvec_ClusterCount.clear();
@@ -201,7 +197,6 @@ public:
       fvec_cut_MinChanWidth    .clear();
       fvec_cut_TimeWindowSize  .clear();
       fvec_cut_TotalADC        .clear();
-      fvec_OptClusterCount.clear();
 
       t_Output_ClusteredWireHit    = NULL;
       t_Output_ClusteredOpticalHit = NULL;
@@ -226,8 +221,7 @@ private:
   std::string fOutputFileName;
   std::string fERecoXMLFile  ;
   TFile *f_Output;
-  Trigger* fTrigger;
-  ClusterSelector* fClustSelec;
+  SimpleWireTrigger* fTrigger;
   ClusterEngine* fClustEng;
   ClusterEnergyEstimator* fEReco;
   
@@ -268,6 +262,7 @@ private:
   int    out_Config        ;
   double out_StartChan     ;
   double out_EndChan       ;
+  double out_APA           ;
   double out_ChanWidth     ;
   double out_NChan         ;
   double out_Type          ;

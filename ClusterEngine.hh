@@ -40,23 +40,15 @@ public:
     Clustering_Time   (){
   };
   
-  void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
-  void ClusterHits2(std::vector<WireHit*>&vec_wirehit,
-                    std::vector<WireCluster*>*vec_cluster,
-                    std::vector<WireHit*>*vec_wirehit_unused) {
-    if (fSorting==1) {
-      ClusterHits2_stable_sort(vec_wirehit,
-                               vec_cluster,
-                               vec_wirehit_unused);
-    } else {
-      ClusterHits2_sort(vec_wirehit,
-                        vec_cluster,
-                        vec_wirehit_unused);
-    }
+  void ClusterHits (const std::vector<WireHit*>&, std::vector<WireCluster*>&);
+  void ClusterHits2(std::vector<WireHit*>&     vec_wirehit,
+                    std::vector<WireCluster*>& vec_cluster) {
+    if (fSorting==1) { ClusterHits2_stable_sort(vec_wirehit, vec_cluster); }
+    else             { ClusterHits2_sort       (vec_wirehit, vec_cluster); }
   }
-  void ClusterHits2_stable_sort(std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
-  void ClusterHits2_sort(std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
-  void ClusterHits3(const std::vector<WireHit*>&, std::vector<WireCluster*>*, std::vector<WireHit*>*);
+  void ClusterHits2_stable_sort(std::vector<WireHit*>&, std::vector<WireCluster*>&);
+  void ClusterHits2_sort(std::vector<WireHit*>&,  std::vector<WireCluster*>&);
+  void ClusterHits3(const std::vector<WireHit*>&, std::vector<WireCluster*>&);
 
   void ClusterOpticalHits (std::vector<OpticalHit*>&, std::vector<OpticalCluster*>&);
   void ClusterOpticalHits2(std::vector<OpticalHit*>&, std::vector<OpticalCluster*>&);

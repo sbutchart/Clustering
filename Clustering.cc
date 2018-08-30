@@ -20,7 +20,8 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredWireHit->Branch("Event",          &out_Event,          "Event/I"         );
   t_Output_ClusteredWireHit->Branch("Config",         &out_Config,         "Config/I"        );
   t_Output_ClusteredWireHit->Branch("MarleyIndex",    &out_MarleyIndex,    "MarleyIndex/I"   );
-  t_Output_ClusteredWireHit->Branch("StartChan",      &out_StartChan,      "StartChan/I"     );
+  t_Output_ClusteredWireHit->Branch("APA",            &out_APA,            "APA/D"           );
+  t_Output_ClusteredWireHit->Branch("StartChan",      &out_StartChan,      "StartChan/D"     );
   t_Output_ClusteredWireHit->Branch("EndChan",        &out_EndChan,        "EndChan/D"       );
   t_Output_ClusteredWireHit->Branch("ChanWidth",      &out_ChanWidth,      "ChanWidth/D"     );
   t_Output_ClusteredWireHit->Branch("NChan",          &out_NChan,          "NChan/D"         );
@@ -65,6 +66,7 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredOpticalHit->Branch("Cluster",        &out_Cluster,        "Cluster/I"       );
   t_Output_ClusteredOpticalHit->Branch("MarleyIndex",    &out_MarleyIndex,    "MarleyIndex/I"   );
   t_Output_ClusteredOpticalHit->Branch("Event",          &out_Event,          "Event/I"         );
+  t_Output_ClusteredOpticalHit->Branch("APA",            &out_APA,            "APA/D"           );
   t_Output_ClusteredOpticalHit->Branch("YWidth",         &out_YWidth,         "YWidth/D"        );
   t_Output_ClusteredOpticalHit->Branch("ZWidth",         &out_ZWidth,         "ZWidth/D"        );
   t_Output_ClusteredOpticalHit->Branch("NChan",          &out_NChan,          "NChan/D"         );
@@ -131,11 +133,9 @@ int Clustering::ClusterAll(int inNEvent){
 
   fClustEng   = new ClusterEngine();
   fClustEng->SetSorting(fSorting);
-  fTrigger    = new Trigger();
-  fClustSelec = new ClusterSelector();
+  fTrigger    = new SimpleWireTrigger();
   fNConfig = (int)fvec_cut_AdjChanTolerance.size();
 
-  std::map<std::pair<int,int>, std::vector<WireHit*>* >     map_unusedHits;
   std::map<std::pair<int,int>, std::vector<WireCluster*>* > map_clusters;
   
   int ConfigBegin = 0;
@@ -177,82 +177,101 @@ int Clustering::ClusterAll(int inNEvent){
       }
       if((*im.Hit_Chan)[j] > fmap_APA_Channel[fNAPA])
         continue;
-      
-      vec_WireHit.push_back(new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
-                                        (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
-                                        (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
-                                        0.5*((*im.Hit_X_start)[j]+(*im.Hit_X_end)[j]),
-                                        0.5*((*im.Hit_Y_start)[j]+(*im.Hit_Y_end)[j]),
-                                        0.5*((*im.Hit_Z_start)[j]+(*im.Hit_Z_end)[j]),
-                                        (*im.Hit_True_X)[j],      (*im.Hit_True_Y)[j],        (*im.Hit_True_Z)[j],
-                                        marley_index,             (*im.Hit_True_nElec)[j]));
+      WireHit* wh = new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
+                                (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
+                                (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
+                                0.5*((*im.Hit_X_start)[j]+(*im.Hit_X_end)[j]),
+                                0.5*((*im.Hit_Y_start)[j]+(*im.Hit_Y_end)[j]),
+                                0.5*((*im.Hit_Z_start)[j]+(*im.Hit_Z_end)[j]),
+                                (*im.Hit_True_X)[j],      (*im.Hit_True_Y)[j],        (*im.Hit_True_Z)[j],
+                                marley_index,             (*im.Hit_True_nElec)[j]);
+      wh->SetTrueEnergy((*im.True_ENu)[marley_index]);
+      if (wh->GetChannel() < 200000 ||
+          abs(wh->GetPosition(kX)) < 20000 ||
+          abs(wh->GetPosition(kY)) < 20000 ||
+          abs(wh->GetPosition(kZ)) < 20000 ||
+          abs(wh->GetPosition(kT)) < 20000) {
+        vec_WireHit.push_back(wh);
+      } else {
+        std::cout << "Messed up wire hit" << std::endl;
+        delete wh;
+        wh = NULL;
+      }
     }
+    std::cout << "vec_WireHit.size() " << vec_WireHit.size() << std::endl;
+
     out_NHits = vec_WireHit.size();
     for(size_t j = 0; j < im.PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
-      vec_OptHit.push_back(new OpticalHit((*im.PDS_OpHit_True_GenType)[j],
-                                          (*im.PDS_OpHit_X)[j],        (*im.PDS_OpHit_Y)[j],     (*im.PDS_OpHit_Z)[j],
-                                          (*im.PDS_OpHit_PeakTime)[j], (*im.PDS_OpHit_Width)[j], (*im.PDS_OpHit_PE)[j],
-                                          (*im.PDS_OpHit_OpChannel)[j]));
-      vec_OptHit.back()->SetMarleyIndex(marley_index);
-    }
+      OpticalHit* oh = new OpticalHit((*im.PDS_OpHit_True_GenType)[j],
+                                      (*im.PDS_OpHit_X)[j],        (*im.PDS_OpHit_Y)[j],     (*im.PDS_OpHit_Z)[j],
+                                      (*im.PDS_OpHit_PeakTime)[j], (*im.PDS_OpHit_Width)[j], (*im.PDS_OpHit_PE)[j],
+                                      (*im.PDS_OpHit_OpChannel)[j]);
+      oh->SetTrueEnergy((*im.True_ENu)[marley_index]);
+      oh->SetMarleyIndex(marley_index);
 
-    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
-    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
-    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
-    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
-    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
-    std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+      if (oh->GetChannel() < 200000 ||
+          abs(oh->GetPosition(kX)) < 20000 ||
+          abs(oh->GetPosition(kY)) < 20000 ||
+          abs(oh->GetPosition(kZ)) < 20000 ||
+          abs(oh->GetPosition(kT)) < 20000) {
+        vec_OptHit.push_back(oh);
+      } else {
+        std::cout << "Messed up optical hit" << std::endl;
+        delete oh;
+        oh = NULL;
+      }
+
+    }
+    // std::cout << "Wire Hit " << vec_WireHit.size() << std::endl;
+    // std::cout << "Opt  Hit " << vec_OptHit .size() << std::endl;
+
+    // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+    // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
+    // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
 
     for(fCurrentConfig=ConfigBegin; fCurrentConfig<ConfigEnd; ++fCurrentConfig) {
-      fClustEng  ->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
-      fClustEng  ->SetTimeWindowOpt  (0.8);
-      fClustEng  ->SetPositionOpt    (300);
-      fClustEng  ->SetBucketSize     (2000);
-      fClustEng  ->SetChannelWidth   (fvec_cut_AdjChanTolerance[fCurrentConfig]);
-      fClustSelec->SetMinChannel     (fvec_cut_MinChannels     [fCurrentConfig]);
-      fClustSelec->SetMinChannelWidth(fvec_cut_MinChanWidth    [fCurrentConfig]);
-      fClustSelec->SetTotalADC       (fvec_cut_TotalADC        [fCurrentConfig]);
-      fTrigger   ->SetNHitsMin       (fvec_cut_HitsInWindow    [fCurrentConfig]);
+      fClustEng->SetTimeWindow     (fvec_cut_TimeWindowSize  [fCurrentConfig]);
+      fClustEng->SetChannelWidth   (fvec_cut_AdjChanTolerance[fCurrentConfig]);
+      fClustEng->SetTimeWindowOpt  (0.8);
+      fClustEng->SetPositionOpt    (300);
+      fClustEng->SetBucketSize     (2000);
+      
+      fTrigger->SetNHitsMin    (fvec_cut_HitsInWindow[fCurrentConfig]);
+      fTrigger->SetNChanMin    (fvec_cut_MinChannels [fCurrentConfig]);
+      fTrigger->SetChanWidthMin(fvec_cut_MinChanWidth[fCurrentConfig]);
+      fTrigger->SetSADCMin     (fvec_cut_TotalADC    [fCurrentConfig]);
 
-      std::vector<WireCluster*>*   vec_Clusters       = new std::vector<WireCluster*>();
-      std::vector<WireHit*>*       vec_UnusedHits     = new std::vector<WireHit*>();
+      std::vector<WireCluster*>    vec_Clusters;
       std::vector<OpticalCluster*> vec_OpticalCluster;
 
       fClustEng->ClusterOpticalHits(vec_OptHit,vec_OpticalCluster);
       FillClusterEngineTimingInfo_Opti(fClustEng);
       FillClusterERecoTimingInfo_Opti (fEReco);
 
-      fClustEng->ClusterHits2(vec_WireHit, vec_Clusters, vec_UnusedHits);
+      fClustEng->ClusterHits2(vec_WireHit, vec_Clusters);
       if (fEReco) fEReco->EstimateEnergy(vec_Clusters);
       FillClusterEngineTimingInfo_Wire(fClustEng);
       FillClusterERecoTimingInfo_Wire (fEReco);
-
       t_Output_TimingInfo->Fill();
+      
+      fTrigger->SetIsSelected(vec_Clusters);
 
-      for(unsigned int k = 0; k < vec_Clusters->size(); k++) {
-        WireCluster* aCluster = vec_Clusters->at(k);
-        fClustSelec->SetSelectionFlag  (aCluster);
-        fTrigger   ->SetTriggerStateFor(aCluster);
-      }
-
-      for(size_t i=0; i<vec_UnusedHits->size();++i)
-        FillUnusedHitInfo((*vec_UnusedHits)[i]);
-
-      for(size_t i=0; i<vec_Clusters->size();++i) {
-        FillClusterInfo((*vec_Clusters)[i]);
-        delete (*vec_Clusters)[i];
-        (*vec_Clusters)[i]=NULL;
+      for(size_t i=0; i<vec_Clusters.size();++i) {
+        FillClusterInfo(vec_Clusters[i]);
+        delete vec_Clusters[i];
+        vec_Clusters[i]=NULL;
       }
 
       if (fPrintLevel > -1) {
         std::cout << "----------------------------------------------" << std::endl;
         std::cout << "Config           " << fCurrentConfig            << std::endl;
-        std::cout << "nWireClusters    " << vec_Clusters->size()      << std::endl;
+        std::cout << "nWireClusters    " << vec_Clusters.size()      << std::endl;
         std::cout << "nOpticalClusters " << vec_OpticalCluster.size() << std::endl;
       }
-
-      std::sort(vec_OpticalCluster.begin(), vec_OpticalCluster.end(), OpticalClusterOrderedInTimePtr);
 
       for(size_t i=0; i<vec_OpticalCluster.size();++i) {
         FillClusterInfo(vec_OpticalCluster[i]);
@@ -319,14 +338,16 @@ void Clustering::FillClusterERecoTimingInfo_Opti(ClusterEnergyEstimator* cluster
 };
 
 void Clustering::FillClusterInfo(OpticalCluster* clust) {
+
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
   out_Config         = fCurrentConfig;
   out_Cluster        = fvec_OptClusterCount[0];
   out_Event          = im.Event;
   out_MarleyIndex    = clust->GetMarleyIndex();
-  out_YWidth         = clust->GetRecoWidth(1);
-  out_ZWidth         = clust->GetRecoWidth(2);
+  out_APA            = clust->GetAPA();
+  out_YWidth         = clust->GetSize(kY);
+  out_ZWidth         = clust->GetSize(kZ);
   out_NChan          = clust->GetNChannel();
   out_Type           = clust->GetType();
   out_NHits          = clust->GetNHit();
@@ -334,18 +355,19 @@ void Clustering::FillClusterInfo(OpticalCluster* clust) {
   out_FirstTimeHit   = clust->GetFirstHitTime();
   out_LastTimeHit    = clust->GetLastHitTime();
   out_TimeWidth      = clust->GetTimeWidth();
-  out_RecClusterPosX = clust->GetRecoPosition(0);
-  out_RecClusterPosY = clust->GetRecoPosition(1);
-  out_RecClusterPosZ = clust->GetRecoPosition(2);
+  out_RecClusterPosX = clust->GetPosition(kX);
+  out_RecClusterPosY = clust->GetPosition(kY);
+  out_RecClusterPosZ = clust->GetPosition(kZ);
 
   if(fPrintLevel == 1 || fPrintLevel > 2)
     clust->Print();
 
-  for(auto const& hit : clust->GetHitVector()) {
+  for(auto const& it : clust->GetHit()) {
+    OpticalHit* hit = (OpticalHit*)it;
     out_PDSHit_GenType  .push_back(hit->GetGenType());
-    out_PDSHit_X        .push_back(hit->GetRecoPosition(0));
-    out_PDSHit_Y        .push_back(hit->GetRecoPosition(1));
-    out_PDSHit_Z        .push_back(hit->GetRecoPosition(2));
+    out_PDSHit_X        .push_back(hit->GetPosition(kX));
+    out_PDSHit_Y        .push_back(hit->GetPosition(kY));
+    out_PDSHit_Z        .push_back(hit->GetPosition(kZ));
     out_PDSHit_PeakTime .push_back(hit->GetTime   ());
     out_PDSHit_Width    .push_back(hit->GetWidth  ());
     out_PDSHit_PE       .push_back(hit->GetSPE    ());
@@ -358,11 +380,15 @@ void Clustering::FillClusterInfo(OpticalCluster* clust) {
 void Clustering::FillClusterInfo(WireCluster* clust) {
   
   ResetFillVariable();
-  //FILL THE OUTPUT TREE.
+  
+  if(!clust->GetIsSelected())
+    return;
+
   out_Event = im.Event;
   out_Config         = fCurrentConfig;
   out_Cluster        = fvec_ClusterCount[fCurrentConfig];
   out_MarleyIndex    = clust->GetMarleyIndex();
+  out_APA            = clust->GetAPA();
   out_StartChan      = clust->GetStartChannel();
   out_EndChan        = clust->GetEndChannel();
   out_ChanWidth      = clust->GetChannelWidth();
@@ -370,18 +396,18 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
   out_Type           = clust->GetType();
   out_NHits          = clust->GetNHit();
   out_SumADC         = clust->GetHitSumADC();
-  out_FirstTimeHit   = clust->GetFirstTimeHit();
-  out_LastTimeHit    = clust->GetLastTimeHit();
+  out_FirstTimeHit   = clust->GetFirstHitTime();
+  out_LastTimeHit    = clust->GetLastHitTime();
   out_TimeWidth      = clust->GetTimeWidth();
-  out_EReco          = clust->GetEReco();
+  out_EReco          = clust->GetRecoEnergy();
   out_MC_UnderlyingE = clust->GetMC_UnderlyingE();
   out_NElectron      = clust->GetNElectron();
-  out_TrClusterPosX  = clust->GetTruePosition(0);
-  out_TrClusterPosY  = clust->GetTruePosition(1);
-  out_TrClusterPosZ  = clust->GetTruePosition(2);
-  out_RecClusterPosX = clust->GetRecoPosition(0);
-  out_RecClusterPosY = clust->GetRecoPosition(1);
-  out_RecClusterPosZ = clust->GetRecoPosition(2);
+  out_TrClusterPosX  = clust->GetTruePosition(kX);
+  out_TrClusterPosY  = clust->GetTruePosition(kY);
+  out_TrClusterPosZ  = clust->GetTruePosition(kZ);
+  out_RecClusterPosX = clust->GetRecoPosition(kX);
+  out_RecClusterPosY = clust->GetRecoPosition(kY);
+  out_RecClusterPosZ = clust->GetRecoPosition(kZ);
   out_pur_Other      = clust->GetPurity(kOther   );
   out_pur_SNnu       = clust->GetPurity(kSNnu    );
   out_pur_APA        = clust->GetPurity(kAPA     );
@@ -392,30 +418,28 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
   out_pur_Polonium   = clust->GetPurity(kPolonium);
   out_pur_Radon      = clust->GetPurity(kRadon   );
   out_pur_Ar42       = clust->GetPurity(kAr42    );
+  
+
   if(fPrintLevel > 1)
     clust->Print();
 
-  std::vector<WireHit*> hits = clust->GetHitVector();
+  std::vector<Hit*> hits = clust->GetHit();
   out_E_deposited=0.;
-  for(auto const& hit : clust->GetHitVector())
-  {
-    out_HitView.push_back(hit->GetHitView());
-    out_GenType.push_back(hit->GetGenType());
-    out_HitChan.push_back(hit->GetHitChan());
-    out_HitTime.push_back(hit->GetHitTime());
-    out_HitSADC.push_back(hit->GetHitSADC());
-    out_HitRMS .push_back(hit->GetHitRMS ());
-    out_TrPosX .push_back(hit->GetTruePosition(0));
-    out_TrPosY .push_back(hit->GetTruePosition(1));
-    out_TrPosZ .push_back(hit->GetTruePosition(2));
-    out_E_deposited += hit->GetTrDepositedE();
+  for(auto const& hit : hits) {
+    WireHit* wh = (WireHit*)hit;
+    out_HitView.push_back(wh->GetHitView());
+    out_GenType.push_back(wh->GetGenType());
+    out_HitChan.push_back(wh->GetHitChan());
+    out_HitTime.push_back(wh->GetHitTime());
+    out_HitSADC.push_back(wh->GetHitSADC());
+    out_HitRMS .push_back(wh->GetHitRMS ());
+    out_TrPosX .push_back(wh->GetTruePosition(kX));
+    out_TrPosY .push_back(wh->GetTruePosition(kY));
+    out_TrPosZ .push_back(wh->GetTruePosition(kZ));
+    out_E_deposited += wh->GetTrDepositedE();
   }
-  if(clust->GetTriggerFlag() && clust->GetIsSelected()){
-    // std::cout << "EVENT " << out_Event << std::endl;
-    // clust->Print();
-    t_Output_ClusteredWireHit->Fill();
-    fvec_ClusterCount[fCurrentConfig]++;
-  }
+  t_Output_ClusteredWireHit->Fill();
+  fvec_ClusterCount[fCurrentConfig]++;
 
 };
 
@@ -423,6 +447,7 @@ void Clustering::ResetFillVariable(){
   out_Cluster        = 0;
   out_Event          = 0;
   out_Config         = 0;
+  out_APA            = 0;
   out_StartChan      = 0;
   out_EndChan        = 0;
   out_ChanWidth      = 0;

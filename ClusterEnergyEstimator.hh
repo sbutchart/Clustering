@@ -21,7 +21,6 @@ public:
   ~ClusterEnergyEstimator();
   double EstimateEnergy(const WireCluster&) const;
   void   EstimateEnergy(const std::vector<WireCluster*>&) const;
-  void   EstimateEnergy(const std::vector<WireCluster*>*) const;
   std::vector<double> GetElapsedTime() const { return {0}; };
   enum Method{
     kUnknown   =-1,

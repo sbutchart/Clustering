@@ -10,8 +10,9 @@
 #include "TTree.h"
 
 #include "WireCluster.hh"
+#include "Trigger.hh"
 
-class SmartTrigger {
+class SmartTrigger: public Trigger {
 public:
   SmartTrigger(const std::string);
   ~SmartTrigger(){
@@ -23,21 +24,23 @@ public:
     fLookupDiscriminator = NULL;
   };
 
+  void SetIsSelected(Cluster* c) const {};
+  void SetIsSelected(const std::vector<Cluster*>&) const;
+
   void ConstructLikelihood(const std::string, const std::string);
   void SetBinning(const std::vector<double>);
   void SetResultFromCache(const std::string);
 
-  void SetConfig(const int c=-1) { fConfig = c; };
-  int  GetConfig() const { return fConfig; };
+  void SetConfig   (const int    c=-1) { fConfig    = c; };
+  void SetThreshold(const double d= 0) { fThreshold = d; };
+  int    GetConfig   () const { return fConfig;    };
+  double GetThreshold() const { return fThreshold; };
   
-  TH1D* GetLikelihood_Signal    () const { return fLikelihood_Sign; };
-  TH1D* GetLikelihood_Background() const { return fLikelihood_Back; };
+  TH1D* GetLikelihood_Signal    () const { return fLikelihood_Sign;     };
+  TH1D* GetLikelihood_Background() const { return fLikelihood_Back;     };
   TH1D* GetLookupDiscriminator  () const { return fLookupDiscriminator; };
   
-  double GetEstimator(const WireCluster& cluster) const {
-    return cluster.GetEReco();
-  };
-  
+  virtual double GetEstimator(const Cluster&) const = 0;
 
   double GetDiscriminator(const double feat) const {
     if (!fLookupDiscriminator) {
@@ -49,33 +52,30 @@ public:
     return fLookupDiscriminator->GetBinContent(bin);
   };
   
-  // double GetDiscriminatorVecDouble(const std::vector<double> feat) const {
-  //   double r=0;
-  //   for (std::vector<double>iterator it = feat.begin(); it != feat.end(); ++it) {
-  //     r += GetDiscriminator(it);
-  //   }
-  //   return r;
-  // };
-
-  double GetDiscriminator(const WireCluster& cluster) const {
+  double GetDiscriminator(const Cluster& cluster) const {
     return GetDiscriminator(GetEstimator(cluster));
   };
-
-  // double GetDiscriminatorVecCluster(const std::vector<WireCluster&> cluster) const {
-  //   double r = 0;
-  //   for (auto const& it : cluster) {
-  //     r += GetDiscriminator(GetEstimator(it));
-  //   }
-  //   return r;
-  // };
   
 private:
   TH1D* fLikelihood_Sign;
   TH1D* fLikelihood_Back;
   TH1D* fLookupDiscriminator;
   std::string fFeature;
-  int fConfig; 
+  int fConfig;
+  double fThreshold;
   
 };
+
+
+class SmartERecoWireClusterTrigger: public SmartTrigger {
+  using SmartTrigger::SmartTrigger;
+
+  double GetEstimator(const Cluster& c) const{
+    WireCluster& wc = (WireCluster&)c;
+    return wc.GetRecoEnergy();
+  };
+  
+};
+
 
 #endif

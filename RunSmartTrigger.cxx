@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
-  SmartTrigger strig(Feature);
+  SmartERecoWireClusterTrigger strig(Feature);
   strig.SetConfig(Config);
   std::map<std::string,std::vector<double>> bin;
   bin["SumADC"] = {0,1000,2000,3000,4000,5000,10000};

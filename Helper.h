@@ -29,6 +29,14 @@
 #include <iostream>
 #include <unistd.h>
 
+template<typename T, typename U>
+std::pair<T,U> GetMax(const std::map<T,U>& x) {
+  using pairtype=std::pair<T,U>; 
+  return *std::max_element(x.begin(), x.end(), [] (const pairtype & p1, const pairtype & p2) {
+        return p1.second < p2.second;
+  }); 
+}
+
 //======================================================================
 inline TH1* getPadAxisHist(TPad* pad)
 {
@@ -321,6 +329,29 @@ enum GenType{
   kAllBackground,
   kAll            
 };
+
+
+enum Direction {
+  kX=0,
+  kY,
+  kZ,
+  kT
+};
+
+static const std::vector<Direction> AllDirection = {kX,kY,kZ,kT};
+static const std::vector<GenType>   AllGenType   = {kOther,
+                                                    kSNnu,
+                                                    kAPA,
+                                                    kCPA,
+                                                    kAr39,
+                                                    kNeutron,
+                                                    kKrypton,
+                                                    kPolonium,
+                                                    kRadon,
+                                                    kAr42,
+                                                    kAllBackground,
+                                                    kAll};
+
 static int CurrentProg=0;
 
 inline void PrintProgress(int iter, int nloop){
