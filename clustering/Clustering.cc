@@ -198,8 +198,6 @@ int Clustering::ClusterAll(int inNEvent){
         wh = NULL;
       }
     }
-    std::cout << "vec_WireHit.size() " << vec_WireHit.size() << std::endl;
-
     out_NHits = vec_WireHit.size();
     for(size_t j = 0; j < im.PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
