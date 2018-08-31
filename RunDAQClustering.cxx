@@ -8,10 +8,11 @@ int main(int argc, char** argv){
 
   int nEvent=-1;
   int PrintLevel=-1;
+  int Offset=-1;
   std::string InputFile  = "";
   std::string OutputFile = "";
   std::string InputTree  = "";
-  while ( (opt = getopt(argc, argv, "n:p:i:o:t:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "n:p:i:o:t:s:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'n':
       nEvent = atoi(optarg);
@@ -28,6 +29,9 @@ int main(int argc, char** argv){
     case 't':
       InputTree = std::string(optarg);
       break;
+    case 's':
+      Offset = atoi(optarg);
+      break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
       break;
@@ -35,9 +39,10 @@ int main(int argc, char** argv){
   }
 
   Clustering c;
-  c.SetInputFile (InputFile );
-  c.SetInputTree (InputTree );
-  c.SetOutputFile(OutputFile);
-  c.SetPrintLevel(PrintLevel);
+  c.SetInputFile  (InputFile );
+  c.SetInputTree  (InputTree );
+  c.SetOutputFile (OutputFile);
+  c.SetPrintLevel (PrintLevel);
+  c.SetEventOffset(Offset    );
   return c.ClusterAll(nEvent);
 };

@@ -123,7 +123,13 @@ int Clustering::ClusterAll(int inNEvent){
 
     PrintProgress(iEvent,fNEvent);
     im.GetEntry(iEvent);
-    out_Event = im.Event;
+    
+    if (fEventOffset >= 0) {
+      out_Event = iEvent + fEventOffset;
+    } else {
+      out_Event = im.Event;
+    }
+    
     bool goodEvent = true;
     for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlSample->size(); ++MarleyEvent) {
       h_ENu_MC     ->Fill(1000*(*im.True_ENu)[MarleyEvent]);
@@ -252,7 +258,6 @@ void Clustering::FillClusterInfo(OpticalCluster* clust)
   //FILL THE OUTPUT TREE.
   out_Config         = fCurrentConfig;
   out_Cluster        = fvec_OptClusterCount[0];
-  out_Event          = im.Event;
   out_MarleyIndex    = clust->GetMarleyIndex();
   out_YWidth         = clust->GetRecoWidth(1);
   out_ZWidth         = clust->GetRecoWidth(2);
@@ -289,7 +294,6 @@ void Clustering::FillClusterInfo(WireCluster* clust)
 
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
-  out_Event = im.Event;
   out_Config         = fCurrentConfig;
   out_Cluster        = fvec_ClusterCount[fCurrentConfig];
   out_MarleyIndex    = clust->GetMarleyIndex();
@@ -349,7 +353,7 @@ void Clustering::FillClusterInfo(WireCluster* clust)
 
 void Clustering::ResetFillVariable(){
   out_Cluster        = 0;
-  out_Event          = 0;
+  ///out_Event          = 0;
   out_Config         = 0;
   out_StartChan      = 0;
   out_EndChan        = 0;

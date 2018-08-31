@@ -40,6 +40,7 @@ public:
     fClustSelec    (NULL),
     fClustEng      (NULL),
     fPrintLevel    (-1),
+    fEventOffset   (-1),
     t_Output_ClusteredWireHit   (NULL),
     t_Output_ClusteredOpticalHit(NULL),
     t_Output_TrueInfo           (NULL),
@@ -103,14 +104,17 @@ public:
       }
     };
 
-  int         GetPrintLevel() const { return fPrintLevel;     };
-  std::string GetInputFile () const { return fInputFileName;  };
-  std::string GetInputTree () const { return fInputTreeName;  };
-  std::string GetOutputFile() const { return fOutputFileName; };
-  void        SetPrintLevel(const int p=-1)         { fPrintLevel     = p; };
-  void        SetInputFile (const std::string s="") { fInputFileName  = s; };
-  void        SetInputTree (const std::string s="") { fInputTreeName  = s; };
-  void        SetOutputFile(const std::string s="") { fOutputFileName = s; };
+  int         GetPrintLevel () const { return fPrintLevel;     };
+  int         GetEventOffset() const { return fEventOffset;    };
+  std::string GetInputFile  () const { return fInputFileName;  };
+  std::string GetInputTree  () const { return fInputTreeName;  };
+  std::string GetOutputFile () const { return fOutputFileName; };
+  
+  void        SetPrintLevel (const int p=-1)         { fPrintLevel     = p; };
+  int         SetEventOffset(const int p=-1)         { fEventOffset    = p; };
+  void        SetInputFile  (const std::string s="") { fInputFileName  = s; };
+  void        SetInputTree  (const std::string s="") { fInputTreeName  = s; };
+  void        SetOutputFile (const std::string s="") { fOutputFileName = s; };
     
   void SetupConfigurations_AdjChanTolerance(const std::vector<float> vec_cut_AdjChanTolerance = {1,2,2,2,2,2}          )
     { fvec_cut_AdjChanTolerance = vec_cut_AdjChanTolerance; };
@@ -213,6 +217,7 @@ private:
   int fNConfig;
   int fCurrentConfig;
   int fPrintLevel;
+  int fEventOffset;
   unsigned int fNCuts;
   unsigned int fNEvent;
    
