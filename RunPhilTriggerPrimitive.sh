@@ -1,33 +1,33 @@
 #!/bin/bash
 ResultFile="ResultPhilMCC11.txt"
 echo "" > $ResultFile
-
-for dir in snanatrigprim1000 snanatrigprim1200 snanatrigprim1400 snanatrigprim1600 snanatrigprim1800 snanatrigprim2000 snanatrigprim2400 snanatrigprim800
-#for dir in snanatrigprim800
+OutputDir="/dune/data/users/plasorak/PhilHitPrimitives"
+for threshold in 800 1000 1200 1400 1600 1800 2000 2400
 do
-    if [ ! -e ${dir} ]
+    dir="snanatrigprim"$threshold
+    CompleteDir=${OutputDir}/${dir}
+    if [ ! -e ${CompleteDir} ]
     then
-       mkdir $dir
+       mkdir ${CompleteDir}
     fi
     offset=0
-    for file in `cat /dune/app/users/rodriges/run-snana-on-grid/snana-output-files-defaultnoise.list`
+    
+    for file in `cat /dune/app/users/rodriges/run-snana-on-grid/snana-output-files-defaultnoise-pdreco.list`
     do
         filebase=`basename $file`
         echo $offset
-        #echo $filebase $dir
-        ./build/RunDAQClustering -i ${file} -t ${dir}/SNSimTree -o ${dir}/clustered_${filebase} -s $offset
+        ./build/RunDAQClustering -i ${file} -t ${dir}/SNSimTree -o ${CompleteDir}/clustered_${filebase} -s $offset
         offset=$(( $offset+10000 ))
     done
-    list=`ls -1 ${dir}/clustered_*.root`
-    #echo $list
-    if [ -e ./${dir}/clustered.root ]
+    list=`ls -1 ${CompleteDir}/clustered_*.root`
+    if [ -e ${CompleteDir}/clustered.root ]
     then
-        rm -rf ./${dir}/clustered.root
+        rm -rf ${CompleteDir}/clustered.root
     fi
-    hadd ${dir}/clustered.root ${list}
-    ./build/GetEffBackRate -i ${dir}/clustered.root -o ${dir}/trigprim.txt
-    echo ${dir} >> $ResultFile
-    cat ${dir}/trigprim.txt >> $ResultFile
+    hadd ${CompleteDir}/clustered.root ${list}
+    ./build/GetEffBackRate -i ${CompleteDir}/clustered.root -o ${CompleteDir}/trigprim.txt -n $threshold
+    echo ${CompleteDir} >> $ResultFile
+    cat ${CompleteDir}/trigprim.txt >> $ResultFile
 done
 
 

@@ -47,8 +47,8 @@ public:
     h_ENu_MC     (NULL),
     h_MarlTime_MC(NULL),
     h_TimeElapsed(NULL),
-    im()
-    {
+    im() {
+    
       for(size_t i = 0; i < fvec_g_config.size(); i++){
         if(fvec_g_config[i]) delete fvec_g_config[i];
         fvec_g_config[i] = NULL;
@@ -76,19 +76,19 @@ public:
 
       for(int i = 0; i < fNConfig; i++)
       {
-        std::cout << "---- Config " << i << std::endl;
-        std::cout << "AdjChanTolerance[" << i << "] "
-                  << fvec_cut_AdjChanTolerance[i] << std::endl;//
-        std::cout << "HitsInWindow[" << i << "] "
-                  << fvec_cut_HitsInWindow[i] << std::endl;//
-        std::cout << "MinChannels[" << i << "] "
-                  << fvec_cut_MinChannels[i] << std::endl;//
-        std::cout << "MinChanWidth[" << i << "] "
-                  << fvec_cut_MinChanWidth[i] << std::endl;//
-        std::cout << "TimeWindowSize[" << i << "] "
-                  << fvec_cut_TimeWindowSize[i] << std::endl;
-        std::cout << "TotalADC[" << i << "] "
-                  << fvec_cut_TotalADC[i] << std::endl;
+        // std::cout << "---- Config " << i << std::endl;
+        // std::cout << "AdjChanTolerance[" << i << "] "
+        //           << fvec_cut_AdjChanTolerance[i] << std::endl;//
+        // std::cout << "HitsInWindow[" << i << "] "
+        //           << fvec_cut_HitsInWindow[i] << std::endl;//
+        // std::cout << "MinChannels[" << i << "] "
+        //           << fvec_cut_MinChannels[i] << std::endl;//
+        // std::cout << "MinChanWidth[" << i << "] "
+        //           << fvec_cut_MinChanWidth[i] << std::endl;//
+        // std::cout << "TimeWindowSize[" << i << "] "
+        //           << fvec_cut_TimeWindowSize[i] << std::endl;
+        // std::cout << "TotalADC[" << i << "] "
+        //           << fvec_cut_TotalADC[i] << std::endl;
 
         fvec_ClusterCount   .push_back(0);
         fvec_OptClusterCount.push_back(0);

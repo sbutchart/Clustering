@@ -132,8 +132,9 @@ int main(int argc, char** argv) {
   std::string OutputFile = "";
   int Config = -1;
   int nHitCut = 0;
+  int OffsetConfig = 0;
   double DetectorScaling = 0.12;
-  while ( (opt = getopt(argc, argv, "i:o:c:s:h:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "i:o:c:s:h:n:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile  = std::string(optarg);
@@ -146,6 +147,9 @@ int main(int argc, char** argv) {
       break;
     case 's':
       DetectorScaling = atoi(optarg);
+      break;
+    case 'n':
+      OffsetConfig = atoi(optarg);
       break;
     case 'h':
       std::cout << optarg<< std::endl;
@@ -244,10 +248,10 @@ int main(int argc, char** argv) {
     std::cout  << "Config (Wire) " << c
                << ", SN efficiency: " << it.second.first << " +/- " << it.second.second
                << " Background rate in 10kt (Hz): " << map_Config_WireBackRate[c].first << " +/- " << map_Config_WireBackRate[c].second << std::endl;
-    txt_Result << c
-               << ", " << it.second.first << ", " << it.second.second
-               << ", " << map_Config_WireBackRate[c].first
-               << ", " << map_Config_WireBackRate[c].second << std::endl; 
+    txt_Result << OffsetConfig+c
+               << " " << it.second.first << " " << it.second.second
+               << " " << map_Config_WireBackRate[c].first
+               << " " << map_Config_WireBackRate[c].second << std::endl; 
   }
   
   for(auto const& it : map_Config_WireEff) {
