@@ -71,9 +71,11 @@ int main(int argc, char** argv) {
   }
 
   int nevent=0;
+  int totevent=set_event.size();
   for (auto const& it: set_event) {
     nevent++;
-    if (nevent>100) break;
+    PrintProgress(nevent,totevent);
+    //if (nevent>100) break;
     
     wire_cluster.clear();
     opti_cluster.clear();

@@ -392,6 +392,9 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
   out_ChanWidth      = clust->GetChannelWidth();
   out_NChan          = clust->GetNChannel();
   out_Type           = clust->GetType();
+  if (out_Type == 0)
+    std::cout << "out_Type " << out_Type << std::endl;
+
   out_NHits          = clust->GetNHit();
   out_SumADC         = clust->GetHitSumADC();
   out_FirstTimeHit   = clust->GetFirstHitTime();

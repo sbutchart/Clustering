@@ -72,12 +72,12 @@ int main(int argc, char** argv){
   int    MarleyIndex   ;
   int    EventTrue     ;
   int    Config        ;
-  int    NChan         ;
-  int    Type          ;
-  int    NHits         ;
-  float  FirstTimeHit  ;
-  float  LastTimeHit   ;
-  float  TimeWidth     ;
+  double NChan         ;
+  double Type          ;
+  double NHits         ;
+  double FirstTimeHit  ;
+  double LastTimeHit   ;
+  double TimeWidth     ;
   double RecClusterPosX;
   double RecClusterPosY;
   double RecClusterPosZ;

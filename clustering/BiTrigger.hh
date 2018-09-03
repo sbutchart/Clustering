@@ -33,7 +33,6 @@ struct ClusterEnsemble {
   void AddCluster(const WireCluster& c) {
     ++nWireCluster;
     PeakWireCluster += c.GetSumPeak();
-    std::cout << "PeakWireCluster " << PeakWireCluster << std::endl;
   };
 };
 

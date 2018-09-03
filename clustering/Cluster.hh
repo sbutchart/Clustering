@@ -108,7 +108,7 @@ protected:
     fChannelExtent.second = *channel.rbegin();
     fChannelWidth = (size_t)((int)fChannelExtent.second - (int)fChannelExtent.first);
 
-    SetTypeFromSumHit(fTruePurity);
+    SetTypeFromSumHit(hittype_peak);
     
     for (auto const& d : AllGenType) {
       fTruePurity[d] = hittype_peak[d] / fSumPeak;
