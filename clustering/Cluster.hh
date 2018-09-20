@@ -31,6 +31,7 @@ private:
   
   Cluster(const Cluster& c):
     fHit            (c.fHit            ),
+    fNHit           (c.fNHit           ),
     fNChannel       (c.fNChannel       ),
     fPosition       (c.fPosition       ),
     fSize           (c.fSize           ),
@@ -51,6 +52,7 @@ protected:
   
   Cluster():
     fHit       (),
+    fNHit      (fHit.size()),
     fNChannel  (0),
     fPosition  (),
     fSize      (),
@@ -70,6 +72,7 @@ protected:
 
   Cluster(std::vector<Hit*>& v_hit):
     fHit            (v_hit),
+    fNHit           (v_hit.size()),
     fNChannel       (0),
     fPosition       (),
     fSize           (),
@@ -162,13 +165,13 @@ public:
   double GetRecoPosition (const Direction d) const { return fPosition.at(d);               };
   size_t GetNChannel     ()                  const { return fNChannel;                     };
   double GetSumPeak      ()                  const { return fSumPeak;                      };
-  size_t GetNHit         ()                  const { return fHit.size();                   };
   size_t GetAPA          ()                  const { return fAPA;                          };
   double GetSize         (const Direction d) const { return fSize.at(d);                   };
   extent GetExtent       (const Direction d) const { return fExtent.at(d);                 };
   double GetPurity       (const GenType   d) const { return fTruePurity.at(d);             };
   double GetTruePosition (const Direction d) const { return fTruePosition.at(d);           };
   double GetTrueDirection(const Direction d) const { return fTrueDirection.at(d);          };
+  size_t GetNHit         ()                  const { return fNHit;                         };
   bool   GetType         ()                  const { return (fTrueGenType==kSNnu);         };
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
@@ -186,6 +189,7 @@ public:
   void SetAPA          (const size_t d)                    { fAPA              = d; };
   void SetSize         (const Direction d, const double s) { fSize         [d] = s; };
   void SetGenType      (const GenType d)                   { fTrueGenType      = d; };
+  void SetNHit         (const size_t  d)                   { fNHit             = d; };
   void SetSumPeak      (const double  s)                   { fSumPeak          = s; };
   void SetExtent       (const Direction d, const extent e) { fExtent       [d] = e; };
   void SetTruePosition (const Direction d, const double e) { fTruePosition [d] = e; };
@@ -198,6 +202,7 @@ public:
 protected:
   virtual void SetTypeFromSumHit(const std::map<GenType,double>&) = 0;
   std::vector<Hit*> fHit;
+  size_t fNHit;
   size_t fNChannel;
   std::pair<size_t,size_t> fChannelExtent;
   size_t fChannelWidth;

@@ -10,13 +10,21 @@ int main(int argc, char** argv){
 
   int RMS=-1;
   int Width=-1;
-  while ( (opt = getopt(argc, argv, "r:w:")) != -1 ) {  // for each option...
+  std::string InputFile = "";
+  std::string InputTree = "";
+  while ( (opt = getopt(argc, argv, "r:w:i:t:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'r':
       RMS = atoi(optarg);
       break;
     case 'w':
       Width = atoi(optarg);
+      break;
+    case 'i':
+      InputFile = optarg;
+      break;
+    case 't':
+      InputTree = optarg;
       break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
@@ -27,7 +35,7 @@ int main(int argc, char** argv){
   if(RMS>=0 && Width >=0)
     return 1;
 
-  HitSimplePlot hsp;
+  HitSimplePlot hsp(InputFile, InputTree);
   if(RMS  >=0) hsp.PlotRMS  (RMS  );
   if(Width>=0) hsp.PlotWidth(Width);
 

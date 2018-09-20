@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
   TTree* wire_tree = (TTree*)f.Get("ClusteredWireHit");
   TTree* opti_tree = (TTree*)f.Get("ClusteredOpticalHit");
   int    Event   = 0;
+  double nHit    = 0;
   double APA     = 0;
   double SumPeak = 0;
   double Type    = 0;
@@ -48,10 +49,12 @@ int main(int argc, char** argv) {
   wire_tree->SetBranchAddress("Event",   &Event  );
   wire_tree->SetBranchAddress("APA",     &APA    );
   wire_tree->SetBranchAddress("SumADC",  &SumPeak);
+  wire_tree->SetBranchAddress("NHits",   &nHit   );
   wire_tree->SetBranchAddress("Type",    &Type   );
   opti_tree->SetBranchAddress("Event",   &Event  );
   opti_tree->SetBranchAddress("APA",     &APA    );
   opti_tree->SetBranchAddress("SumPE",   &SumPeak);
+  opti_tree->SetBranchAddress("NHits",   &nHit   );
   opti_tree->SetBranchAddress("Type",    &Type   );
   
   std::map<int,std::vector<int>> event_entry_wire;
@@ -75,27 +78,28 @@ int main(int argc, char** argv) {
   for (auto const& it: set_event) {
     nevent++;
     PrintProgress(nevent,totevent);
-    //if (nevent>100) break;
     
     wire_cluster.clear();
     opti_cluster.clear();
     for (auto const& entry_wire: event_entry_wire[it]) {
       wire_tree->GetEntry(entry_wire);
       auto wc = std::unique_ptr<WireCluster>(new WireCluster);
-      //std::cout << "APA " << APA << std::endl;
       wc->SetSumPeak(SumPeak);
+      wc->SetNHit(nHit);
       wc->SetGenType(ConvertIntToGenType((int)Type));
       wc->SetAPA(APA);
-      wire_cluster.push_back(std::move(wc));
+      if(nHit>3)
+        wire_cluster.push_back(std::move(wc));
     }
     for (auto const& entry_opti: event_entry_opti[it]) {
       opti_tree->GetEntry(entry_opti);
       auto oc = std::unique_ptr<OpticalCluster>(new OpticalCluster);
-      //std::cout << "SumPE " << SumPeak << std::endl;
       oc->SetSumPeak(SumPeak);
+      oc->SetNHit(nHit);
       oc->SetGenType(ConvertIntToGenType((int)Type));
       oc->SetAPA(APA);
-      opti_cluster.push_back(std::move(oc));
+      if(nHit>20)
+        opti_cluster.push_back(std::move(oc));
     }
     bt.AddEventToStudy(wire_cluster, opti_cluster);
   }

@@ -37,7 +37,8 @@ public:
     fInputTreeName (""),
     fOutputFileName(""),
     f_Output       (NULL),
-    fTrigger       (NULL),
+    fWireTrigger   (NULL),
+    fOpticalTrigger(NULL),
     fClustEng      (NULL),
     fEReco         (NULL),
     fPrintLevel    (-1),
@@ -52,18 +53,18 @@ public:
     h_MarlTime_MC(NULL),
     fmap_APA_Channel(),
     im()    {
-      for(size_t i = 0; i < fvec_g_config.size(); i++){
-        if(fvec_g_config[i]) delete fvec_g_config[i];
-        fvec_g_config[i] = NULL;
-      }
 
-      SetupConfigurations_AdjChanTolerance();
-      SetupConfigurations_MinHitADC       ();
-      SetupConfigurations_HitsInWindow    ();
-      SetupConfigurations_MinChannels     ();
-      SetupConfigurations_MinChanWidth    ();
-      SetupConfigurations_TimeWindowSize  ();
-      SetupConfigurations_TotalADC        ();
+      SetupConfig_AdjChanTolerance();
+      SetupConfig_HitsInWindow    ();
+      SetupConfig_MinChannels     ();
+      SetupConfig_MinChanWidth    ();
+      SetupConfig_TimeWindowSize  ();
+      SetupConfig_TotalADC        ();
+      SetupConfig_TimeWindowOpt   ();
+      SetupConfig_PositionOpt     ();
+      SetupConfig_BucketSize      ();
+      SetupConfig_OptHitInCluster ();
+      
       fmap_APA_Channel[-1] = std::numeric_limits<int>::max();
       fmap_APA_Channel[0]  = 0;
       fmap_APA_Channel[1]  = 3000;
@@ -79,45 +80,21 @@ public:
       fmap_APA_Channel[11] = 29000;
       fmap_APA_Channel[12] = 31000;
       
-      std::vector<size_t> sizes ={fvec_cut_HitsInWindow  .size(),
-                                  fvec_cut_MinHitADC     .size(),
-                                  fvec_cut_MinChannels   .size(),
-                                  fvec_cut_MinChanWidth  .size(),
-                                  fvec_cut_TimeWindowSize.size(),
-                                  fvec_cut_TotalADC      .size()};
+      std::vector<size_t> sizes ={fcut_AdjChanTolerance.size(),
+                                  fcut_HitsInWindow    .size(),
+                                  fcut_MinChannels     .size(),
+                                  fcut_MinChanWidth    .size(),
+                                  fcut_TimeWindowSize  .size(),
+                                  fcut_TotalADC        .size(),
+                                  fcut_TimeWindowOpt   .size(),
+                                  fcut_PositionOpt     .size(),
+                                  fcut_BucketSize      .size(),
+                                  fcut_OptHitInCluster .size()};
     
       fNConfig = (int)(*std::min_element(sizes.begin(), sizes.end()));
-      // std::cout << "There are " << fNConfig << " configs"<< std::endl;
-      fNCuts = 6;
-      
-      for(int i = 0; i < fNConfig; i++) {
-        // std::cout << "---- Config " << i << std::endl;
-        // std::cout << "AdjChanTolerance[" << i << "] "
-        //           << fvec_cut_AdjChanTolerance[i] << std::endl;//
-        // std::cout << "HitsInWindow[" << i << "] "
-        //           << fvec_cut_HitsInWindow[i] << std::endl;//
-        // std::cout << "MinChannels[" << i << "] "
-        //           << fvec_cut_MinChannels[i] << std::endl;//
-        // std::cout << "MinChanWidth[" << i << "] "
-        //           << fvec_cut_MinChanWidth[i] << std::endl;//
-        // std::cout << "TimeWindowSize[" << i << "] "
-        //           << fvec_cut_TimeWindowSize[i] << std::endl;
-        // std::cout << "TotalADC[" << i << "] "
-        //           << fvec_cut_TotalADC[i] << std::endl;
-
-        fvec_ClusterCount   .push_back(0);
-        fvec_OptClusterCount.push_back(0);
-
-        fvec_g_config.push_back(new TGraph(fNCuts));
-        fvec_g_config.back()->SetName(Form("g_ConfigDefinitions%i",i));
-        fvec_g_config.back()->SetPoint(0, 1, fvec_cut_AdjChanTolerance[i]);
-        fvec_g_config.back()->SetPoint(1, 2, fvec_cut_HitsInWindow    [i]);
-        fvec_g_config.back()->SetPoint(2, 3, fvec_cut_MinChannels     [i]);
-        fvec_g_config.back()->SetPoint(3, 4, fvec_cut_MinChanWidth    [i]);
-        fvec_g_config.back()->SetPoint(4, 5, fvec_cut_TimeWindowSize  [i]);
-        fvec_g_config.back()->SetPoint(5, 6, fvec_cut_TotalADC        [i]);
-      }
-    };
+      fWireClusterCount    = std::vector<float>(fNConfig,0);
+      fOpticalClusterCount = std::vector<float>(fNConfig,0);
+  };
 
   int GetPrintLevel() const { return fPrintLevel; };
   std::string GetInputFile   () const { return fInputFileName;  };
@@ -134,29 +111,19 @@ public:
   void SetConfig      (const int n=-1)         { fConfig         = n; };
   void SetSorting     (const int n=0)          { fSorting        = n; };
     
-  void SetupConfigurations_AdjChanTolerance(const std::vector<float> vec_cut_AdjChanTolerance = {1,2,2,2,2,2,2}          )
-    { fvec_cut_AdjChanTolerance = vec_cut_AdjChanTolerance; };
-  void SetupConfigurations_MinHitADC       (const std::vector<float> vec_cut_MinHitADC        = {0,0,0,0,0,0,0}          )
-    { fvec_cut_MinHitADC = vec_cut_MinHitADC; };
-  void SetupConfigurations_HitsInWindow    (const std::vector<float> vec_cut_HitsInWindow     = {2,3,3,4,5,6,5}          )
-    { fvec_cut_HitsInWindow  = vec_cut_HitsInWindow; };
-  void SetupConfigurations_MinChannels     (const std::vector<float> vec_cut_MinChannels      = {2,2,2,2,2,2,2}          )
-    { fvec_cut_MinChannels = vec_cut_MinChannels; };
-  void SetupConfigurations_MinChanWidth    (const std::vector<float> vec_cut_MinChanWidth     = {0,0,0,0,0,0,0}          )
-    { fvec_cut_MinChanWidth = vec_cut_MinChanWidth; };
-  void SetupConfigurations_TimeWindowSize  (const std::vector<float> vec_cut_TimeWindowSize   = {20,20,20,20,20,20,20}   )
-    { fvec_cut_TimeWindowSize = vec_cut_TimeWindowSize; };
-  void SetupConfigurations_TotalADC        (const std::vector<float> vec_cut_TotalADC         = {350,400,450,400,400,0,0})
-    { fvec_cut_TotalADC =vec_cut_TotalADC; };
- 
-  int GetNConfig() const { return fNConfig; };
-  std::vector<float> GetCutAdjChanTolerance() const { return fvec_cut_AdjChanTolerance; };
-  std::vector<float> GetCutHitsInWindow    () const { return fvec_cut_HitsInWindow    ; };
-  std::vector<float> GetCutMinChannels     () const { return fvec_cut_MinChannels     ; };
-  std::vector<float> GetCutMinChanWidth    () const { return fvec_cut_MinChanWidth    ; };
-  std::vector<float> GetCutTimeWindowSize  () const { return fvec_cut_TimeWindowSize  ; };
-  std::vector<float> GetCutTotalADC        () const { return fvec_cut_TotalADC        ; };
+  void SetupConfig_AdjChanTolerance(const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_AdjChanTolerance = cut; };
+  void SetupConfig_HitsInWindow    (const std::vector<float> cut = {5,5,5,6,6,6}            ) { fcut_HitsInWindow     = cut; };
+  void SetupConfig_MinChannels     (const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_MinChannels      = cut; };
+  void SetupConfig_MinChanWidth    (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_MinChanWidth     = cut; };
+  void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_TimeWindowSize   = cut; };
+  void SetupConfig_TotalADC        (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_TotalADC         = cut; };
+  void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {1.0,1.5,2.0,1.0,1.5,2.0}) { fcut_TimeWindowOpt    = cut; };
+  void SetupConfig_PositionOpt     (const std::vector<float> cut = {300,300,300,300,300,300}) { fcut_PositionOpt      = cut; };
+  void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_BucketSize       = cut; };
+  void SetupConfig_OptHitInCluster (const std::vector<float> cut = {15,15,15,20,20,20}      ) { fcut_OptHitInCluster  = cut; };
 
+  
+  int GetNConfig() const { return fNConfig; };
   // The main guts...
   int ClusterAll(int);
   void FillClusterInfo(WireCluster* clust);
@@ -177,26 +144,26 @@ public:
       if(t_Output_TrueInfo           ) delete t_Output_TrueInfo           ;
       if(t_Output_TimingInfo         ) delete t_Output_TimingInfo         ;
       
-      for(size_t i = 0; i < fvec_g_config.size(); i++){
-        if(fvec_g_config[i]) delete fvec_g_config[i];
-        fvec_g_config[i] = NULL;
-      }
-      fvec_g_config.clear();
-      if(fTrigger)    delete fTrigger;
-      if(fClustEng)   delete fClustEng;  
-      fTrigger = NULL;
+      if(fWireTrigger)    delete fWireTrigger;
+      if(fOpticalTrigger) delete fOpticalTrigger;
+      if(fClustEng) delete fClustEng;  
+      fWireTrigger    = NULL;
+      fOpticalTrigger = NULL;
       fClustEng = NULL;
 
-      fvec_ClusterCount.clear();
-      fvec_OptClusterCount.clear();
+      fWireClusterCount   .clear();
+      fOpticalClusterCount.clear();
       
-      fvec_cut_MinHitADC       .clear();
-      fvec_cut_AdjChanTolerance.clear();
-      fvec_cut_HitsInWindow    .clear();
-      fvec_cut_MinChannels     .clear();
-      fvec_cut_MinChanWidth    .clear();
-      fvec_cut_TimeWindowSize  .clear();
-      fvec_cut_TotalADC        .clear();
+      fcut_AdjChanTolerance.clear();
+      fcut_HitsInWindow    .clear();
+      fcut_MinChannels     .clear();
+      fcut_MinChanWidth    .clear();
+      fcut_TimeWindowSize  .clear();
+      fcut_TotalADC        .clear();
+      fcut_TimeWindowOpt   .clear();
+      fcut_PositionOpt     .clear();
+      fcut_BucketSize      .clear();
+      fcut_OptHitInCluster .clear();
 
       t_Output_ClusteredWireHit    = NULL;
       t_Output_ClusteredOpticalHit = NULL;
@@ -221,22 +188,25 @@ private:
   std::string fOutputFileName;
   std::string fERecoXMLFile  ;
   TFile *f_Output;
-  SimpleWireTrigger* fTrigger;
+  SimpleWireTrigger* fWireTrigger;
+  SimpleOpticalTrigger* fOpticalTrigger;
   ClusterEngine* fClustEng;
   ClusterEnergyEstimator* fEReco;
   
-  std::vector<float> fvec_ClusterCount   ;
-  std::vector<float> fvec_OptClusterCount;
+  std::vector<float> fWireClusterCount   ;
+  std::vector<float> fOpticalClusterCount;
 
-  std::vector<float> fvec_cut_AdjChanTolerance;
-  std::vector<float> fvec_cut_HitsInWindow    ;
-  std::vector<float> fvec_cut_MinChannels     ;
-  std::vector<float> fvec_cut_MinChanWidth    ;
-  std::vector<float> fvec_cut_TimeWindowSize  ;
-  std::vector<float> fvec_cut_TotalADC        ;
-  std::vector<float> fvec_cut_MinHitADC       ;
-
-  std::vector<TGraph*> fvec_g_config;
+  std::vector<float> fcut_AdjChanTolerance;
+  std::vector<float> fcut_HitsInWindow    ;
+  std::vector<float> fcut_MinChannels     ;
+  std::vector<float> fcut_MinChanWidth    ;
+  std::vector<float> fcut_TimeWindowSize  ;
+  std::vector<float> fcut_TotalADC        ;
+  std::vector<float> fcut_TimeWindowOpt   ;
+  std::vector<float> fcut_PositionOpt     ;
+  std::vector<float> fcut_BucketSize      ;
+  std::vector<float> fcut_OptHitInCluster ;
+  
   int fNConfig;
   int fCurrentConfig;
   int fPrintLevel;
@@ -244,7 +214,6 @@ private:
   int fConfig;
   int fSorting;
 
-  unsigned int fNCuts;
   unsigned int fNEvent;
    
   TTree* t_Output_ClusteredWireHit;

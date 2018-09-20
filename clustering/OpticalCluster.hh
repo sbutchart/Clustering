@@ -26,10 +26,12 @@ protected:
     std::map<GenType,int> h_type;
     for (auto const& it: fHit) {
       h_type[it->GetGenType()]++;
-      if (it->GetGenType() == kSNnu) { ++sign; }
-      else                           { ++back; }
+      if (it->GetGenType() == kSNnu) {
+        fTrueGenType = kSNnu;
+        return;
+      }
     }
-    fTrueGenType = GetMax(h_type).first;
+    fTrueGenType = kOther;
     
   };
 

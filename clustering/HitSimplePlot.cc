@@ -1,28 +1,49 @@
 #include "HitSimplePlot.hh"
 
-HitSimplePlot::HitSimplePlot(){
-  im.SetInputFile("/dune/app/users/plasorak/workspace/SNAna.root");
-  im.SetInputTree("snanagaushit/SNSimTree");
+HitSimplePlot::HitSimplePlot(std::string InputFile, std::string InputTree):
+  im(),
+  c(NULL),
+  nbin_1D_RMS(),
+  xmin_1D_RMS(),
+  xmax_1D_RMS(),
+  nbin_1D_Width(),
+  xmin_1D_Width(),
+  xmax_1D_Width(),
+  nbin_2D_x_RMS(),
+  xmin_2D_x_RMS(),
+  xmax_2D_x_RMS(),
+  nbin_2D_x_Width(),
+  xmin_2D_x_Width(),
+  xmax_2D_x_Width(),
+  nbin_2D_y_RMS(),
+  xmin_2D_y_RMS(),
+  xmax_2D_y_RMS(),
+  nbin_2D_y_Width(),
+  xmin_2D_y_Width(),
+  xmax_2D_y_Width() {  
+
+  im.SetInputFile(InputFile.c_str());
+  im.SetInputTree(InputTree.c_str());
   im.LoadTree();
   c = new TCanvas;
   nbin_1D_RMS    [1] = 100 ; nbin_1D_RMS    [2] = 40  ; nbin_1D_RMS    [3] = 100 ; nbin_1D_RMS    [4] = 20 ;
-  xmin_1D_RMS    [1] = 0   ; xmin_1D_RMS    [2] = 0   ; xmin_1D_RMS    [3] = 0   ; xmin_1D_RMS    [4] = 0   ;
-  xmax_1D_RMS    [1] = 4000; xmax_1D_RMS    [2] = 200 ; xmax_1D_RMS    [3] = 1000; xmax_1D_RMS    [4] = 20;
-  nbin_1D_Width  [1] = 100 ; nbin_1D_Width  [2] = 40  ; nbin_1D_Width  [3] = 100 ; nbin_1D_Width  [4] = 20 ;
-  xmin_1D_Width  [1] = 0   ; xmin_1D_Width  [2] = 0   ; xmin_1D_Width  [3] = 0   ; xmin_1D_Width  [4] = 0   ;
-  xmax_1D_Width  [1] = 4000; xmax_1D_Width  [2] = 1000; xmax_1D_Width  [3] = 1000; xmax_1D_Width  [4] = 20;
+  xmin_1D_RMS    [1] = 0   ; xmin_1D_RMS    [2] = 0   ; xmin_1D_RMS    [3] = 0   ; xmin_1D_RMS    [4] = 0  ;
+  xmax_1D_RMS    [1] = 4000; xmax_1D_RMS    [2] = 200 ; xmax_1D_RMS    [3] = 1000; xmax_1D_RMS    [4] = 20 ;
+  nbin_1D_Width  [1] = 100 ; nbin_1D_Width  [2] = 50  ; nbin_1D_Width  [3] = 15  ; nbin_1D_Width  [4] = 30 ;
+  xmin_1D_Width  [1] = 0   ; xmin_1D_Width  [2] = 0   ; xmin_1D_Width  [3] = 0   ; xmin_1D_Width  [4] = 0  ;
+  xmax_1D_Width  [1] = 4000; xmax_1D_Width  [2] = 1500; xmax_1D_Width  [3] = 1500; xmax_1D_Width  [4] = 30 ;
   nbin_2D_x_RMS  [1] = 100 ; nbin_2D_x_RMS  [2] = 40  ; nbin_2D_x_RMS  [3] = 100 ; nbin_2D_x_RMS  [4] = 20 ;
-  xmin_2D_x_RMS  [1] = 0   ; xmin_2D_x_RMS  [2] = 0   ; xmin_2D_x_RMS  [3] = 0   ; xmin_2D_x_RMS  [4] = 0   ;
-  xmax_2D_x_RMS  [1] = 4000; xmax_2D_x_RMS  [2] = 200 ; xmax_2D_x_RMS  [3] = 1000; xmax_2D_x_RMS  [4] = 20;
+  xmin_2D_x_RMS  [1] = 0   ; xmin_2D_x_RMS  [2] = 0   ; xmin_2D_x_RMS  [3] = 0   ; xmin_2D_x_RMS  [4] = 0  ;
+  xmax_2D_x_RMS  [1] = 4000; xmax_2D_x_RMS  [2] = 200 ; xmax_2D_x_RMS  [3] = 1000; xmax_2D_x_RMS  [4] = 20 ;
   nbin_2D_x_Width[1] = 100 ; nbin_2D_x_Width[2] = 40  ; nbin_2D_x_Width[3] = 100 ; nbin_2D_x_Width[4] = 20 ;
-  xmin_2D_x_Width[1] = 0   ; xmin_2D_x_Width[2] = 0   ; xmin_2D_x_Width[3] = 0   ; xmin_2D_x_Width[4] = 0   ;
-  xmax_2D_x_Width[1] = 4000; xmax_2D_x_Width[2] = 1000; xmax_2D_x_Width[3] = 1000; xmax_2D_x_Width[4] = 20;
+  xmin_2D_x_Width[1] = 0   ; xmin_2D_x_Width[2] = 0   ; xmin_2D_x_Width[3] = 0   ; xmin_2D_x_Width[4] = 0  ;
+  xmax_2D_x_Width[1] = 4000; xmax_2D_x_Width[2] = 1000; xmax_2D_x_Width[3] = 1000; xmax_2D_x_Width[4] = 20 ;
   nbin_2D_y_RMS  [1] = 100 ; nbin_2D_y_RMS  [2] = 40  ; nbin_2D_y_RMS  [3] = 100 ; nbin_2D_y_RMS  [4] = 20 ;
-  xmin_2D_y_RMS  [1] = 0   ; xmin_2D_y_RMS  [2] = 0   ; xmin_2D_y_RMS  [3] = 0   ; xmin_2D_y_RMS  [4] = 0   ;
-  xmax_2D_y_RMS  [1] = 4000; xmax_2D_y_RMS  [2] = 200 ; xmax_2D_y_RMS  [3] = 1000; xmax_2D_y_RMS  [4] = 20;
+  xmin_2D_y_RMS  [1] = 0   ; xmin_2D_y_RMS  [2] = 0   ; xmin_2D_y_RMS  [3] = 0   ; xmin_2D_y_RMS  [4] = 0  ;
+  xmax_2D_y_RMS  [1] = 4000; xmax_2D_y_RMS  [2] = 200 ; xmax_2D_y_RMS  [3] = 1000; xmax_2D_y_RMS  [4] = 20 ;
   nbin_2D_y_Width[1] = 100 ; nbin_2D_y_Width[2] = 40  ; nbin_2D_y_Width[3] = 100 ; nbin_2D_y_Width[4] = 20 ;
-  xmin_2D_y_Width[1] = 0   ; xmin_2D_y_Width[2] = 0   ; xmin_2D_y_Width[3] = 0   ; xmin_2D_y_Width[4] = 0   ;
-  xmax_2D_y_Width[1] = 2000; xmax_2D_y_Width[2] = 1000; xmax_2D_y_Width[3] = 1000; xmax_2D_y_Width[4] = 20;
+  xmin_2D_y_Width[1] = 0   ; xmin_2D_y_Width[2] = 0   ; xmin_2D_y_Width[3] = 0   ; xmin_2D_y_Width[4] = 0  ;
+  xmax_2D_y_Width[1] = 2000; xmax_2D_y_Width[2] = 1000; xmax_2D_y_Width[3] = 1000; xmax_2D_y_Width[4] = 20 ;
 };
 
 
@@ -165,9 +186,11 @@ void HitSimplePlot::Fill2DHistosRMS(std::vector<double>* vecx,
                                     std::vector<double>* vecy,
                                     std::map<GenType, TH2D*>& RMS) {
   
-  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) {
+  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) { 
     PrintProgress(iEntry,im.GetEntries());
     im.GetEntry(iEntry);
+    if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
+      continue;
     std::map<GenType,std::map<int, std::pair<std::vector<double>,std::vector<double> > > > map_pos =
       Get2DMap(vecx, vecy,
                im.PDS_OpHit_True_GenType,
@@ -188,6 +211,8 @@ void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenTyp
   for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) {
     PrintProgress(iEntry,im.GetEntries());
     im.GetEntry(iEntry);
+    if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
+      continue;
     std::map<GenType,std::map<int, std::vector<double> > > map_pos = GetMap(vector,
                                                                             im.PDS_OpHit_True_GenType,
                                                                             im.PDS_OpHit_True_TrackID);
@@ -287,6 +312,7 @@ void HitSimplePlot::PlotWidth1D(const int dim) {
   std::string filename = Form("Width_1D_%i.pdf",dim);
   c->Print((filename+"[").c_str());
   for (auto const& it: Width) {
+    gPad->SetLogy();
     AddOverflow(it.second);
     it.second->Draw();
     c->Print(filename.c_str());
