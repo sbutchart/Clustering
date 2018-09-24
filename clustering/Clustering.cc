@@ -164,8 +164,8 @@ int Clustering::ClusterAll(int inNEvent){
       out_DirY    .push_back((*im.True_Diry)    [MarleyEvent]);
       out_DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
     }
-    t_Output_TrueInfo->Fill();
     if(!goodEvent) continue;
+    t_Output_TrueInfo->Fill();
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
     std::vector<WireHit*>    vec_WireHit;
     std::vector<OpticalHit*> vec_OptHit;

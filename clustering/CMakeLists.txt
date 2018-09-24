@@ -11,18 +11,7 @@ find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ferror-limit=1000")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-# ROOT_GENERATE_DICTIONARY(G__OpticalHit      OpticalHit.hh)
-# ROOT_GENERATE_DICTIONARY(G__WireHit         WireHit.hh)
-# ROOT_GENERATE_DICTIONARY(G__OpticalCluster  OpticalCluster.hh)
-# ROOT_GENERATE_DICTIONARY(G__WireCluster     WireCluster.hh)
-# ROOT_GENERATE_DICTIONARY(G__ClusterSelector ClusterSelector.hh)
-# ROOT_GENERATE_DICTIONARY(G__ClusterEngine   ClusterEngine.hh)
-# ROOT_GENERATE_DICTIONARY(G__Trigger         Trigger.hh)
 
 add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc SmartTrigger.cc SmartTriggerToyThrower.cc BiTrigger.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
