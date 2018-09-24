@@ -14,25 +14,32 @@ WirePositionTimingDisplay::WirePositionTimingDisplay(const std::string F, const 
 
 void WirePositionTimingDisplay::LookForAPA(const GenType gen) {
 
-  size_t it=0;
-  for (; it < im.Hit_True_GenType->size(); ++it) {
-    if ((*im.Hit_True_GenType)[it] == gen)
-      break;
+  std::vector<size_t> type_count;
+  for (size_t it; it < im.Hit_True_GenType->size(); ++it) {
+    if ((*im.Hit_True_GenType)[it] == gen) {
+      type_count.push_back(it);
+    }
   }
-  if (it == im.Hit_True_GenType->size()) {
+  
+  if (type_count.size() == 0 ||
+      (gen == kSNnu && type_count.size() < 10)) {
     std::cout << "Didn't find this event in the whole detector trying next event." << std::endl;
     fAPA = -1;
     return;
+  } else if (type_count.size() == 1) {
+    fChan = (*im.Hit_Chan)[type_count[0]];
+    fTime = (*im.Hit_Time)[type_count[0]];
+  } else {
+    size_t it = type_count[type_count.size()/2];
+    fChan = (*im.Hit_Chan)[it];
+    fTime = (*im.Hit_Time)[it];
   }
-
-  fChan = (*im.Hit_Chan)[it];
   for (auto const& apa : fAPA_Bounds) {
     if (apa.second.IsInOrOnBorder(fChan)) {
       fAPA = apa.first;
       break;
     }
   }
-  fTime = (*im.Hit_Time)[it];
 }
 
 void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gentype=-1) {
@@ -55,7 +62,7 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
     ev++;
   }
   int spread = 50;
-  f_map_wire_time = Get2DHistos("EventDisplay",";Channel number;Time;ADC",
+  f_map_wire_time = Get2DHistos("EventDisplay",";Channel number;Time [ticks];ADC",
                                 2*spread,fChan-spread,fChan+spread,
                                 2*spread,fTime-spread,fTime+spread);
 

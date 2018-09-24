@@ -23,16 +23,11 @@ public:
 protected:
   virtual void SetTypeFromSumHit(const std::map<GenType,double>& nHit) {
     fTrueGenType = kOther;
-    for (auto const& it: nHit) {
-      if (it.second > 0)
-        if (it.first == kSNnu) {
-          fTrueGenType = kSNnu;
-          break;
-        }
+    int sign=0;
+    for (auto const& it: fHit) {
+      sign+=(it->GetGenType() == kSNnu);
     }
-    if (fTrueGenType != kSNnu) {
-      fTrueGenType = GetMax(nHit).first;
-    }
+    if (sign>1) fTrueGenType = kSNnu;
   };
   
 private:

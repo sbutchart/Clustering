@@ -6,12 +6,13 @@
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TPad.h"
 
 
 class HitSimplePlot {
 
 public:
-  HitSimplePlot();
+  HitSimplePlot(std::string, std::string);
   ~HitSimplePlot();
   void PlotRMS    (const int);
   void PlotWidth  (const int);

@@ -3,7 +3,6 @@
 #include <fstream>
 #include <unistd.h>
 
-
 #include "Helper.h"
 
 #include "TFile.h"
@@ -40,13 +39,13 @@ int main(int argc, char** argv){
   extern char *optarg;
   extern int  optopt;
 
-  int nHitCut=-1;
+  int RequestedConfig=0;
   std::string InputFile="";
   std::string OutputFile="OpticalCluster.pdf";
-  while ( (opt = getopt(argc, argv, "n:o:i:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "c:n:o:i:")) != -1 ) {  // for each option...
     switch ( opt ) {
-    case 'n':
-      nHitCut = atoi(optarg);
+    case 'c':
+      RequestedConfig = atoi(optarg);
       break;
     case 'i':
       InputFile = optarg;
@@ -60,6 +59,10 @@ int main(int argc, char** argv){
     }
   }
 
+  if (OutputFile == "OpticalCluster.pdf") {
+    OutputFile = Form("OpticalCluster_c%i.pdf",RequestedConfig);
+  }
+    
   if (InputFile == "") {
     std::cout << "You need to provide an input file -i ClusteringOutput.root" << std::endl;
   }
@@ -72,19 +75,18 @@ int main(int argc, char** argv){
   int    MarleyIndex   ;
   int    EventTrue     ;
   int    Config        ;
-  int    NChan         ;
-  int    Type          ;
-  int    NHits         ;
-  float  FirstTimeHit  ;
-  float  LastTimeHit   ;
-  float  TimeWidth     ;
+  double NChan         ;
+  double Type          ;
+  double NHits         ;
+  double FirstTimeHit  ;
+  double LastTimeHit   ;
+  double TimeWidth     ;
   double RecClusterPosX;
   double RecClusterPosY;
   double RecClusterPosZ;
   double YWidth        ;
   double ZWidth        ;
   double SumPE         ;
-  
 
   std::vector<int>    * PDSHit_GenType   = NULL;
   std::vector<double> * PDSHit_X         = NULL;
@@ -147,24 +149,30 @@ int main(int argc, char** argv){
 
   std::map<int,int> map_Event_TrueEntry;
   int nMarleyEvent=0;
-  for(int i = 0; i < t_TrueInfo->GetEntries(); i++) {
+  for (int i=0; i<t_TrueInfo->GetEntries(); ++i) {
     t_TrueInfo->GetEntry(i);
     map_Event_TrueEntry[EventTrue] = i;
     nMarleyEvent += (int)ENu->size();
   }
+  std::cout << "I will look at the config " << RequestedConfig << std::endl;
   std::cout << "There were " << nMarleyEvent << " Marley events in " << map_Event_TrueEntry.size() << " Larsoft events." << std::endl;
 
   std::map<int,std::vector<int> > map_event_entry_opti;
 
-  std::cout << t_ClusteredOptHit->GetEntries() << " optical cluster were saved." << std::endl;
-
-  for(int i=0; i<t_ClusteredOptHit->GetEntries();++i) {
+  std::cout << t_ClusteredOptHit->GetEntries() << " optical clusters were saved." << std::endl;
+  std::set<int> event_opt;
+  for (int i=0; i<t_ClusteredOptHit->GetEntries(); ++i) {
     t_ClusteredOptHit->GetEntry(i);
-    if (Config==5) map_event_entry_opti[Event].push_back(i);
+    event_opt.insert(Event);
+    if (Config==RequestedConfig)
+      map_event_entry_opti[Event].push_back(i);
   }
-
+  
+  std::cout << "There were " << map_event_entry_opti.size()
+            << " events in the optical cluster tree." << std::endl;
+  std::cout << "event_opt " << event_opt.size() << std::endl;
   TCanvas c;
-  c.Print("opt_clustering.pdf[");
+  c.Print((OutputFile+"[").c_str());
   TProfile* p_gentype_sign_opti = SetUpTProfileGenType("p_gentype_sign_opti", ";;average number of hits in cluster");
   TProfile* p_gentype_back_opti = SetUpTProfileGenType("p_gentype_back_opti", ";;average number of hits in cluster");
   p_gentype_sign_opti->SetLineColor(kRed);
@@ -175,8 +183,8 @@ int main(int argc, char** argv){
   p_gentype_back_opti->SetLineWidth(2);
 
 
-  TH1D* h_ncluster_sign_opti = new TH1D("h_ncluster_sign_opti", ";n clusters;Events", 1500, 0, 1500);
-  TH1D* h_ncluster_back_opti = new TH1D("h_ncluster_back_opti", ";n clusters;Events", 1500, 0, 1500);
+  TH1D* h_ncluster_sign_opti = new TH1D("h_ncluster_sign_opti", ";n clusters;Events", 10, -0.5, 9.5);
+  TH1D* h_ncluster_back_opti = new TH1D("h_ncluster_back_opti", ";n clusters;Events", 10, -0.5, 9.5);
   h_ncluster_sign_opti->SetLineColor(kRed);
   h_ncluster_back_opti->SetLineColor(kBlue);
   h_ncluster_sign_opti->SetLineStyle(1);
@@ -195,20 +203,24 @@ int main(int argc, char** argv){
 
   TEfficiency* eff_enu_opti  = new TEfficiency("eff_enu_opti",  ";E#nu [MeV];Efficiency", 10, 0, 30);
 
-  t_ClusteredOptHit->Project("h_nhit_sign_opti", "NHits", "Type==1 && Config==5");
-  t_ClusteredOptHit->Project("h_nhit_back_opti", "NHits", "Type==0 && Config==5");
+  t_ClusteredOptHit->Project("h_nhit_sign_opti", "NHits", Form("Type==1 && Config==%i",RequestedConfig));
+  t_ClusteredOptHit->Project("h_nhit_back_opti", "NHits", Form("Type==0 && Config==%i",RequestedConfig));
+  TH1D* son = DoIntegratedSignalOverNoiseUnitNorm(h_nhit_sign_opti, h_nhit_back_opti);
   std::vector<double> max = {h_nhit_sign_opti->GetMaximum(),
                              h_nhit_back_opti->GetMaximum()};
-  
   h_nhit_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
   h_nhit_sign_opti->SetMinimum(0.1);
   gPad->SetLogy();
+  son->SetLineWidth(2);
+  son->SetLineColor(kCyan);
+  son->SetMarkerColor(kCyan);
   h_nhit_sign_opti->Draw("");
   h_nhit_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
+  son->Draw("SAME E");
+  c.Print(OutputFile.c_str());
 
-  TH1D* h_npe_sign_opti = new TH1D("h_npe_sign_opti", ";n PEs;Clusters", 20, 0, 20);
-  TH1D* h_npe_back_opti = new TH1D("h_npe_back_opti", ";n PEs;Clusters", 20, 0, 20);
+  TH1D* h_npe_sign_opti = new TH1D("h_npe_sign_opti", ";n PEs;Clusters", 200, -0.5, 199.5);
+  TH1D* h_npe_back_opti = new TH1D("h_npe_back_opti", ";n PEs;Clusters", 200, -0.5, 199.5);
   h_npe_sign_opti->SetLineColor(kRed);
   h_npe_back_opti->SetLineColor(kBlue);
   h_npe_sign_opti->SetLineStyle(1);
@@ -216,8 +228,12 @@ int main(int argc, char** argv){
   h_npe_sign_opti->SetLineWidth(2);
   h_npe_back_opti->SetLineWidth(2);
 
-  t_ClusteredOptHit->Project("h_npe_sign_opti", "SumPE", "Type==1 && Config==5");
-  t_ClusteredOptHit->Project("h_npe_back_opti", "SumPE", "Type==0 && Config==5");
+  t_ClusteredOptHit->Project("h_npe_sign_opti", "SumPE", Form("Type==1 && Config==%i",RequestedConfig));
+  t_ClusteredOptHit->Project("h_npe_back_opti", "SumPE", Form("Type==0 && Config==%i",RequestedConfig));
+  son = DoIntegratedSignalOverNoiseUnitNorm(h_npe_sign_opti, h_npe_back_opti);
+  son->SetLineWidth(2);
+  son->SetLineColor(kCyan);
+  son->SetMarkerColor(kCyan);
   max = {h_npe_sign_opti->GetMaximum(),
          h_npe_back_opti->GetMaximum()};
   h_npe_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
@@ -227,10 +243,11 @@ int main(int argc, char** argv){
                                  h_npe_sign_opti->GetBinContent(h_npe_sign_opti->GetXaxis()->GetNbins()+1));
   h_npe_sign_opti->Draw("");
   h_npe_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
+  son->Draw("SAME E");
+  c.Print(OutputFile.c_str());
   
-  TH1D* h_twidth_sign_opti = new TH1D("h_twidth_sign_opti", ";Time Width [#mus];Clusters", 20,0, 10);
-  TH1D* h_twidth_back_opti = new TH1D("h_twidth_back_opti", ";Time Width [#mus];Clusters", 20,0, 10);
+  TH1D* h_twidth_sign_opti = new TH1D("h_twidth_sign_opti", ";Time Width [#mus];Clusters", 20,0, 20);
+  TH1D* h_twidth_back_opti = new TH1D("h_twidth_back_opti", ";Time Width [#mus];Clusters", 20,0, 20);
   h_twidth_sign_opti->SetLineColor(kRed);
   h_twidth_back_opti->SetLineColor(kBlue);
   h_twidth_sign_opti->SetLineStyle(1);
@@ -238,8 +255,8 @@ int main(int argc, char** argv){
   h_twidth_sign_opti->SetLineWidth(2);
   h_twidth_back_opti->SetLineWidth(2);
 
-  t_ClusteredOptHit->Project("h_twidth_sign_opti", "TimeWidth", "Type==1 && Config==5");
-  t_ClusteredOptHit->Project("h_twidth_back_opti", "TimeWidth", "Type==0 && Config==5");
+  t_ClusteredOptHit->Project("h_twidth_sign_opti", "TimeWidth", Form("Type==1 && Config==%i",RequestedConfig));
+  t_ClusteredOptHit->Project("h_twidth_back_opti", "TimeWidth", Form("Type==0 && Config==%i",RequestedConfig));
   h_twidth_sign_opti->SetStats(0);
   h_twidth_back_opti->SetStats(0);
   AddOverflow(h_twidth_sign_opti);
@@ -251,7 +268,7 @@ int main(int argc, char** argv){
   gPad->SetLogy();
   h_twidth_sign_opti->Draw("");
   h_twidth_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
+  c.Print(OutputFile.c_str());
   
   TH1D* h_width_sign_opti = new TH1D("h_width_sign_opti", ";Z Width [cm];Clusters", 6, 0., 6.*232.39);
   TH1D* h_width_back_opti = new TH1D("h_width_back_opti", ";Z Width [cm];Clusters", 6, 0., 6.*232.39);
@@ -262,8 +279,8 @@ int main(int argc, char** argv){
   h_width_sign_opti->SetLineWidth(2);
   h_width_back_opti->SetLineWidth(2);
 
-  t_ClusteredOptHit->Project("h_width_sign_opti", "ZWidth", "Type==1 && Config==5");
-  t_ClusteredOptHit->Project("h_width_back_opti", "ZWidth", "Type==0 && Config==5");
+  t_ClusteredOptHit->Project("h_width_sign_opti", "ZWidth", Form("Type==1 && Config==%i",RequestedConfig));
+  t_ClusteredOptHit->Project("h_width_back_opti", "ZWidth", Form("Type==0 && Config==%i",RequestedConfig));
   max = {h_width_sign_opti->GetMaximum(),
          h_width_back_opti->GetMaximum()};
   h_width_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
@@ -271,7 +288,7 @@ int main(int argc, char** argv){
   gPad->SetLogy();
   h_width_sign_opti->Draw("");
   h_width_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
+  c.Print(OutputFile.c_str());
 
   TH1D* h_ywidth_sign_opti = new TH1D("h_ywidth_sign_opti", ";Y Width [cm];Clusters", 25, 0., 25.*62.3567);
   TH1D* h_ywidth_back_opti = new TH1D("h_ywidth_back_opti", ";Y Width [cm];Clusters", 25, 0., 25.*62.3567);
@@ -282,34 +299,32 @@ int main(int argc, char** argv){
   h_ywidth_sign_opti->SetLineWidth(2);
   h_ywidth_back_opti->SetLineWidth(2);
 
-  t_ClusteredOptHit->Project("h_ywidth_sign_opti", "YWidth", "Type==1 && Config==5");
-  t_ClusteredOptHit->Project("h_ywidth_back_opti", "YWidth", "Type==0 && Config==5");
+  t_ClusteredOptHit->Project("h_ywidth_sign_opti", "YWidth", Form("Type==1 && Config==%i",RequestedConfig));
+  t_ClusteredOptHit->Project("h_ywidth_back_opti", "YWidth", Form("Type==0 && Config==%i",RequestedConfig));
   max = {h_ywidth_sign_opti->GetMaximum(),
          h_ywidth_back_opti->GetMaximum()};
   h_ywidth_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
   h_ywidth_sign_opti->SetMinimum(0.1);
   h_ywidth_sign_opti->Draw("");
   h_ywidth_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
-  int nEventOpti=0;
-  int nDetectedSignalEventOpti=0;
-  int nBackgroundEventOpti=0;
-  std::cout << "map_event_entry_opti " << map_event_entry_opti.size() << std::endl;
-  
-  for(auto const& it : map_event_entry_opti) {
+  c.Print(OutputFile.c_str());
+
+  int total_selected = 0;
+  for(auto const& it : map_Event_TrueEntry) {
     int ncluster_sign=0;
     int ncluster_back=0;
-    ++nEventOpti;
     bool SignDetected=false;
-    for (auto const& it2 : it.second) {
+    if (map_event_entry_opti[it.first].size() == 0)
+      std::cout << "No optical cluster in this event (" << it.first << ") -> if this happens very often there is probably something wrong" <<  std::endl;
+    // else 
+    //   std::cout << "There are " << map_event_entry_opti[it.first].size() << " optical clusters in this event (" << it.first << ")" << std::endl;
+    for (auto const& it2 : map_event_entry_opti[it.first]) {
       std::map<int, int> map_gentype_nhit_sign;
       std::map<int, int> map_gentype_nhit_back;
       t_ClusteredOptHit->GetEntry(it2);
-      if (nHitCut!=-1 && PDSHit_GenType->size()<nHitCut) continue;
       if (Type==0) {
         map_gentype_nhit_back = GetMapOfHit(PDSHit_GenType);
         ++ncluster_back;
-        ++nBackgroundEventOpti;
       } else {
         SignDetected=true;
         map_gentype_nhit_sign = GetMapOfHit(PDSHit_GenType);
@@ -318,19 +333,19 @@ int main(int argc, char** argv){
       for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_opti->Fill(genhit.first, genhit.second);
       for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_opti->Fill(genhit.first, genhit.second);
     }
-    if(SignDetected)
-      ++nDetectedSignalEventOpti;
-    t_TrueInfo->GetEntry(map_Event_TrueEntry[Event]);
-    double Energy_Neutrino = ENu->at(MarleyIndex);
+    t_TrueInfo->GetEntry(it.second);
+    double Energy_Neutrino = ENu->at(0);
     eff_enu_opti->Fill(SignDetected, Energy_Neutrino*1000.);
     h_ncluster_sign_opti->Fill(ncluster_sign);
     h_ncluster_back_opti->Fill(ncluster_back);
-  }
-  std::cout << "Here " <<std::endl;
 
+    if (ncluster_sign>0)
+      total_selected++;
+  }
+  std::cout << "Overall efficiency " << (double)total_selected / map_Event_TrueEntry.size() << std::endl;
   gPad->SetLogy(false);
   eff_enu_opti->Draw();
-  c.Print("opt_clustering.pdf");
+  c.Print(OutputFile.c_str());
   gPad->SetLogy(true);
 
   max = {p_gentype_sign_opti->GetMaximum(),
@@ -343,7 +358,7 @@ int main(int argc, char** argv){
   p_gentype_sign_opti->SetStats(0);
   p_gentype_sign_opti->Draw("E");
   p_gentype_back_opti->Draw("E SAME");
-  c.Print("opt_clustering.pdf");
+  c.Print(OutputFile.c_str());
   gPad->SetGridx(false);
   gPad->SetGridy(false);
 
@@ -353,21 +368,21 @@ int main(int argc, char** argv){
 
   h_ncluster_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
   h_ncluster_sign_opti->SetMinimum(0.1);
-  gPad->SetLogx();
+  // gPad->SetLogx();
 
-  auto axis = h_ncluster_sign_opti->GetXaxis();
-  axis->SetLimits(0.5,1000); 
+  // auto axis = h_ncluster_sign_opti->GetXaxis();
+  // axis->SetLimits(0.5,1000); 
   h_ncluster_sign_opti->Draw("");
   h_ncluster_back_opti->Draw("SAME");
-  c.Print("opt_clustering.pdf");
-
+  c.Print(OutputFile.c_str());
+  
   gPad->Clear();
   TLegend* leg = new TLegend(0.1, 0.1, 0.9, 0.9);
   leg->AddEntry(p_gentype_sign_opti, "signal optical clusters");
   leg->AddEntry(p_gentype_back_opti, "background optical clusters");
   leg->Draw();
-  c.Print("opt_clustering.pdf");
-  c.Print("opt_clustering.pdf]");
+  c.Print(OutputFile.c_str());
+  c.Print((OutputFile+"]").c_str());
   return 1;
 
 };
