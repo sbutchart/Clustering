@@ -145,13 +145,17 @@ int Clustering::ClusterAll(int inNEvent){
     ConfigBegin = fConfig;
     ConfigEnd   = fConfig+1;
   }
-  
+  int nMaxMarleyPerEvent=0;
   for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
 
     PrintProgress(iEvent,fNEvent);
     im.GetEntry(iEvent);
     out_Event = im.Event;
     bool goodEvent = true;
+
+    if (im.True_MarlSample->size() > nMaxMarleyPerEvent)
+      nMaxMarleyPerEvent = im.True_MarlSample->size();
+    
     for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlSample->size(); ++MarleyEvent) {
       h_ENu_MC     ->Fill(1000*(*im.True_ENu)[MarleyEvent]);
       h_MarlTime_MC->Fill((*im.True_MarlTime)[MarleyEvent]);
@@ -167,6 +171,7 @@ int Clustering::ClusterAll(int inNEvent){
       out_DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
       goodEvent = ((*im.True_VertZ)[MarleyEvent] > 695) && ((*im.True_VertZ)[MarleyEvent] < 1160);
     }
+    
     if(!goodEvent) continue;
     t_Output_TrueInfo->Fill();
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
@@ -311,6 +316,11 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredOpticalHit->Write();
   t_Output_TrueInfo           ->Write();
   t_Output_TimingInfo         ->Write();
+
+  if (nMaxMarleyPerEvent>1) {
+    std::cout << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
+    std::cout << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;
+  }
   
   return 0;
 
