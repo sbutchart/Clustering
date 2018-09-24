@@ -29,7 +29,7 @@ public:
     else if (1160 <  z && z <= 1392) { column = 5; }
     else {
       std::cout << "Unknown z position -> " << z <<  std::endl;
-      throw;
+      column=0;
     }
     return row+column*2;
   };
@@ -50,7 +50,6 @@ public:
     else if (29760 <= c && c <= 30720) { return 11; }
     else {
       std::cout << "Unknown channel " << c << std::endl;
-      throw;
     }
     return 0;
   };

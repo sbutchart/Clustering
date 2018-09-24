@@ -501,4 +501,75 @@ inline void AddOverflow(TH1D& histo){
                       histo.GetBinContent(histo.GetXaxis()->GetNbins()+1));
   histo.SetBinContent(histo.GetXaxis()->GetNbins()+1,0);
 };
+
+inline TH1D* DoSignalOverNoise(const TH1D* signal,
+                               const TH1D* noise) {
+
+  TH1D* s_over_n = (TH1D*)signal->Clone();
+  s_over_n->Divide(noise);
+  return s_over_n;
+};
+
+inline TH1D* DoIntegratedSignalOverNoise(const TH1D* signal,
+                                         const TH1D* noise) {
+  TH1D* s_over_n = (TH1D*)signal->Clone();
+  s_over_n->Reset();
+  int nbins = signal->GetXaxis()->GetNbins();
+  for (int i=0; i<nbins; ++i) {
+    double s = signal->Integral(i, nbins);
+    double n = noise ->Integral(i, nbins);
+    if (n!=0) {
+      s_over_n->SetBinContent(i, s/n);
+      s_over_n->SetBinError  (i, (s/n)*sqrt(1/s+1/n));
+    } else {
+      s_over_n->SetBinContent(i, 0);
+    }
+  }
+  return s_over_n;
+  
+};
+
+inline TH1D* DoIntegratedSignalOverNoiseUnitNorm(const TH1D* signal,
+                                                 const TH1D* noise) {
+  TH1D* signal2  = (TH1D*)signal->Clone();
+  TH1D* noise2   = (TH1D*)noise->Clone();
+  int nbins = signal->GetXaxis()->GetNbins();
+
+  signal2->Scale(1./signal2->Integral());
+  noise2 ->Scale(1./noise2 ->Integral());
+  TH1D* s_over_n = DoIntegratedSignalOverNoise(signal2, noise2);
+  for (int i=0; i<nbins; ++i) {
+    double s = signal->Integral(i, nbins);
+    double n = noise ->Integral(i, nbins);
+    if (n!=0) {
+      s_over_n->SetBinError(i, s_over_n->GetBinContent(i)*sqrt(1/s+1/n));
+    } else {
+      s_over_n->SetBinError(i, 0);
+    }
+  }
+  return s_over_n;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #endif

@@ -29,9 +29,9 @@ HitSimplePlot::HitSimplePlot(std::string InputFile, std::string InputTree):
   nbin_1D_RMS    [1] = 100 ; nbin_1D_RMS    [2] = 40  ; nbin_1D_RMS    [3] = 100 ; nbin_1D_RMS    [4] = 20 ;
   xmin_1D_RMS    [1] = 0   ; xmin_1D_RMS    [2] = 0   ; xmin_1D_RMS    [3] = 0   ; xmin_1D_RMS    [4] = 0  ;
   xmax_1D_RMS    [1] = 4000; xmax_1D_RMS    [2] = 200 ; xmax_1D_RMS    [3] = 1000; xmax_1D_RMS    [4] = 20 ;
-  nbin_1D_Width  [1] = 100 ; nbin_1D_Width  [2] = 50  ; nbin_1D_Width  [3] = 15  ; nbin_1D_Width  [4] = 30 ;
+  nbin_1D_Width  [1] = 100 ; nbin_1D_Width  [2] = 25  ; nbin_1D_Width  [3] = 6   ; nbin_1D_Width  [4] = 30 ;
   xmin_1D_Width  [1] = 0   ; xmin_1D_Width  [2] = 0   ; xmin_1D_Width  [3] = 0   ; xmin_1D_Width  [4] = 0  ;
-  xmax_1D_Width  [1] = 4000; xmax_1D_Width  [2] = 1500; xmax_1D_Width  [3] = 1500; xmax_1D_Width  [4] = 30 ;
+  xmax_1D_Width  [1] = 4000; xmax_1D_Width  [2] = 25.*62.3567; xmax_1D_Width  [3] = 6.*232.39; xmax_1D_Width  [4] = 30 ;
   nbin_2D_x_RMS  [1] = 100 ; nbin_2D_x_RMS  [2] = 40  ; nbin_2D_x_RMS  [3] = 100 ; nbin_2D_x_RMS  [4] = 20 ;
   xmin_2D_x_RMS  [1] = 0   ; xmin_2D_x_RMS  [2] = 0   ; xmin_2D_x_RMS  [3] = 0   ; xmin_2D_x_RMS  [4] = 0  ;
   xmax_2D_x_RMS  [1] = 4000; xmax_2D_x_RMS  [2] = 200 ; xmax_2D_x_RMS  [3] = 1000; xmax_2D_x_RMS  [4] = 20 ;

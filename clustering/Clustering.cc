@@ -138,13 +138,14 @@ int Clustering::ClusterAll(int inNEvent){
   fOpticalTrigger = new SimpleOpticalTrigger();
 
   std::map<std::pair<int,int>, std::vector<WireCluster*>* > map_clusters;
-  
+
   int ConfigBegin = 0;
   int ConfigEnd   = fNConfig;
   if (fConfig != -1) {
     ConfigBegin = fConfig;
     ConfigEnd   = fConfig+1;
   }
+  
   for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
 
     PrintProgress(iEvent,fNEvent);
@@ -166,8 +167,8 @@ int Clustering::ClusterAll(int inNEvent){
       out_DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
       goodEvent = ((*im.True_VertZ)[MarleyEvent] > 695) && ((*im.True_VertZ)[MarleyEvent] < 1160);
     }
-    t_Output_TrueInfo->Fill();
     if(!goodEvent) continue;
+    t_Output_TrueInfo->Fill();
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
     std::vector<WireHit*>    vec_WireHit;
     std::vector<OpticalHit*> vec_OptHit;
@@ -276,6 +277,14 @@ int Clustering::ClusterAll(int inNEvent){
         vec_WireCluster[i]=NULL;
       }
 
+      if (vec_OpticalCluster.size() == 0)
+        std::cout << "No optical clusters in this event (config = "
+                  << fCurrentConfig << ")" << std::endl;
+
+      if (vec_WireCluster.size() == 0)
+        std::cout << "No wire clusters in this event (config = "
+                  << fCurrentConfig << ")" << std::endl;
+
       for(size_t i=0; i<vec_OpticalCluster.size(); ++i) {
         FillClusterInfo(vec_OpticalCluster[i]);
         delete vec_OpticalCluster[i];
@@ -345,8 +354,8 @@ void Clustering::FillClusterInfo(OpticalCluster* clust) {
   ResetFillVariable();
   //FILL THE OUTPUT TREE.
 
-  if(!clust->GetIsSelected())
-    return;
+  // if(!clust->GetIsSelected())
+  //   return;
 
   out_Config         = fCurrentConfig;
   out_Cluster        = fOpticalClusterCount[fCurrentConfig];
@@ -450,7 +459,6 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
 
 void Clustering::ResetFillVariable(){
   out_Cluster        = 0;
-  out_Event          = 0;
   out_Config         = 0;
   out_APA            = 0;
   out_StartChan      = 0;

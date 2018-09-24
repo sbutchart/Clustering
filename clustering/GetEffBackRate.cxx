@@ -190,6 +190,7 @@ int main(int argc, char** argv) {
     map_Event_nMarley[in_Event] = (int)dummy->size();
     nMarleyEvent += (int)dummy->size();
   }
+  
   std::cout << "There were " << nMarleyEvent << " Marley events in " << map_Event_nMarley.size() << " Larsoft events." << std::endl;
   //OVERALL EFFICIENCIES AND BACKGROUND RATES.
   std::map<int,double> map_Config_nWireBackCluster;
@@ -212,16 +213,28 @@ int main(int argc, char** argv) {
   for (int c=iterConfig; c<nConfig; ++c) {
     std::cout << "N background wire clusters " << map_Config_nWireBackCluster[c] << " in config " << c << std::endl;
     std::cout << "N background opti clusters " << map_Config_nOpticalBackCluster[c] << " in config " << c << std::endl;
-    GetEfficiency(c, map_ConfigEventIndex_nWireSignCluster, map_Event_nMarley,
+    GetEfficiency(c,
+                  map_ConfigEventIndex_nWireSignCluster,
+                  map_Event_nMarley,
                   map_Config_WireEff[c]);
 
-    GetEfficiency(c, map_ConfigEventIndex_nOpticalSignCluster, map_Event_nMarley,
+    GetEfficiency(c,
+                  map_ConfigEventIndex_nOpticalSignCluster,
+                  map_Event_nMarley,
                   map_Config_OpticalEff[c]);
 
-    GetBackgroundRate(c, map_Config_nWireBackCluster,nEventOriginally, 2.246e-3, DetectorScaling,
+    GetBackgroundRate(c,
+                      map_Config_nWireBackCluster,
+                      nEventOriginally,
+                      2.246e-3,
+                      DetectorScaling,
                       map_Config_WireBackRate[c]);
 
-    GetBackgroundRate(c, map_Config_nOpticalBackCluster,nEventOriginally, 3.2e-3*3., DetectorScaling,
+    GetBackgroundRate(c,
+                      map_Config_nOpticalBackCluster,
+                      nEventOriginally,
+                      3.2e-3*3.,
+                      DetectorScaling,
                       map_Config_OpticalBackRate[c]);
   }
   

@@ -117,10 +117,12 @@ public:
   void SetupConfig_MinChanWidth    (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_MinChanWidth     = cut; };
   void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_TimeWindowSize   = cut; };
   void SetupConfig_TotalADC        (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_TotalADC         = cut; };
-  void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {1.0,1.5,2.0,1.0,1.5,2.0}) { fcut_TimeWindowOpt    = cut; };
+  //void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {1.0,1.5,2.0,1.0,1.5,2.0}) { fcut_TimeWindowOpt    = cut; };
+  void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.8,0.8}) { fcut_TimeWindowOpt    = cut; };
   void SetupConfig_PositionOpt     (const std::vector<float> cut = {300,300,300,300,300,300}) { fcut_PositionOpt      = cut; };
-  void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_BucketSize       = cut; };
-  void SetupConfig_OptHitInCluster (const std::vector<float> cut = {15,15,15,20,20,20}      ) { fcut_OptHitInCluster  = cut; };
+  //void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_BucketSize       = cut; };
+  void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20000000}      ) { fcut_BucketSize       = cut; };
+  void SetupConfig_OptHitInCluster (const std::vector<float> cut = {0,0,15,20,20,20}      ) { fcut_OptHitInCluster  = cut; };
 
   
   int GetNConfig() const { return fNConfig; };

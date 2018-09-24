@@ -57,7 +57,7 @@ protected:
     fPosition  (),
     fSize      (),
     fExtent    (),
-    fIsSelected(false),
+    fIsSelected(true),
     fSumPeak        (0),
     fRecoEnergy     (0),
     fAPA            (0),
@@ -77,7 +77,7 @@ protected:
     fPosition       (),
     fSize           (),
     fExtent         (),
-    fIsSelected     (false),
+    fIsSelected     (true),
     fSumPeak        (0),
     fRecoEnergy     (0),
     fAPA            (0),
@@ -86,7 +86,8 @@ protected:
     fTrueMarleyIndex(0),
     fTruePosition   (),
     fTrueDirection  () {
-  }
+  };
+  
   void Initialise() {
     InitVecMap();
     
@@ -104,7 +105,7 @@ protected:
       apa[it->GetAPA()] += it->GetPeak();
       hittype_peak[it->GetGenType()] += it->GetPeak();
     }
-
+    fIsSelected = true;
     fAPA = GetMax(apa).first;
     fNChannel = channel.size();
     fChannelExtent.first  = *channel.begin();
@@ -116,7 +117,7 @@ protected:
     for (auto const& d : AllGenType) {
       fTruePurity[d] = hittype_peak[d] / fSumPeak;
     }
-    //std::cout << (*all_pos[kZ].begin()) << std::endl;
+
     for (auto const& d : AllDirection) {
       fPosition[d]   /= fSumPeak;
       fExtent[d].first  = *(all_pos[d].begin());
