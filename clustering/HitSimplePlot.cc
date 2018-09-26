@@ -3,6 +3,7 @@
 HitSimplePlot::HitSimplePlot(std::string InputFile, std::string InputTree):
   im(),
   c(NULL),
+  fNEvent(-1),
   nbin_1D_RMS(),
   xmin_1D_RMS(),
   xmax_1D_RMS(),
@@ -166,9 +167,11 @@ std::map<GenType, std::map<int,std::pair<std::vector<double>,std::vector<double>
 
 
 void HitSimplePlot::FillHistosRMS(std::vector<double>* vector, std::map<GenType, TH1D*>& RMS) {
-  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) {
-    PrintProgress(iEntry,im.GetEntries());
+  for (int iEntry=0; iEntry<fNEvent; ++iEntry) {
+    PrintProgress(iEntry,fNEvent);
     im.GetEntry(iEntry);
+    if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
+      continue;
     std::map<GenType,std::map<int, std::vector<double> > > map_pos = GetMap(vector,
                                                                             im.PDS_OpHit_True_GenType,
                                                                             im.PDS_OpHit_True_TrackID);
@@ -186,8 +189,8 @@ void HitSimplePlot::Fill2DHistosRMS(std::vector<double>* vecx,
                                     std::vector<double>* vecy,
                                     std::map<GenType, TH2D*>& RMS) {
   
-  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) { 
-    PrintProgress(iEntry,im.GetEntries());
+  for (int iEntry=0; iEntry<fNEvent; ++iEntry) { 
+    PrintProgress(iEntry,fNEvent);
     im.GetEntry(iEntry);
     if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
       continue;
@@ -208,8 +211,8 @@ void HitSimplePlot::Fill2DHistosRMS(std::vector<double>* vecx,
 
 
 void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenType, TH1D*>& Width) {
-  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) {
-    PrintProgress(iEntry,im.GetEntries());
+  for (int iEntry=0; iEntry<fNEvent; ++iEntry) {
+    PrintProgress(iEntry,fNEvent);
     im.GetEntry(iEntry);
     if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
       continue;
@@ -231,8 +234,8 @@ void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenTyp
 void HitSimplePlot::Fill2DHistosWidth(std::vector<double>* vecx,
                                       std::vector<double>* vecy,
                                       std::map<GenType, TH2D*>& Width) {
-  for (int iEntry=0; iEntry<im.GetEntries(); ++iEntry) {
-    PrintProgress(iEntry,im.GetEntries());
+  for (int iEntry=0; iEntry<fNEvent; ++iEntry) {
+    PrintProgress(iEntry,fNEvent);
     im.GetEntry(iEntry);
     std::map<GenType,std::map<int, std::pair<std::vector<double>,std::vector<double> > > > map_pos =
       Get2DMap(vecx, vecy,

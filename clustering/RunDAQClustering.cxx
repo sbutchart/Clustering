@@ -10,12 +10,12 @@ int main(int argc, char** argv){
   int PrintLevel=-1;
   int nAPA=-1;
   int Config=-1;
-  int Sorting=0;
+  int Offset=0;
   std::string InputFile    = "";
   std::string OutputFile   = "";
   std::string ERecoXMLFile = "";
   std::string InputTree    = "";
-  while ( (opt = getopt(argc, argv, "n:p:i:o:t:e:a:c:s:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "n:p:i:o:t:e:a:c:s:f:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'a':
       nAPA = atoi(optarg);
@@ -27,7 +27,7 @@ int main(int argc, char** argv){
       Config = atoi(optarg);
       break;
     case 's':
-      Sorting = atoi(optarg);
+      Offset = atoi(optarg);
       break;
     case 'p':
       PrintLevel = atoi(optarg);
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
   Clustering c;
   c.SetInputFile   (InputFile   );
   c.SetConfig      (Config      );
-  c.SetSorting     (Sorting     );
+  c.SetOffset      (Offset      );
   c.SetNAPA        (nAPA        );
   c.SetERecoXMLFile(ERecoXMLFile);
   c.SetInputTree   (InputTree   );

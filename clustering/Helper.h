@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <iostream>
 #include <unistd.h>
-
+#include <limits>
 template<typename T, typename U>
 std::pair<T,U> GetMax(const std::map<T,U>& x) {
   using pairtype=std::pair<T,U>; 
@@ -552,23 +552,44 @@ inline TH1D* DoIntegratedSignalOverNoiseUnitNorm(const TH1D* signal,
 
 
 
+inline double GetStatThreshold(const TH1D* signal,
+                               const TH1D* noise,
+                               const double threshold=20) {
+
+  int nbins = signal->GetXaxis()->GetNbins();
+  double max_sig = 0;
+  bool haveseen = false;
+
+  for (int i=0; i<nbins; ++i) {
+    double s = signal->Integral(i, nbins);
+    if (s <= threshold) {
+      max_sig = signal->GetBinCenter(i);
+      haveseen = true;
+      break;
+    }
+  }
+
+  if (!haveseen)
+    max_sig = std::numeric_limits<double>::max();
 
 
+  double max_back = 0;
+  haveseen=false;
+  for (int i=0; i<nbins; ++i) {
+    double s = noise->Integral(i, nbins);
+    if (s <= threshold) {
+      max_back = noise->GetBinCenter(i);
+      haveseen = true;
+      break;
+    }
+  }
 
+  if (!haveseen)
+    max_back = std::numeric_limits<double>::max();
 
+  return std::min(max_sig, max_back);
 
-
-
-
-
-
-
-
-
-
-
-
-
+};
 
 
 

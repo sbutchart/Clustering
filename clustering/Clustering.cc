@@ -121,7 +121,7 @@ int Clustering::ClusterAll(int inNEvent){
   if (inNEvent!=-1) {
     fNEvent = std::min(inNEvent,(int)im.GetEntries());
   } else {
-    fNEvent = (int)im.GetEntries();
+    fNEvent = (size_t)im.GetEntries();
   }
 
   TH1I *hNEvents = new TH1I("hNEvents", "hNEvents", 100,0,10e6);
@@ -145,18 +145,34 @@ int Clustering::ClusterAll(int inNEvent){
     ConfigBegin = fConfig;
     ConfigEnd   = fConfig+1;
   }
-  int nMaxMarleyPerEvent=0;
-  for (size_t iEvent=0; iEvent<fNEvent; ++iEvent) {
 
-    PrintProgress(iEvent,fNEvent);
-    im.GetEntry(iEvent);
-    out_Event = im.Event;
+  std::cout << "Running over: " << std::endl;
+  std::cout << " - " << ConfigEnd - ConfigBegin << " configurations" << std::endl;
+  std::cout << " - " << fNEvent << " events" << std::endl;
+  int nMaxMarleyPerEvent=0;
+  
+  for (fCurrentEvent=0; fCurrentEvent<fNEvent; ++fCurrentEvent) {
+
+    PrintProgress(fCurrentEvent,fNEvent);
+    im.GetEntry(fCurrentEvent);
     bool goodEvent = true;
 
     if (im.True_MarlSample->size() > nMaxMarleyPerEvent)
       nMaxMarleyPerEvent = im.True_MarlSample->size();
+
+    out_MarlTime.clear();
+    out_ENu     .clear();
+    out_ENu_Lep .clear();
+    out_PosX    .clear();
+    out_PosY    .clear();
+    out_PosZ    .clear();
+    out_PosT    .clear();
+    out_DirX    .clear();
+    out_DirY    .clear();
+    out_DirZ    .clear();
     
     for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlSample->size(); ++MarleyEvent) {
+      out_Event = fOffset+fCurrentEvent;
       h_ENu_MC     ->Fill(1000*(*im.True_ENu)[MarleyEvent]);
       h_MarlTime_MC->Fill((*im.True_MarlTime)[MarleyEvent]);
       out_MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
@@ -188,12 +204,12 @@ int Clustering::ClusterAll(int inNEvent){
       WireHit* wh = new WireHit((*im.Hit_View)[j],        (*im.Hit_True_GenType)[j],  (*im.Hit_Chan)[j],
                                 (*im.Hit_Time)[j],        (*im.Hit_SADC)[j],          (*im.Hit_RMS)[j],
                                 (*im.Hit_True_Energy)[j], (*im.Hit_True_EvEnergy)[j], (*im.Hit_True_MainTrID)[j],
-                                0.5*((*im.Hit_X_start)[j]+(*im.Hit_X_end)[j]),
-                                0.5*((*im.Hit_Y_start)[j]+(*im.Hit_Y_end)[j]),
-                                0.5*((*im.Hit_Z_start)[j]+(*im.Hit_Z_end)[j]),
+                                0.5,//*((*im.Hit_X_start)[j]+(*im.Hit_X_end)[j]),
+                                0.5,//*((*im.Hit_Y_start)[j]+(*im.Hit_Y_end)[j]),
+                                0.5,//*((*im.Hit_Z_start)[j]+(*im.Hit_Z_end)[j]),
                                 (*im.Hit_True_X)[j],      (*im.Hit_True_Y)[j],        (*im.Hit_True_Z)[j],
                                 marley_index,             (*im.Hit_True_nElec)[j]);
-      wh->SetTrueEnergy((*im.True_ENu)[marley_index]);
+      //wh->SetTrueEnergy((*im.True_ENu)[marley_index]);
       if (wh->GetChannel() < 200000 ||
           abs(wh->GetPosition(kX)) < 20000 ||
           abs(wh->GetPosition(kY)) < 20000 ||
@@ -227,8 +243,8 @@ int Clustering::ClusterAll(int inNEvent){
         delete oh;
         oh = NULL;
       }
-
     }
+
     // std::cout << "Wire Hit " << vec_WireHit.size() << std::endl;
     // std::cout << "Opt  Hit " << vec_OptHit .size() << std::endl;
 
@@ -262,12 +278,12 @@ int Clustering::ClusterAll(int inNEvent){
       FillClusterEngineTimingInfo_Opti(fClustEng);
       FillClusterERecoTimingInfo_Opti (fEReco);
 
-      fClustEng->ClusterHits2(vec_WireHit, vec_WireCluster);
-      if (fEReco) fEReco->EstimateEnergy(vec_WireCluster);
-      fWireTrigger->SetIsSelected(vec_WireCluster);
-      FillClusterEngineTimingInfo_Wire(fClustEng);
-      FillClusterERecoTimingInfo_Wire (fEReco);
-      t_Output_TimingInfo->Fill();
+      // fClustEng->ClusterHits2(vec_WireHit, vec_WireCluster);
+      // if (fEReco) fEReco->EstimateEnergy(vec_WireCluster);
+      // fWireTrigger->SetIsSelected(vec_WireCluster);
+      // FillClusterEngineTimingInfo_Wire(fClustEng);
+      // FillClusterERecoTimingInfo_Wire (fEReco);
+      // t_Output_TimingInfo->Fill();
       
       if (fPrintLevel > -1) {
         std::cout << "----------------------------------------------" << std::endl;
@@ -282,13 +298,13 @@ int Clustering::ClusterAll(int inNEvent){
         vec_WireCluster[i]=NULL;
       }
 
-      if (vec_OpticalCluster.size() == 0)
-        std::cout << "No optical clusters in this event (config = "
-                  << fCurrentConfig << ")" << std::endl;
+      // if (vec_OpticalCluster.size() == 0)
+      //   std::cout << "No optical clusters in this event (config = "
+      //             << fCurrentConfig << ")" << std::endl;
 
-      if (vec_WireCluster.size() == 0)
-        std::cout << "No wire clusters in this event (config = "
-                  << fCurrentConfig << ")" << std::endl;
+      // if (vec_WireCluster.size() == 0)
+      //   std::cout << "No wire clusters in this event (config = "
+      //             << fCurrentConfig << ")" << std::endl;
 
       for(size_t i=0; i<vec_OpticalCluster.size(); ++i) {
         FillClusterInfo(vec_OpticalCluster[i]);
@@ -316,7 +332,6 @@ int Clustering::ClusterAll(int inNEvent){
   t_Output_ClusteredOpticalHit->Write();
   t_Output_TrueInfo           ->Write();
   t_Output_TimingInfo         ->Write();
-
   if (nMaxMarleyPerEvent>1) {
     std::cout << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
     std::cout << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;
@@ -331,7 +346,7 @@ void Clustering::FillClusterEngineTimingInfo_Opti(ClusterEngine* clusterEngine) 
   SpaceOrdering_OptClustTime.clear();
   Clustering_OptClustTime   .clear();
   out_Config = fCurrentConfig;
-  out_Event  = im.Event;
+  out_Event  = fOffset+fCurrentEvent;
   TimeOrdering_OptClustTime  = clusterEngine->GetElapsedTime_TimeOrdering ();
   SpaceOrdering_OptClustTime = clusterEngine->GetElapsedTime_SpaceOrdering();
   Clustering_OptClustTime    = clusterEngine->GetElapsedTime_Clustering   ();
@@ -343,7 +358,7 @@ void Clustering::FillClusterEngineTimingInfo_Wire(ClusterEngine* clusterEngine) 
   SpaceOrdering_WireClustTime.clear();
   Clustering_WireClustTime   .clear();
   out_Config = fCurrentConfig;
-  out_Event  = im.Event;
+  out_Event  = fOffset+fCurrentEvent;
   TimeOrdering_WireClustTime  = clusterEngine->GetElapsedTime_TimeOrdering ();
   SpaceOrdering_WireClustTime = clusterEngine->GetElapsedTime_SpaceOrdering();
   Clustering_WireClustTime    = clusterEngine->GetElapsedTime_Clustering   ();
@@ -369,7 +384,7 @@ void Clustering::FillClusterInfo(OpticalCluster* clust) {
 
   out_Config         = fCurrentConfig;
   out_Cluster        = fOpticalClusterCount[fCurrentConfig];
-  out_Event          = im.Event;
+  out_Event          = fOffset+fCurrentEvent;
   out_MarleyIndex    = clust->GetMarleyIndex();
   out_APA            = clust->GetAPA();
   out_YWidth         = clust->GetSize(kY);
@@ -409,7 +424,7 @@ void Clustering::FillClusterInfo(WireCluster* clust) {
   if(!clust->GetIsSelected())
     return;
 
-  out_Event = im.Event;
+  out_Event          = fOffset+fCurrentEvent;
   out_Config         = fCurrentConfig;
   out_Cluster        = fWireClusterCount[fCurrentConfig];
   out_MarleyIndex    = clust->GetMarleyIndex();

@@ -60,6 +60,7 @@ void FillEventCountMap(TTree* ClusteredHit,
   } else {
     ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
   }
+  
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
     if (in_Type == 1) {

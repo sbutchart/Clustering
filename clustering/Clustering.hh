@@ -45,6 +45,7 @@ public:
     fNAPA          (-1),
     fConfig        (-1),
     fSorting       (0),
+    fOffset        (0),
     t_Output_ClusteredWireHit   (NULL),
     t_Output_ClusteredOpticalHit(NULL),
     t_Output_TrueInfo           (NULL),
@@ -109,20 +110,20 @@ public:
   void SetERecoXMLFile(const std::string s="") { fERecoXMLFile   = s; };
   void SetNAPA        (const int n=-1)         { fNAPA           = n; };
   void SetConfig      (const int n=-1)         { fConfig         = n; };
-  void SetSorting     (const int n=0)          { fSorting        = n; };
+  void SetOffset      (const int n=0)          { fOffset         = n; };
     
   void SetupConfig_AdjChanTolerance(const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_AdjChanTolerance = cut; };
-  void SetupConfig_HitsInWindow    (const std::vector<float> cut = {5,5,5,6,6,6}            ) { fcut_HitsInWindow     = cut; };
+  void SetupConfig_HitsInWindow    (const std::vector<float> cut = {6,6,6,6,6,6}            ) { fcut_HitsInWindow     = cut; };
   void SetupConfig_MinChannels     (const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_MinChannels      = cut; };
   void SetupConfig_MinChanWidth    (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_MinChanWidth     = cut; };
   void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_TimeWindowSize   = cut; };
   void SetupConfig_TotalADC        (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_TotalADC         = cut; };
   //void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {1.0,1.5,2.0,1.0,1.5,2.0}) { fcut_TimeWindowOpt    = cut; };
-  void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.8,0.8}) { fcut_TimeWindowOpt    = cut; };
+  void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2,1}                ) { fcut_TimeWindowOpt    = cut; };
   void SetupConfig_PositionOpt     (const std::vector<float> cut = {300,300,300,300,300,300}) { fcut_PositionOpt      = cut; };
   //void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_BucketSize       = cut; };
-  void SetupConfig_BucketSize      (const std::vector<float> cut = {20,20000000}      ) { fcut_BucketSize       = cut; };
-  void SetupConfig_OptHitInCluster (const std::vector<float> cut = {0,0,15,20,20,20}      ) { fcut_OptHitInCluster  = cut; };
+  void SetupConfig_BucketSize      (const std::vector<float> cut = {1,20}                  ) { fcut_BucketSize       = cut; };
+  void SetupConfig_OptHitInCluster (const std::vector<float> cut = {0,0,15,20,20,20}        ) { fcut_OptHitInCluster  = cut; };
 
   
   int GetNConfig() const { return fNConfig; };
@@ -215,9 +216,11 @@ private:
   int fNAPA;
   int fConfig;
   int fSorting;
+  int fOffset;
 
-  unsigned int fNEvent;
-   
+  size_t fNEvent;
+  size_t fCurrentEvent;
+  
   TTree* t_Output_ClusteredWireHit;
   TTree* t_Output_ClusteredOpticalHit;
   TTree* t_Output_TrueInfo;

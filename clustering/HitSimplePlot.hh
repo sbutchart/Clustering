@@ -13,6 +13,13 @@ class HitSimplePlot {
 
 public:
   HitSimplePlot(std::string, std::string);
+  void SetNEvent(int n) {
+    if (n==0) {
+      fNEvent = im.GetEntries();
+    } else {
+      fNEvent = std::min(n,(int)im.GetEntries());
+    }
+  };
   ~HitSimplePlot();
   void PlotRMS    (const int);
   void PlotWidth  (const int);
@@ -40,6 +47,8 @@ private:
   void Fill2DHistosRMS  (std::vector<double>*, std::vector<double>*, std::map<GenType, TH2D*>&);
   void Fill2DHistosWidth(std::vector<double>*, std::vector<double>*, std::map<GenType, TH2D*>&);
 
+
+  int fNEvent;
   std::map<int, int> nbin_1D_RMS;
   std::map<int, int> xmin_1D_RMS;
   std::map<int, int> xmax_1D_RMS;
