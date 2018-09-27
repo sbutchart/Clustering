@@ -46,7 +46,7 @@ int main(int argc, char** argv){
     case 'n':
       nHitCut = atoi(optarg);
       break;
-    case '':
+    case 'i':
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
       break;
