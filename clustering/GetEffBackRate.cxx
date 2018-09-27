@@ -41,7 +41,8 @@ int getClusterType(const std::vector<int>* vec_GenType) {
 };
 
 
-void FillEventCountMap(TTree* ClusteredHit,
+void FillEventCountMap(int nhit,
+                       TTree* ClusteredHit,
                        std::map<int,double>& map_Config_nBackCluster,
                        std::map<int,std::map<int,std::map<int,int>>>& map_ConfigEventIndex_nSignCluster){
   
@@ -63,6 +64,7 @@ void FillEventCountMap(TTree* ClusteredHit,
   
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
+    if (in_GenType->size() < nhit) continue;
     if (in_Type == 1) {
       map_ConfigEventIndex_nSignCluster[in_Config][in_Event][in_MarleyIndex]++;
     } else {
@@ -128,8 +130,9 @@ int main(int argc, char** argv) {
   std::string InputFile  = "";
   std::string OutputFile = "";
   int Config = -1;
+  int nHit = -1;
   double DetectorScaling = 0.12;
-  while ( (opt = getopt(argc, argv, "i:o:c:s:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "i:o:c:s:h:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile  = std::string(optarg);
@@ -140,6 +143,9 @@ int main(int argc, char** argv) {
     case 'c':
       Config = atoi(optarg);
       break;
+    case 'h':
+      nHit = atoi(optarg);
+      break;
     case 's':
       DetectorScaling = atoi(optarg);
       break;
@@ -149,6 +155,10 @@ int main(int argc, char** argv) {
     }
   }
 
+  if (nHit < 0) {
+    std::cout << "You have to set nhit cut (option -h)" << std::endl;
+  }
+  
   Clustering c;
   if (Config >= c.GetNConfig()) {
     std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << c.GetNConfig()-1 << std::endl;
@@ -196,13 +206,13 @@ int main(int argc, char** argv) {
   //OVERALL EFFICIENCIES AND BACKGROUND RATES.
   std::map<int,double> map_Config_nWireBackCluster;
   std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nWireSignCluster;
-  FillEventCountMap(ClusteredWireHit,
+  FillEventCountMap(nHit, ClusteredWireHit,
                     map_Config_nWireBackCluster,
                     map_ConfigEventIndex_nWireSignCluster);
 
   std::map<int,double> map_Config_nOpticalBackCluster;
   std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nOpticalSignCluster;
-  FillEventCountMap(ClusteredOpticalHit,
+  FillEventCountMap(nHit, ClusteredOpticalHit,
                     map_Config_nOpticalBackCluster,
                     map_ConfigEventIndex_nOpticalSignCluster);
 
