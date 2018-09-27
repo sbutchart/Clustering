@@ -188,7 +188,7 @@ int Clustering::ClusterAll(int inNEvent){
       goodEvent = ((*im.True_VertZ)[MarleyEvent] > 695) && ((*im.True_VertZ)[MarleyEvent] < 1160);
     }
     
-    if(!goodEvent) continue;
+    // if(!goodEvent) continue;
     t_Output_TrueInfo->Fill();
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
     std::vector<WireHit*>    vec_WireHit;
@@ -278,12 +278,12 @@ int Clustering::ClusterAll(int inNEvent){
       FillClusterEngineTimingInfo_Opti(fClustEng);
       FillClusterERecoTimingInfo_Opti (fEReco);
 
-      // fClustEng->ClusterHits2(vec_WireHit, vec_WireCluster);
-      // if (fEReco) fEReco->EstimateEnergy(vec_WireCluster);
-      // fWireTrigger->SetIsSelected(vec_WireCluster);
-      // FillClusterEngineTimingInfo_Wire(fClustEng);
-      // FillClusterERecoTimingInfo_Wire (fEReco);
-      // t_Output_TimingInfo->Fill();
+      fClustEng->ClusterHits2(vec_WireHit, vec_WireCluster);
+      if (fEReco) fEReco->EstimateEnergy(vec_WireCluster);
+      fWireTrigger->SetIsSelected(vec_WireCluster);
+      FillClusterEngineTimingInfo_Wire(fClustEng);
+      FillClusterERecoTimingInfo_Wire (fEReco);
+      t_Output_TimingInfo->Fill();
       
       if (fPrintLevel > -1) {
         std::cout << "----------------------------------------------" << std::endl;
