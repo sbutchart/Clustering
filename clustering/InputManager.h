@@ -464,30 +464,30 @@ public:
     t_Input->GetEntry(i);
     if (vec_Hit_True_nIDEs!=NULL) {
       for (int i=0; i<NColHit; ++i) {
-        Hit_View         .push_back(vec_Hit_View         [i]);
-        Hit_Size         .push_back(vec_Hit_Size         [i]);
-        Hit_TPC          .push_back(vec_Hit_TPC          [i]);
-        Hit_Chan         .push_back(vec_Hit_Chan         [i]);
-        Hit_X_start      .push_back(vec_Hit_X_start      [i]);
-        Hit_Y_start      .push_back(vec_Hit_Y_start      [i]);
-        Hit_Z_start      .push_back(vec_Hit_Z_start      [i]);
-        Hit_X_end        .push_back(vec_Hit_X_end        [i]);
-        Hit_Y_end        .push_back(vec_Hit_Y_end        [i]);
-        Hit_Z_end        .push_back(vec_Hit_Z_end        [i]);
-        Hit_Time         .push_back(vec_Hit_Time         [i]);
-        Hit_RMS          .push_back(vec_Hit_RMS          [i]);
-        Hit_SADC         .push_back(vec_Hit_SADC         [i]);
-        Hit_Int          .push_back(vec_Hit_Int          [i]);
-        Hit_Peak         .push_back(vec_Hit_Peak         [i]);
-        Hit_True_GenType .push_back(vec_Hit_True_GenType [i]);
-        Hit_True_MainTrID.push_back(vec_Hit_True_MainTrID[i]);
-        Hit_True_EvEnergy.push_back(vec_Hit_True_EvEnergy[i]);
-        Hit_True_X       .push_back(vec_Hit_True_X       [i]);
-        Hit_True_Y       .push_back(vec_Hit_True_Y       [i]);
-        Hit_True_Z       .push_back(vec_Hit_True_Z       [i]);
-        Hit_True_Energy  .push_back(vec_Hit_True_Energy  [i]);
-        Hit_True_nElec   .push_back(vec_Hit_True_nElec   [i]);
-        Hit_True_nIDEs   .push_back(vec_Hit_True_nIDEs   [i]);
+        Hit_View         ->push_back(vec_Hit_View         [i]);
+        Hit_Size         ->push_back(vec_Hit_Size         [i]);
+        Hit_TPC          ->push_back(vec_Hit_TPC          [i]);
+        Hit_Chan         ->push_back(vec_Hit_Chan         [i]);
+        Hit_X_start      ->push_back(vec_Hit_X_start      [i]);
+        Hit_Y_start      ->push_back(vec_Hit_Y_start      [i]);
+        Hit_Z_start      ->push_back(vec_Hit_Z_start      [i]);
+        Hit_X_end        ->push_back(vec_Hit_X_end        [i]);
+        Hit_Y_end        ->push_back(vec_Hit_Y_end        [i]);
+        Hit_Z_end        ->push_back(vec_Hit_Z_end        [i]);
+        Hit_Time         ->push_back(vec_Hit_Time         [i]);
+        Hit_RMS          ->push_back(vec_Hit_RMS          [i]);
+        Hit_SADC         ->push_back(vec_Hit_SADC         [i]);
+        Hit_Int          ->push_back(vec_Hit_Int          [i]);
+        Hit_Peak         ->push_back(vec_Hit_Peak         [i]);
+        Hit_True_GenType ->push_back(vec_Hit_True_GenType [i]);
+        Hit_True_MainTrID->push_back(vec_Hit_True_MainTrID[i]);
+        Hit_True_EvEnergy->push_back(vec_Hit_True_EvEnergy[i]);
+        Hit_True_X       ->push_back(vec_Hit_True_X       [i]);
+        Hit_True_Y       ->push_back(vec_Hit_True_Y       [i]);
+        Hit_True_Z       ->push_back(vec_Hit_True_Z       [i]);
+        Hit_True_Energy  ->push_back(vec_Hit_True_Energy  [i]);
+        Hit_True_nElec   ->push_back(vec_Hit_True_nElec   [i]);
+        Hit_True_nIDEs   ->push_back(vec_Hit_True_nIDEs   [i]);
       }
     }
   };
