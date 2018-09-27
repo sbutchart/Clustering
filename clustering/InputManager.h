@@ -34,7 +34,33 @@ public:
   int TotGen_Plon;
   int TotGen_Rdon;
   int TotGen_Ar42;   
- 
+
+
+  int   * vec_Hit_View         ;
+  int   * vec_Hit_Size         ;
+  int   * vec_Hit_TPC          ;
+  int   * vec_Hit_Chan         ;
+  int   * vec_Hit_X_start      ;
+  int   * vec_Hit_Y_start      ;
+  int   * vec_Hit_Z_start      ;
+  int   * vec_Hit_X_end        ;
+  int   * vec_Hit_Y_end        ;
+  int   * vec_Hit_Z_end        ;
+  float * vec_Hit_Time         ;
+  float * vec_Hit_RMS          ;
+  float * vec_Hit_SADC         ;
+  float * vec_Hit_Int          ;
+  float * vec_Hit_Peak         ;
+  int   * vec_Hit_True_GenType ;
+  int   * vec_Hit_True_MainTrID;
+  float * vec_Hit_True_EvEnergy;
+  float * vec_Hit_True_X       ;                  
+  float * vec_Hit_True_Y       ;                  
+  float * vec_Hit_True_Z       ;                  
+  float * vec_Hit_True_Energy  ;             
+  float * vec_Hit_True_nElec   ;
+  int   * vec_Hit_True_nIDEs   ; 
+  
   std::vector<int>                 * Hit_View                 ;
   std::vector<int>                 * Hit_Size                 ;
   std::vector<int>                 * Hit_TPC                  ;
@@ -292,6 +318,32 @@ public:
     TotGen_Plon(0),
     TotGen_Rdon(0),
     TotGen_Ar42(0),   
+    
+    vec_Hit_View         (NULL),
+    vec_Hit_Size         (NULL),
+    vec_Hit_TPC          (NULL),
+    vec_Hit_Chan         (NULL),
+    vec_Hit_X_start      (NULL),
+    vec_Hit_Y_start      (NULL),
+    vec_Hit_Z_start      (NULL),
+    vec_Hit_X_end        (NULL),
+    vec_Hit_Y_end        (NULL),
+    vec_Hit_Z_end        (NULL),
+    vec_Hit_Time         (NULL),
+    vec_Hit_RMS          (NULL),
+    vec_Hit_SADC         (NULL),
+    vec_Hit_Int          (NULL),
+    vec_Hit_Peak         (NULL),
+    vec_Hit_True_GenType (NULL),
+    vec_Hit_True_MainTrID(NULL),
+    vec_Hit_True_EvEnergy(NULL),
+    vec_Hit_True_X       (NULL),
+    vec_Hit_True_Y       (NULL),
+    vec_Hit_True_Z       (NULL),
+    vec_Hit_True_Energy  (NULL),
+    vec_Hit_True_nElec   (NULL),
+    vec_Hit_True_nIDEs   (NULL),
+
     Hit_View                 (NULL),
     Hit_Size                 (NULL),
     Hit_TPC                  (NULL),
@@ -408,7 +460,38 @@ public:
     True_Bck_IDAll           (NULL){};
   
   int         GetEntries  ()                       const { return t_Input->GetEntries(); };
-  void        GetEntry    (const int i=0)                { t_Input->GetEntry(i); };
+  void        GetEntry    (const int i=0)                {
+    t_Input->GetEntry(i);
+    if (vec_Hit_True_nIDEs!=NULL) {
+      for (int i=0; i<NColHit; ++i) {
+        Hit_View         .push_back(vec_Hit_View         [i]);
+        Hit_Size         .push_back(vec_Hit_Size         [i]);
+        Hit_TPC          .push_back(vec_Hit_TPC          [i]);
+        Hit_Chan         .push_back(vec_Hit_Chan         [i]);
+        Hit_X_start      .push_back(vec_Hit_X_start      [i]);
+        Hit_Y_start      .push_back(vec_Hit_Y_start      [i]);
+        Hit_Z_start      .push_back(vec_Hit_Z_start      [i]);
+        Hit_X_end        .push_back(vec_Hit_X_end        [i]);
+        Hit_Y_end        .push_back(vec_Hit_Y_end        [i]);
+        Hit_Z_end        .push_back(vec_Hit_Z_end        [i]);
+        Hit_Time         .push_back(vec_Hit_Time         [i]);
+        Hit_RMS          .push_back(vec_Hit_RMS          [i]);
+        Hit_SADC         .push_back(vec_Hit_SADC         [i]);
+        Hit_Int          .push_back(vec_Hit_Int          [i]);
+        Hit_Peak         .push_back(vec_Hit_Peak         [i]);
+        Hit_True_GenType .push_back(vec_Hit_True_GenType [i]);
+        Hit_True_MainTrID.push_back(vec_Hit_True_MainTrID[i]);
+        Hit_True_EvEnergy.push_back(vec_Hit_True_EvEnergy[i]);
+        Hit_True_X       .push_back(vec_Hit_True_X       [i]);
+        Hit_True_Y       .push_back(vec_Hit_True_Y       [i]);
+        Hit_True_Z       .push_back(vec_Hit_True_Z       [i]);
+        Hit_True_Energy  .push_back(vec_Hit_True_Energy  [i]);
+        Hit_True_nElec   .push_back(vec_Hit_True_nElec   [i]);
+        Hit_True_nIDEs   .push_back(vec_Hit_True_nIDEs   [i]);
+      }
+    }
+  };
+
   std::string GetInputFile()                       const { return filename; };
   std::string GetInputTree()                       const { return treename; };
   void        SetInputFile(const std::string s="")       { filename=s; };
@@ -444,30 +527,58 @@ public:
     t_Input->SetBranchAddress("NFlash"    , &NFlash    );
     t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
 
-    t_Input->SetBranchAddress("Hit_View"                 , &Hit_View                 );
-    t_Input->SetBranchAddress("Hit_Size"                 , &Hit_Size                 );
-    t_Input->SetBranchAddress("Hit_TPC"                  , &Hit_TPC                  );
-    t_Input->SetBranchAddress("Hit_Chan"                 , &Hit_Chan                 );
-    t_Input->SetBranchAddress("Hit_X_start"              , &Hit_X_start              );
-    t_Input->SetBranchAddress("Hit_Y_start"              , &Hit_Y_start              );
-    t_Input->SetBranchAddress("Hit_Z_start"              , &Hit_Z_start              );
-    t_Input->SetBranchAddress("Hit_X_end"                , &Hit_X_end                );
-    t_Input->SetBranchAddress("Hit_Y_end"                , &Hit_Y_end                );
-    t_Input->SetBranchAddress("Hit_Z_end"                , &Hit_Z_end                );
-    t_Input->SetBranchAddress("Hit_Time"                 , &Hit_Time                 );
-    t_Input->SetBranchAddress("Hit_RMS"                  , &Hit_RMS                  );
-    t_Input->SetBranchAddress("Hit_SADC"                 , &Hit_SADC                 );
-    t_Input->SetBranchAddress("Hit_Int"                  , &Hit_Int                  );
-    t_Input->SetBranchAddress("Hit_Peak"                 , &Hit_Peak                 );
-    t_Input->SetBranchAddress("Hit_True_GenType"         , &Hit_True_GenType         );
-    t_Input->SetBranchAddress("Hit_True_MainTrID"        , &Hit_True_MainTrID        );
-    t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &Hit_True_EvEnergy        );
-    t_Input->SetBranchAddress("Hit_True_X"               , &Hit_True_X               );
-    t_Input->SetBranchAddress("Hit_True_Y"               , &Hit_True_Y               );
-    t_Input->SetBranchAddress("Hit_True_Z"               , &Hit_True_Z               );
-    t_Input->SetBranchAddress("Hit_True_Energy"          , &Hit_True_Energy          );
-    t_Input->SetBranchAddress("Hit_True_nElec"           , &Hit_True_nElec           );
-    t_Input->SetBranchAddress("Hit_True_nIDEs"           , &Hit_True_nIDEs           );
+    if(t_Input->GetListOfBranches()->FindObject("Hit_View")) {
+      t_Input->SetBranchAddress("Hit_View"                 , &Hit_View                 );
+      t_Input->SetBranchAddress("Hit_Size"                 , &Hit_Size                 );
+      t_Input->SetBranchAddress("Hit_TPC"                  , &Hit_TPC                  );
+      t_Input->SetBranchAddress("Hit_Chan"                 , &Hit_Chan                 );
+      t_Input->SetBranchAddress("Hit_X_start"              , &Hit_X_start              );
+      t_Input->SetBranchAddress("Hit_Y_start"              , &Hit_Y_start              );
+      t_Input->SetBranchAddress("Hit_Z_start"              , &Hit_Z_start              );
+      t_Input->SetBranchAddress("Hit_X_end"                , &Hit_X_end                );
+      t_Input->SetBranchAddress("Hit_Y_end"                , &Hit_Y_end                );
+      t_Input->SetBranchAddress("Hit_Z_end"                , &Hit_Z_end                );
+      t_Input->SetBranchAddress("Hit_Time"                 , &Hit_Time                 );
+      t_Input->SetBranchAddress("Hit_RMS"                  , &Hit_RMS                  );
+      t_Input->SetBranchAddress("Hit_SADC"                 , &Hit_SADC                 );
+      t_Input->SetBranchAddress("Hit_Int"                  , &Hit_Int                  );
+      t_Input->SetBranchAddress("Hit_Peak"                 , &Hit_Peak                 );
+      t_Input->SetBranchAddress("Hit_True_GenType"         , &Hit_True_GenType         );
+      t_Input->SetBranchAddress("Hit_True_MainTrID"        , &Hit_True_MainTrID        );
+      t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &Hit_True_EvEnergy        );
+      t_Input->SetBranchAddress("Hit_True_X"               , &Hit_True_X               );
+      t_Input->SetBranchAddress("Hit_True_Y"               , &Hit_True_Y               );
+      t_Input->SetBranchAddress("Hit_True_Z"               , &Hit_True_Z               );
+      t_Input->SetBranchAddress("Hit_True_Energy"          , &Hit_True_Energy          );
+      t_Input->SetBranchAddress("Hit_True_nElec"           , &Hit_True_nElec           );
+      t_Input->SetBranchAddress("Hit_True_nIDEs"           , &Hit_True_nIDEs           );
+    } else {
+      t_Input->SetBranchAddress("Hit_View"                 , &vec_Hit_View         );
+      t_Input->SetBranchAddress("Hit_Size"                 , &vec_Hit_Size         );
+      t_Input->SetBranchAddress("Hit_TPC"                  , &vec_Hit_TPC          );
+      t_Input->SetBranchAddress("Hit_Chan"                 , &vec_Hit_Chan         );
+      t_Input->SetBranchAddress("Hit_X_start"              , &vec_Hit_X_start      );
+      t_Input->SetBranchAddress("Hit_Y_start"              , &vec_Hit_Y_start      );
+      t_Input->SetBranchAddress("Hit_Z_start"              , &vec_Hit_Z_start      );
+      t_Input->SetBranchAddress("Hit_X_end"                , &vec_Hit_X_end        );
+      t_Input->SetBranchAddress("Hit_Y_end"                , &vec_Hit_Y_end        );
+      t_Input->SetBranchAddress("Hit_Z_end"                , &vec_Hit_Z_end        );
+      t_Input->SetBranchAddress("Hit_Time"                 , &vec_Hit_Time         );
+      t_Input->SetBranchAddress("Hit_RMS"                  , &vec_Hit_RMS          );
+      t_Input->SetBranchAddress("Hit_SADC"                 , &vec_Hit_SADC         );
+      t_Input->SetBranchAddress("Hit_Int"                  , &vec_Hit_Int          );
+      t_Input->SetBranchAddress("Hit_Peak"                 , &vec_Hit_Peak         );
+      t_Input->SetBranchAddress("Hit_True_GenType"         , &vec_Hit_True_GenType );
+      t_Input->SetBranchAddress("Hit_True_MainTrID"        , &vec_Hit_True_MainTrID);
+      t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &vec_Hit_True_EvEnergy);
+      t_Input->SetBranchAddress("Hit_True_X"               , &vec_Hit_True_X       );
+      t_Input->SetBranchAddress("Hit_True_Y"               , &vec_Hit_True_Y       );
+      t_Input->SetBranchAddress("Hit_True_Z"               , &vec_Hit_True_Z       );
+      t_Input->SetBranchAddress("Hit_True_Energy"          , &vec_Hit_True_Energy  );
+      t_Input->SetBranchAddress("Hit_True_nElec"           , &vec_Hit_True_nElec   );
+      t_Input->SetBranchAddress("Hit_True_nIDEs"           , &vec_Hit_True_nIDEs   );
+    }
+    
     if(t_Input->GetListOfBranches()->FindObject("Hit_True_MarleyIndex")) {
       t_Input->SetBranchAddress("Hit_True_MarleyIndex", &Hit_True_MarleyIndex);
     } else {
