@@ -1,8 +1,10 @@
 #include "WirePositionTimingDisplay.hh"
 
 
-WirePositionTimingDisplay::WirePositionTimingDisplay(const std::string F, const std::string T): Display(F,T),
-                                                                                                fAPA(-1){
+WirePositionTimingDisplay::WirePositionTimingDisplay(const std::string F, const std::string T):
+  Display(F,T),
+  fAPA(-1){
+
   for (size_t i=0; i<12; ++i) {
     int low = 1600 + 2560*i;
     int high = low + 960;
@@ -15,10 +17,16 @@ WirePositionTimingDisplay::WirePositionTimingDisplay(const std::string F, const 
 void WirePositionTimingDisplay::LookForAPA(const GenType gen) {
 
   std::vector<size_t> type_count;
-  for (size_t it; it < im.Hit_True_GenType->size(); ++it) {
+  std::cout << "Gen requested " << gen << std::endl; 
+  for (size_t it=0; it < im.Hit_True_GenType->size(); ++it) {
     if ((*im.Hit_True_GenType)[it] == gen) {
       type_count.push_back(it);
     }
+  }
+  if (1000.*(*im.True_ENu)[0] < 10 ||
+      1000.*(*im.True_ENu)[0] > 11) {
+    fAPA = -1;
+    return;
   }
   
   if (type_count.size() == 0 ||
@@ -40,6 +48,8 @@ void WirePositionTimingDisplay::LookForAPA(const GenType gen) {
       break;
     }
   }
+  std::cout << "Energy " << 1000.*(*im.True_ENu)[0] << " MeV"<< std::endl;
+  std::cout << "X " << (*im.True_VertX)[0] << " cm"<< std::endl;
 }
 
 void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gentype=-1) {
@@ -82,6 +92,8 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
   c->Print("WireTimingDisplay.pdf[");
   gPad->SetRightMargin(1.5*gPad->GetRightMargin());
   for (auto const& it: f_map_wire_time) {
+    it.second->SetMaximum(500);
+    it.second->SetMinimum(0);
     it.second->Draw("COLZ");
     c->Print("WireTimingDisplay.pdf");
   }

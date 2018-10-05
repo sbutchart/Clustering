@@ -520,14 +520,14 @@ public:
     t_Input->SetBranchAddress("Run"       , &Run       );
     t_Input->SetBranchAddress("SubRun"    , &SubRun    );
     t_Input->SetBranchAddress("Event"     , &Event     );
-    t_Input->SetBranchAddress("NTotHit"   , &NTotHit   );
-    t_Input->SetBranchAddress("NColHit"   , &NColHit   );
-    t_Input->SetBranchAddress("NIndHit"   , &NIndHit   );
-    t_Input->SetBranchAddress("NHitNoBT"  , &NHitNoBT  );
-    t_Input->SetBranchAddress("NFlash"    , &NFlash    );
-    t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
 
-    if(t_Input->GetListOfBranches()->FindObject("Hit_View")) {
+    if(t_Input->GetListOfBranches()->FindObject("NTotHit")) {
+      t_Input->SetBranchAddress("NTotHit"   , &NTotHit   );
+      t_Input->SetBranchAddress("NColHit"   , &NColHit   );
+      t_Input->SetBranchAddress("NIndHit"   , &NIndHit   );
+      t_Input->SetBranchAddress("NHitNoBT"  , &NHitNoBT  );
+      t_Input->SetBranchAddress("NFlash"    , &NFlash    );
+      t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
       t_Input->SetBranchAddress("Hit_View"                 , &Hit_View                 );
       t_Input->SetBranchAddress("Hit_Size"                 , &Hit_Size                 );
       t_Input->SetBranchAddress("Hit_TPC"                  , &Hit_TPC                  );
@@ -553,6 +553,12 @@ public:
       t_Input->SetBranchAddress("Hit_True_nElec"           , &Hit_True_nElec           );
       t_Input->SetBranchAddress("Hit_True_nIDEs"           , &Hit_True_nIDEs           );
     } else {
+      t_Input->SetBranchAddress("NTotHits"   , &NTotHit   );
+      t_Input->SetBranchAddress("NColHits"   , &NColHit   );
+      t_Input->SetBranchAddress("NIndHits"   , &NIndHit   );
+      t_Input->SetBranchAddress("NHitNoBTs"  , &NHitNoBT  );
+      t_Input->SetBranchAddress("NFlash"    , &NFlash    );
+      t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
       t_Input->SetBranchAddress("Hit_View"                 , &vec_Hit_View         );
       t_Input->SetBranchAddress("Hit_Size"                 , &vec_Hit_Size         );
       t_Input->SetBranchAddress("Hit_TPC"                  , &vec_Hit_TPC          );

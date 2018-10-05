@@ -57,5 +57,8 @@ target_link_libraries(ThrowToySmartTrigger Clustering)
 add_executable(RunBiTrigger RunBiTrigger.cxx)
 target_link_libraries(RunBiTrigger Clustering)
 
+add_executable(CreateReweightingScheme CreateReweightingScheme.cxx)
+target_link_libraries(CreateReweightingScheme ${ROOT_LIBRARIES})
+
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
