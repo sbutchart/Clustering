@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 #include "TCanvas.h"
 #include "TFile.h"
@@ -12,7 +13,41 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char** argv){
+
+  int opt;
+  // Shut GetOpt error messages down (return '?'): 
+  extern char *optarg;
+  extern int  optopt;
+
+  int nHitCut=-1, RequestedConfig=0;
+  std::string InputFile;
+  std::string OutputFile;
+  int nEvent = 0;
+
+  while ( (opt = getopt(argc, argv, "h:o:i:n:")) != -1 ) {  // for each option...
+    switch ( opt ) {
+    case 'h':
+      nHitCut = atoi(optarg);
+      break;
+    case 'i':
+      InputFile = optarg;
+      break;
+    case 'c':
+      RequestedConfig = atoi(optarg);
+      break;
+    case 'n':
+      nEvent = atoi(optarg);
+      break;
+    case 'o':
+      OutputFile = optarg;
+      break;
+    case '?':  // unknown option...
+      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
+      break;
+    }
+  }
+  
   TGraph *flux_HEP = new TGraph("/Users/plasorak/Downloads/SNOFluxSpectrum_HEP.txt");
   TGraph *flux_B8  = new TGraph("/Users/plasorak/Downloads/SNOFluxSpectrum_B8.txt");
   ifstream xsec_file;
@@ -195,8 +230,9 @@ int main() {
   integrated_rate_tot_th1->Draw();
   c->Print("SolarWeights.pdf");
   
-  TFile* file_weights = new TFile("../../SNAna.root", "READ");
+  TFile* file_weights = new TFile("../clustering/data/RateMarley.root", "READ");
   TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
+  std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;
   TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);
   tree->Project("rate_tot_sn_th1", "True_ENu*1000.");
   rate_tot_sn_th1->SetStats(0);

@@ -66,5 +66,8 @@ target_link_libraries(AnalyseWireClustering_SolarNu ${ROOT_LIBRARIES})
 add_executable(EfficiencyCalculator EfficiencyCalculator.cxx)
 target_link_libraries(EfficiencyCalculator Clustering)
 
+add_executable(DumpSNRate DumpRate.cxx)
+target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
+
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
