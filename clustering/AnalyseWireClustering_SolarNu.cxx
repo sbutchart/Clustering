@@ -6,6 +6,8 @@
 #include "Helper.h"
 
 #include "TFile.h"
+
+#include "TMath.h"
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -13,7 +15,7 @@
 #include "TPad.h"
 #include "TTree.h"
 #include "TLegend.h"
-#include "TEfficiency.h"
+#include "TGraphErrors.h"
 
 
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
@@ -33,7 +35,6 @@ std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
 };
 
 int main(int argc, char** argv){
-
   int opt;
   // Shut GetOpt error messages down (return '?'): 
   extern char *optarg;
@@ -71,7 +72,7 @@ int main(int argc, char** argv){
     }
   }
   TFile *f_Weights = new TFile(WeightFile.c_str(), "READ");
-  TH1D* hWeight = (TH1D*)f_Weights->Get("weight");
+  TH1D* hWeight = (TH1D*)f_Weights->Get("SolarNu_weight");
   
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
 
@@ -204,19 +205,11 @@ int main(int argc, char** argv){
     t_TrueInfo->GetEntry(i);
     map_Event_TrueEntry[EventTrue] = i;
     ++nMarleyEvent;
-    map_Event_Weight[EventTrue] = WeightFile
+    map_Event_Weight[EventTrue] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(0)));
   }
   
   TCanvas c;
   c.Print((OutputFile+"[").c_str());
-  TProfile* p_gentype_sign_wire = SetUpTProfileGenType("p_gentype_sign_wire", ";;average number of hits in cluster");
-  TProfile* p_gentype_back_wire = SetUpTProfileGenType("p_gentype_back_wire", ";;average number of hits in cluster");
-  p_gentype_sign_wire->SetLineColor(kRed);
-  p_gentype_back_wire->SetLineColor(kBlue);
-  p_gentype_sign_wire->SetLineStyle(1);
-  p_gentype_back_wire->SetLineStyle(1);
-  p_gentype_sign_wire->SetLineWidth(2);
-  p_gentype_back_wire->SetLineWidth(2);
 
   std::map<int,std::vector<int> > map_event_entry_wire;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
@@ -225,99 +218,79 @@ int main(int argc, char** argv){
   }
 
   TH1D* h_ncluster_sign_wire = new TH1D("h_ncluster_sign_wire", ";n clusters;Events", 1500, 0, 1500);
-  TH1D* h_ncluster_back_wire = new TH1D("h_ncluster_back_wire", ";n clusters;Events", 1500, 0, 1500);
-  h_ncluster_sign_wire->SetLineColor(kRed);
-  h_ncluster_back_wire->SetLineColor(kBlue);
-  h_ncluster_sign_wire->SetLineStyle(1);
-  h_ncluster_back_wire->SetLineStyle(1);
-  h_ncluster_sign_wire->SetLineWidth(2);
-  h_ncluster_back_wire->SetLineWidth(2);
+  std::cout << "here " << std::endl;
 
-  TH1D* h_nhit_sign_wire = new TH1D("h_nhit_sign_wire", ";n Hits;Clusters", 100, -0.5, 99.5);
-  TH1D* h_nhit_back_wire = new TH1D("h_nhit_back_wire", ";n Hits;Clusters", 100, -0.5, 99.5);
-  h_nhit_sign_wire->SetLineColor(kRed);
-  h_nhit_back_wire->SetLineColor(kBlue);
-  h_nhit_sign_wire->SetLineStyle(1);
-  h_nhit_back_wire->SetLineStyle(1);
-  h_nhit_sign_wire->SetLineWidth(2);
-  h_nhit_back_wire->SetLineWidth(2);
 
-  t_Output_triggeredclusteredhits->Project("h_nhit_sign_wire", "NHits", Form("Type==1 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
-  t_Output_triggeredclusteredhits->Project("h_nhit_back_wire", "NHits", Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
-  std::vector<double> max = {h_nhit_sign_wire->GetMaximum(),
-                             h_nhit_back_wire->GetMaximum()};
-  
-  h_nhit_sign_wire->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
-  h_nhit_sign_wire->SetMinimum(0.1);
-  gPad->SetLogy();
-  h_nhit_sign_wire->Draw();
-  h_nhit_back_wire->Draw("SAME");
-  c.Print(OutputFile.c_str());
-
-  int nEventWire=0;
-  int nDetectedSignalEventWire=0;
-  int nBackgroundEventWire=0;
-  for(auto const& it : map_Event_TrueEntry) {
-    int ncluster_sign=0;
-    int ncluster_back=0;
-    ++nEventWire;
-    bool SignDetected=false;
-    for (auto const& it2 : map_event_entry_wire[it.first]) {
-      std::map<int, int> map_gentype_nhit_sign;
-      std::map<int, int> map_gentype_nhit_back;
-      t_Output_triggeredclusteredhits->GetEntry(it2);
-      if (Type==0) {
-        map_gentype_nhit_back = GetMapOfHit(GenType);
-        ++ncluster_back;
-        ++nBackgroundEventWire;
-      } else {
-        SignDetected=true;
-        map_gentype_nhit_sign = GetMapOfHit(GenType);
-        ++ncluster_sign;
+  std::vector<double> vec_SADC_Cut = {0,1000,2000,3000,4000,5000,6000};
+  std::map<double,TEfficiency*> map_eff;
+  TGraphErrors* BackgroundRate_SADC = new TGraphErrors(vec_SADC_Cut.size());
+  TGraphErrors* Efficiency_SADC     = new TGraphErrors(vec_SADC_Cut.size());
+  int pointcount=0;
+  double ADCerror=500;
+  for (auto const& ADC: vec_SADC_Cut) {
+    std::cout << "ADC " << ADC << std::endl;
+    double eff, efferror;
+    double back, backerror;
+    double nEventWire=0;
+    double nDetectedSignalEventWire=0;
+    double nBackgroundEventWire=0;
+    map_eff[ADC] = new TEfficiency(Form("EffAtADC>%.0f",ADC),Form("Efficiency at ADC > %.0f;E_{#nu};Efficiency to cluster",ADC),30,0,30);
+    for (auto const& it: map_Event_TrueEntry) {
+      nEventWire += map_Event_Weight[it.first];
+      bool detected = false;
+      for (auto const& it2 : map_event_entry_wire[it.first]) {
+        std::map<int, int> map_gentype_nhit_sign;
+        std::map<int, int> map_gentype_nhit_back;
+        t_Output_triggeredclusteredhits->GetEntry(it2);
+        if (SumADC < ADC) continue;
+        if (Type!=1) {
+          std::cout << "nBackgroundEventWire " << nBackgroundEventWire <<std::endl;
+          ++nBackgroundEventWire;
+        } else {
+          detected = true;
+          nDetectedSignalEventWire += map_Event_Weight[it.first];
+        }
       }
-      for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
-      for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+      t_TrueInfo->GetEntry(it.second);
+      map_eff[ADC]->Fill(detected, 1000.*ENu->at(0));
     }
-    if(SignDetected)
-      ++nDetectedSignalEventWire;
-    h_ncluster_sign_wire->Fill(ncluster_sign);
-    h_ncluster_back_wire->Fill(ncluster_back);
+    std::cout << nEventWire << std::endl;
+    std::cout << nBackgroundEventWire << std::endl;
+    eff = nDetectedSignalEventWire / nEventWire;
+    efferror = TMath::Sqrt(1./(nDetectedSignalEventWire) + 1./(nEventWire));
+    efferror = eff*efferror;
+    back = (double)nBackgroundEventWire / nEventWire / 2.246e-3 /0.12;
+    backerror = TMath::Sqrt(1./nBackgroundEventWire + 1./ nEventWire);
+    backerror = back*backerror;
+    std::cout << "eff " << eff << " +- " << efferror << std::endl;
+    std::cout << "back " << back << " +- " << backerror << std::endl;
+    std::cout << "pc " << pointcount << std::endl;
+    BackgroundRate_SADC->SetPoint(pointcount, ADC, back);
+    Efficiency_SADC    ->SetPoint(pointcount, ADC, eff );
+    BackgroundRate_SADC->SetPointError(pointcount, ADCerror, backerror);
+    Efficiency_SADC    ->SetPointError(pointcount, ADCerror, efferror );
+
+    ++pointcount;
+    
   }
-
-  gPad->SetLogy(true);
-
-  max = {p_gentype_sign_wire->GetMaximum(),
-         p_gentype_back_wire->GetMaximum()};
   
-  p_gentype_sign_wire->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
-  p_gentype_sign_wire->SetMinimum(0.1);
-  gPad->SetGridx();
-  gPad->SetGridy();
-  p_gentype_sign_wire->SetStats(0);
-  p_gentype_sign_wire->Draw("E");
-  p_gentype_back_wire->Draw("E SAME");
+  BackgroundRate_SADC->Draw("AP");
+  BackgroundRate_SADC->SetTitle("");
   c.Print(OutputFile.c_str());
-  gPad->SetGridx(false);
-  gPad->SetGridy(false);
-
-  max = {h_ncluster_sign_wire->GetMaximum(),
-         h_ncluster_back_wire->GetMaximum()};
-
-  h_ncluster_sign_wire->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
-  h_ncluster_sign_wire->SetMinimum(0.1);
-  gPad->SetLogx();
-
-  h_ncluster_sign_wire->Draw("");
-  h_ncluster_back_wire->Draw("SAME");
+  gPad->SetLogy();
+  Efficiency_SADC->GetXaxis()->SetTitle("Sum ADC threshold");
+  Efficiency_SADC->GetYaxis()->SetTitle("Efficiency for Solar #nu");
+  Efficiency_SADC->SetTitle("");
+  Efficiency_SADC->Draw("AP");
   c.Print(OutputFile.c_str());
 
-  gPad->Clear();
-  TLegend* leg = new TLegend(0.1, 0.1, 0.9, 0.9);
-  leg->AddEntry(p_gentype_sign_wire, "signal wire clusters");
-  leg->AddEntry(p_gentype_back_wire, "background wire clusters");
-  leg->Draw();
-  c.Print(OutputFile.c_str());
+  gPad->SetLogy(false);
+  for (auto const& it:map_eff) {
+    it.second->Draw();
+    c.Print(OutputFile.c_str());
+  }
   c.Print((OutputFile+"]").c_str());
+
   return 1;
 
 };

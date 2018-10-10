@@ -1,5 +1,5 @@
-#ifndef INPUTMANAGER_H
-#define INPUTMANAGER_H
+#ifndef INPUTMANAGER_HH
+#define INPUTMANAGER_HH
 
 #include "TFile.h"
 #include "TTree.h"
@@ -8,12 +8,58 @@
 #include <iostream>
 
 class InputManager{
-private:
-  TFile* f_Input;
+protected:
+  TFile*      f_Input;
   std::string treename;
   std::string filename;
+  
 public:
   TTree* t_Input;
+
+  InputManager(){};
+  ~InputManager(){};
+
+  int GetEntries() const {
+    return t_Input->GetEntries();
+  };
+  
+  virtual void GetEntry (const int i=0) {
+    t_Input->GetEntry(i);
+  };
+
+  
+  std::string GetInputFile()                       const { return filename; };
+  std::string GetInputTree()                       const { return treename; };
+  void        SetInputFile(const std::string s="")       { filename=s; };
+  void        SetInputTree(const std::string s="")       { treename=s; };
+    
+  virtual void LoadTree() = 0;
+protected:
+  void Initialise() {
+    if (filename == "") {
+      std::cerr << "Need to provide an input file" << std::endl;
+      exit(1);
+    }
+    
+    f_Input = new TFile(filename.c_str(), "READ");
+    if (!f_Input->IsOpen()) {
+      std::cerr << "The file " << filename.c_str() << " does not exist." << std::endl;
+      exit(1);
+    }
+
+    if (f_Input->Get(treename.c_str())) {
+      t_Input = (TTree*)f_Input->Get(treename.c_str());
+    } else {
+      std::cerr << "The requested tree (" << treename.c_str() << ") does not exist in file " << filename << std::endl;
+      exit(1);
+    }
+  }
+};
+
+
+class SNAnaInputManager: public InputManager{
+
+public:
 
   int Run;
   int SubRun;
@@ -177,7 +223,7 @@ public:
   std::vector<int>                 * True_Bck_IDAll           ;
 
   
-  ~InputManager(){
+  ~SNAnaInputManager(){
     delete Hit_View                 ; Hit_View                  = NULL;
     delete Hit_Size                 ; Hit_Size                  = NULL;
     delete Hit_TPC                  ; Hit_TPC                   = NULL;
@@ -297,9 +343,7 @@ public:
 
   };
   
-  InputManager():
-    f_Input(NULL),
-    t_Input(NULL),
+  SNAnaInputManager():
     Run        (0),
     SubRun     (0),
     Event      (0),
@@ -457,10 +501,15 @@ public:
     True_Bck_EndTimeAll      (NULL),
     True_Bck_EnergyAll       (NULL),
     True_Bck_PDGAll          (NULL),
-    True_Bck_IDAll           (NULL){};
+    True_Bck_IDAll           (NULL){
+
+    f_Input = NULL;
+    t_Input = NULL;
+    treename = "";
+    filename = "";
+  };
   
-  int         GetEntries  ()                       const { return t_Input->GetEntries(); };
-  void        GetEntry    (const int i=0)                {
+  void GetEntry (const int i=0) {
     t_Input->GetEntry(i);
     if (vec_Hit_True_nIDEs!=NULL) {
       for (int i=0; i<NColHit; ++i) {
@@ -492,30 +541,8 @@ public:
     }
   };
 
-  std::string GetInputFile()                       const { return filename; };
-  std::string GetInputTree()                       const { return treename; };
-  void        SetInputFile(const std::string s="")       { filename=s; };
-  void        SetInputTree(const std::string s="")       { treename=s; };
-    
   void LoadTree(){
-    if (filename == "") {
-      std::cerr << "Need to provide an input file" << std::endl;
-      exit(1);
-    }
-    
-    f_Input = new TFile(filename.c_str(), "READ");
-    if (!f_Input->IsOpen()) {
-      std::cerr << "The file " << filename.c_str() << " does not exist." << std::endl;
-      exit(1);
-    }
-
-    if (f_Input->Get(treename.c_str())) {
-      t_Input = (TTree*)f_Input->Get(treename.c_str());
-    } else {
-      std::cerr << "The requested tree (" << treename.c_str() << ") does not exist in file " << filename << std::endl;
-      exit(1);
-    }
-    
+    Initialise();   
     
     t_Input->SetBranchAddress("Run"       , &Run       );
     t_Input->SetBranchAddress("SubRun"    , &SubRun    );

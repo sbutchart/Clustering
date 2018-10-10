@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "InputManager.h"
+#include "InputManager.hh"
 #include "Helper.h"
 
 #include "OpticalCluster.hh"
@@ -312,7 +312,7 @@ private:
   std::vector<double> out_DirZ;
 
   std::map<int, int> fmap_APA_Channel;
-  InputManager im;
+  SNAnaInputManager im;
 
 };
 #endif

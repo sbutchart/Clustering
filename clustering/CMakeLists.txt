@@ -60,5 +60,11 @@ target_link_libraries(RunBiTrigger Clustering)
 add_executable(CreateReweightingScheme CreateReweightingScheme.cxx)
 target_link_libraries(CreateReweightingScheme ${ROOT_LIBRARIES})
 
+add_executable(AnalyseWireClustering_SolarNu AnalyseWireClustering_SolarNu.cxx)
+target_link_libraries(AnalyseWireClustering_SolarNu ${ROOT_LIBRARIES})
+
+add_executable(EfficiencyCalculator EfficiencyCalculator.cxx)
+target_link_libraries(EfficiencyCalculator Clustering)
+
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})

@@ -3,14 +3,14 @@
 
 
 #include "Helper.h"
-#include "InputManager.h"
+#include "InputManager.hh"
 #include <unistd.h>
 
 
 
 class EventInspector {
 protected:
-  InputManager im;
+  SNAnaInputManager im;
   virtual void ExecuteInLoop() = 0;
   virtual bool Selected() = 0;
   void InitialiseInput(){

@@ -1,8 +1,5 @@
 #ifndef HELPER_HH
 #define HELPER_HH
-#include <iostream>
-#include <vector>
-#include <cassert>
 
 #include "TColor.h"
 #include "TH1.h"
@@ -26,9 +23,78 @@
 #include "TEfficiency.h"
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
-#include <unistd.h>
 #include <limits>
+#include <unistd.h>
+#include <vector>
+
+template<typename T>
+void PlotAll(const std::map<T, TH1D*>& m, std::string opt=""){
+  m.begin()->second->Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TH1D&>& m, std::string opt=""){
+  m.begin()->second.Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second.Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TProfile*>& m, std::string opt=""){
+  m.begin()->second->Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TProfile&>& m, std::string opt=""){
+  m.begin()->second.Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second.Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TEfficiency*>& m, std::string opt=""){
+  m.begin()->second->Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TEfficiency&>& m, std::string opt=""){
+  m.begin()->second.Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second.Draw((opt+"SAME").c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TGraph&>& m, std::string opt="LP"){
+  m.begin()->second.Draw((opt+"A").c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second.Draw(opt.c_str());
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TGraph*>& m, std::string opt="LP"){
+  m.begin()->second->Draw((opt+"A").c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw(opt.c_str());
+}
+
+
+
 template<typename T, typename U>
 std::pair<T,U> GetMax(const std::map<T,U>& x) {
   using pairtype=std::pair<T,U>; 
@@ -105,7 +171,7 @@ enum EColorPalettes
 };
 
 //======================================================================
-inline const std::vector<int>& getColors(int whichColours)
+inline const std::vector<int>& getColors(int whichColours=0)
 {
   const int alphabetColors[]={
     TColor::GetColor(  25,  25,  25 ), //ebony

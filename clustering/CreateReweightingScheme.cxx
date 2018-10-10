@@ -7,6 +7,7 @@
 #include "TH1D.h"
 #include "TLegend.h"
 #include "TPad.h"
+#include "TTree.h"
 
 
 using namespace std;
@@ -175,16 +176,16 @@ int main() {
   leg_rate->AddEntry(rate_Tot, "total rate", "L");
   leg_rate->Draw();
   c->Print("SolarWeights.pdf");
-
-  TH1D* rate_tot_th1 = new TH1D("rate_tot_th1","",1000,3,20);
+  TH1D* rate_tot_th1 = new TH1D("rate_tot_th1","",100,3,20);
   for (size_t i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
-    rate_tot_th1->SetBinContent(i, rate_Tot->Eval(rate_tot_th1->GetBinCenter(i)));
+    rate_tot_th1->SetBinContent(i, std::max(0.,rate_Tot->Eval(rate_tot_th1->GetBinCenter(i))));
+    rate_tot_th1->SetBinError(i, 0);
   }
 
   rate_tot_th1->Scale(rate_Tot->Integral() / rate_tot_th1->Integral());
   TH1D* integrated_rate_tot_th1 = new TH1D("integrated_rate_tot_th1",
                                            ";E_{threshold} [MeV];Events / 10 kT / day",
-                                           1000,3,20);
+                                           100,3,20);
   for (size_t i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
     integrated_rate_tot_th1->SetBinContent(i, rate_tot_th1->Integral(i, rate_tot_th1->GetXaxis()->GetNbins()));
   }
@@ -194,7 +195,26 @@ int main() {
   integrated_rate_tot_th1->Draw();
   c->Print("SolarWeights.pdf");
   
+  TFile* file_weights = new TFile("../../SNAna.root", "READ");
+  TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
+  TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);
+  tree->Project("rate_tot_sn_th1", "True_ENu*1000.");
+  rate_tot_sn_th1->SetStats(0);
+  rate_tot_sn_th1->Scale(1. / rate_tot_sn_th1->Integral(0,99));
+  rate_tot_sn_th1->Draw();
+  c->Print("SolarWeights.pdf");
+
+  TH1D* weight_tot_th1 = (TH1D*)rate_tot_th1->Clone();
+  weight_tot_th1->Divide(rate_tot_sn_th1);
+  weight_tot_th1->SetStats(0);
+  weight_tot_th1->SetTitle(";E_{#nu} [MeV];Weight [Solar events / 10 kT / day] / [SN event]");
+  weight_tot_th1->Draw();
+  c->Print("SolarWeights.pdf");
   c->Print("SolarWeights.pdf]");
-  c->Clear();
+
+  TFile* output_weight_file = new TFile("WeightFile.root", "RECREATE");
+  weight_tot_th1->Write("SolarNu_weight");
+  output_weight_file->Close();
+
   return 0;
 }

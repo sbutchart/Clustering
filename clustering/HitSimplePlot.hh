@@ -1,6 +1,6 @@
 #ifndef HITSIMPLEPLOT_HH
 #define HITSIMPLEPLOT_HH
-#include "InputManager.h"
+#include "InputManager.hh"
 #include "Helper.h"
 
 #include "TCanvas.h"
@@ -29,7 +29,7 @@ public:
   void PlotWidth2D(const int, const int);
 
 private:
-  InputManager im;
+  SNAnaInputManager im;
   TCanvas* c;
   void   GetDimension(const int, int&, int&) const;
   double GetMean  (std::vector<double> const) const;

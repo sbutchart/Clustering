@@ -7,7 +7,7 @@
 #include "TH2D.h"
 
 #include "Helper.h"
-#include "InputManager.h"
+#include "InputManager.hh"
 
 
 class Display {
@@ -26,7 +26,7 @@ public:
   };
 protected:
   TCanvas* c;
-  InputManager im;
+  SNAnaInputManager im;
   std::string FileName;
   std::string TreeName;
 };
