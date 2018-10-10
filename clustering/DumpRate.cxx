@@ -20,14 +20,18 @@ int main(int argc, char** argv){
   std::string InputFile;
   std::string InputTree;
   std::string OutputFile;
-
-  while ( (opt = getopt(argc, argv, "i:o:t:")) != -1 ) {  // for each option...
+  std::string ENuVar;
+  
+  while ( (opt = getopt(argc, argv, "i:o:t:v:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile = optarg;
       break;
     case 't':
       InputTree = optarg;
+      break;
+    case 'v':
+      ENuVar = optarg;
       break;
     case 'o':
       OutputFile = optarg;
@@ -42,7 +46,7 @@ int main(int argc, char** argv){
   TTree* tree = (TTree*)file_weights->Get(InputTree.c_str());
   std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;
   TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);
-  tree->Project("rate_tot_sn_th1", "True_ENu*1000.");
+  tree->Project("rate_tot_sn_th1", (ENuVar+"*1000.").c_str());
   rate_tot_sn_th1->SetStats(0);
   rate_tot_sn_th1->Scale(1. / rate_tot_sn_th1->Integral(0,99));
   rate_tot_sn_th1->Draw();
