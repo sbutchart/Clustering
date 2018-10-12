@@ -8,10 +8,11 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
+find_package(Boost REQUIRED)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 
 add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc SmartTrigger.cc SmartTriggerToyThrower.cc BiTrigger.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
@@ -21,8 +22,6 @@ target_link_libraries(Display ${ROOT_LIBRARIES})
 
 add_library(SimpleOptHit SHARED HitSimplePlot.cc)
 target_link_libraries(SimpleOptHit ${ROOT_LIBRARIES})
-
-link_directories(build)
 
 add_executable(RunDAQClustering RunDAQClustering.cxx)
 target_link_libraries(RunDAQClustering Clustering)
