@@ -39,9 +39,9 @@ public:
 private:
   WireHit(const WireHit&hit):
     Hit(hit),
+    fHitView     (hit.fHitView     ),
     fTrDepositedE(hit.fTrDepositedE),
     fNElectron   (hit.fNElectron   ),
-    fHitView     (hit.fHitView     ),
     fTrEPart     (hit.fTrEPart     ),
     fTrIDPart    (hit.fTrIDPart    ) { };
 public:

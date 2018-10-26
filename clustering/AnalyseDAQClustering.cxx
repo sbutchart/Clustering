@@ -102,9 +102,6 @@ int main(int argc, char** argv){
   double pur_Polonium  ;
   double pur_Radon     ;
   double pur_Ar42      ;
-  double YWidth        ;
-  double ZWidth        ;
-  double SumPE         ;
   
   std::vector<int>    * HitView  = NULL;
   std::vector<int>    * GenType  = NULL;

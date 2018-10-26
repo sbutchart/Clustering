@@ -30,62 +30,74 @@ private:
   };
   
   Cluster(const Cluster& c):
-    fHit            (c.fHit            ),
-    fNHit           (c.fNHit           ),
-    fNChannel       (c.fNChannel       ),
-    fPosition       (c.fPosition       ),
-    fSize           (c.fSize           ),
-    fExtent         (c.fExtent         ),
-    fIsSelected     (c.fIsSelected     ),
-    fSumPeak        (c.fSumPeak        ),
-    fRecoEnergy     (c.fRecoEnergy     ),
-    fAPA            (c.fAPA            ),
-    fTruePurity     (c.fTruePurity     ),
-    fTrueEnergy     (c.fTrueEnergy     ),
-    fTrueMarleyIndex(c.fTrueMarleyIndex),
-    fTruePosition   (c.fTruePosition   ),
-    fTrueDirection  (c.fTrueDirection  ) {
-  };
+    fHit             (c.fHit            ),
+    fNHit            (c.fNHit           ),
+    fNChannel        (c.fNChannel       ),
+    fChannelExtent   (c.fChannelExtent  ),
+    fChannelWidth    (c.fChannelWidth   ),
+    fPosition        (c.fPosition       ),
+    fSize            (c.fSize           ),
+    fExtent          (c.fExtent         ),
+    fIsSelected      (c.fIsSelected     ),
+    fTruePurity      (c.fTruePurity     ),
+    fSumPeak         (c.fSumPeak        ),
+    fRecoEnergy      (c.fRecoEnergy     ),
+    fAPA             (c.fAPA            ),
+    fTrueGenType     (c.fTrueGenType    ),
+    fTrueEnergy      (c.fTrueEnergy     ),
+    fTrueMarleyIndex (c.fTrueMarleyIndex),
+    fTruePosition    (c.fTruePosition   ),
+    fTrueDirection   (c.fTrueDirection  ),
+    fIsTriggering    (c.fIsTriggering   )
+    {}
 
 
 protected:
   
   Cluster():
-    fHit       (),
-    fNHit      (fHit.size()),
-    fNChannel  (0),
-    fPosition  (),
-    fSize      (),
-    fExtent    (),
-    fIsSelected(true),
-    fSumPeak        (0),
-    fRecoEnergy     (0),
-    fAPA            (0),
-    fTruePurity     (),
-    fTrueEnergy     (0),
-    fTrueMarleyIndex(0),
-    fTruePosition   (),
-    fTrueDirection  () {
+    fHit             (),
+    fNHit            (0),
+    fNChannel        (0),
+    fChannelExtent   (),
+    fChannelWidth    (0),
+    fPosition        (),
+    fSize            (),
+    fExtent          (),
+    fIsSelected      (0),
+    fTruePurity      (),
+    fSumPeak         (0),
+    fRecoEnergy      (0),
+    fAPA             (0),
+    fTrueGenType     (kOther),
+    fTrueEnergy      (0),
+    fTrueMarleyIndex (0),
+    fTruePosition    (),
+    fTrueDirection   (),
+    fIsTriggering    (0){
     InitVecMap();
   };
 
 
   Cluster(std::vector<Hit*>& v_hit):
-    fHit            (v_hit),
-    fNHit           (v_hit.size()),
-    fNChannel       (0),
-    fPosition       (),
-    fSize           (),
-    fExtent         (),
-    fIsSelected     (true),
-    fSumPeak        (0),
-    fRecoEnergy     (0),
-    fAPA            (0),
-    fTruePurity     (),
-    fTrueEnergy     (0),
-    fTrueMarleyIndex(0),
-    fTruePosition   (),
-    fTrueDirection  () {
+    fHit             (v_hit),
+    fNHit            (v_hit.size()),
+    fNChannel        (0),
+    fChannelExtent   (),
+    fChannelWidth    (0),
+    fPosition        (),
+    fSize            (),
+    fExtent          (),
+    fIsSelected      (0),
+    fTruePurity      (),
+    fSumPeak         (0),
+    fRecoEnergy      (0),
+    fAPA             (0),
+    fTrueGenType     (kOther),
+    fTrueEnergy      (0),
+    fTrueMarleyIndex (0),
+    fTruePosition    (),
+    fTrueDirection   (),
+    fIsTriggering    (0){
   };
   
   void Initialise() {
@@ -152,10 +164,11 @@ protected:
               << " Extent[Y]: "      << fExtent[kY].first << "-" << fExtent[kY].second 
               << " Extent[Z]: "      << fExtent[kZ].first << "-" << fExtent[kZ].second 
               << " Extent[T]: "      << fExtent[kT].first << "-" << fExtent[kT].second << std::endl;
-    std::cout << " IsSelected "      << fIsSelected  << std::endl;
+    std::cout << " IsSelected: "     << fIsSelected  << std::endl;
+    std::cout << " IsTriggering: "   << fIsTriggering  << std::endl;
     std::cout << " SumPeak: "        << fSumPeak     << std::endl;
     std::cout << " APA: "            << fAPA         << std::endl;
-    std::cout << " fTrueGenType: "   << fTrueGenType << std::endl;
+    std::cout << " TrueGenType: "    << fTrueGenType << std::endl;
     if (printHit)
       for (auto const& it:fHit)
         it->Print();
@@ -178,6 +191,7 @@ public:
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };
   bool   GetIsSelected   ()                  const { return fIsSelected;                   };
+  bool   GetIsTriggering ()                  const { return fIsTriggering;                 };
   double GetRecoEnergy   ()                  const { return fRecoEnergy;                   };
   size_t GetMarleyIndex  ()                  const { return fTrueMarleyIndex;              };
   double GetStartChannel ()                  const { return (double)fChannelExtent.first ; };
@@ -196,6 +210,7 @@ public:
   void SetTruePosition (const Direction d, const double e) { fTruePosition [d] = e; };
   void SetTrueDirection(const Direction d, const double e) { fTrueDirection[d] = e; };
   void SetIsSelected   (const bool b=true)                 { fIsSelected       = b; };
+  void SetIsTriggering (const bool b=true)                 { fIsTriggering     = b; };
   void SetRecoEnergy   (const double d)                    { fRecoEnergy       = d; };
   void SetMarleyIndex  (const size_t d)                    { fTrueMarleyIndex  = d; };
   void SetHit          (const std::vector<Hit*>& h)        { fHit              = h; };
@@ -220,6 +235,7 @@ protected:
   size_t  fTrueMarleyIndex;
   std::map<Direction,double> fTruePosition;
   std::map<Direction,double> fTrueDirection;
+  bool fIsTriggering;
 };
 
 

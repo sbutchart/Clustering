@@ -107,9 +107,6 @@ int main(int argc, char** argv){
   double pur_Polonium  ;
   double pur_Radon     ;
   double pur_Ar42      ;
-  double YWidth        ;
-  double ZWidth        ;
-  double SumPE         ;
   
   std::vector<int>    * HitView  = NULL;
   std::vector<int>    * GenType  = NULL;
@@ -216,10 +213,6 @@ int main(int argc, char** argv){
     t_Output_triggeredclusteredhits->GetEntry(i);
     if (Config==RequestedConfig) map_event_entry_wire[Event].push_back(i);
   }
-
-  TH1D* h_ncluster_sign_wire = new TH1D("h_ncluster_sign_wire", ";n clusters;Events", 1500, 0, 1500);
-  std::cout << "here " << std::endl;
-
 
   std::vector<double> vec_SADC_Cut = {0,1000,2000,3000,4000,5000,6000};
   std::map<double,TEfficiency*> map_eff;

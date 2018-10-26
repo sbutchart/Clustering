@@ -7,6 +7,9 @@
 #include <vector>
 #include <iostream>
 
+#include "OpticalCluster.hh"
+#include "WireCluster.hh"
+
 class InputManager{
 protected:
   TFile*      f_Input;
@@ -17,7 +20,7 @@ public:
   TTree* t_Input;
 
   InputManager(){};
-  ~InputManager(){};
+  virtual ~InputManager(){};
 
   int GetEntries() const {
     return t_Input->GetEntries();
@@ -33,7 +36,7 @@ public:
   void        SetInputFile(const std::string s="")       { filename=s; };
   void        SetInputTree(const std::string s="")       { treename=s; };
     
-  virtual void LoadTree() = 0;
+  virtual void LoadTree() {};
 protected:
   void Initialise() {
     if (filename == "") {
@@ -58,9 +61,10 @@ protected:
 
 
 class SNAnaInputManager: public InputManager{
+private:
+  std::map<int,int> fAPA_Channel;
 
 public:
-
   int Run;
   int SubRun;
   int Event;
@@ -222,6 +226,59 @@ public:
   std::vector<int>                 * True_Bck_PDGAll          ;
   std::vector<int>                 * True_Bck_IDAll           ;
 
+  void GetWireHits(std::vector<WireHit*>& wire) {
+    for(int j = 0; j < NColHit; j++) {
+      int marley_index=0;
+      if (Hit_True_MarleyIndex != NULL) {
+        marley_index=(*Hit_True_MarleyIndex)[j];
+      }
+      if((*Hit_Chan)[j] > fAPA_Channel[fNAPA])
+        continue;
+      WireHit* wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
+                                (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
+                                (*Hit_True_Energy)[j], (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
+                                0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
+                                0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
+                                0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
+                                (*Hit_True_X)[j],      (*Hit_True_Y)[j],        (*Hit_True_Z)[j],
+                                marley_index,          (*Hit_True_nElec)[j]);
+      if (wh->GetChannel() < 200000 ||
+          abs(wh->GetPosition(kX)) < 20000 ||
+          abs(wh->GetPosition(kY)) < 20000 ||
+          abs(wh->GetPosition(kZ)) < 20000 ||
+          abs(wh->GetPosition(kT)) < 20000) {
+        wire.push_back(wh);
+      } else {
+        std::cout << "Messed up wire hit" << std::endl;
+        delete wh;
+        wh = NULL;
+      }
+    }
+  };
+  
+  void GetOpticalHits(std::vector<OpticalHit*>& opti) {
+    for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
+      int marley_index=0;
+      OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
+                                      (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
+                                      (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
+                                      (*PDS_OpHit_OpChannel)[j]);
+      oh->SetTrueEnergy((*True_ENu)[marley_index]);
+      oh->SetMarleyIndex(marley_index);
+
+      if (oh->GetChannel() < 200000 ||
+          abs(oh->GetPosition(kX)) < 20000 ||
+          abs(oh->GetPosition(kY)) < 20000 ||
+          abs(oh->GetPosition(kZ)) < 20000 ||
+          abs(oh->GetPosition(kT)) < 20000) {
+        opti.push_back(oh);
+      } else {
+        std::cout << "Messed up optical hit" << std::endl;
+        delete oh;
+        oh = NULL;
+      }
+    }
+  };
   
   ~SNAnaInputManager(){
     delete Hit_View                 ; Hit_View                  = NULL;
@@ -720,10 +777,16 @@ public:
     t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
     t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
     t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
-    
   };
   
+public:
+  void SetAPAChannelMap(std::map<int,int>& m) { fAPA_Channel = m; };
+  std::map<int,int>  GetAPAChannelMap() const { return fAPA_Channel; };
+  void SetNAPA(int s=12) { fNAPA =s; };
+  int  GetNAPA() const { return fNAPA; };
   
+private:
+  int fNAPA;
 };
   
 #endif

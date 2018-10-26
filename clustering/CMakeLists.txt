@@ -11,6 +11,7 @@ find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
 find_package(Boost REQUIRED)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -Werror -std=c++11")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 

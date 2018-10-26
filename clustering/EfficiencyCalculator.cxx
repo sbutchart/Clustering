@@ -43,7 +43,6 @@ int main (int argc, char** argv) {
     }
   }
 
-  TFile* InFile = new TFile(InFileName.c_str(),"READ");
   std::map<int,ArbitraryAnaInputManager*> aaim;
   aaim[1600] = new ArbitraryAnaInputManager();
   aaim[2000] = new ArbitraryAnaInputManager();
@@ -77,7 +76,7 @@ int main (int argc, char** argv) {
   std::map<int, TH2D*>    th2d_nSignalCluster;
 
   ClusterEngine clusteng;
-  SimpleWireTrigger wiretrigger;
+  SimpleTrigger wiretrigger;
 
   clusteng.SetTimeWindow   (20);
   clusteng.SetChannelWidth (2);
@@ -85,10 +84,10 @@ int main (int argc, char** argv) {
   clusteng.SetPositionOpt  (300);
   clusteng.SetBucketSize   (1);
       
-  wiretrigger.SetNHitsMin    (6);
-  wiretrigger.SetNChanMin    (2);
-  wiretrigger.SetChanWidthMin(0);
-  wiretrigger.SetSADCMin     (0);
+  wiretrigger.SetWireNHitsMin    (6);
+  wiretrigger.SetWireNChanMin    (2);
+  wiretrigger.SetWireChanWidthMin(0);
+  wiretrigger.SetWireSADCMin     (0);
 
   for (auto const& it: aaim) {
     int fNEvent = nEvent;
@@ -128,7 +127,7 @@ int main (int argc, char** argv) {
       im->GetEntry(CurrentEvent);
       std::vector<WireHit*> vec_WireHit;
       double nhit[2] = {0,0};
-      for (int j=0; j<im->Hit_View->size(); ++j) {
+      for (size_t j=0; j<im->Hit_View->size(); ++j) {
         WireHit* hit = new WireHit((*im->Hit_View)[j],        (*im->Hit_True_GenType)[j],  (*im->Hit_Chan)[j],
                                    (*im->Hit_Time)[j],        (*im->Hit_SADC)[j],          (*im->Hit_RMS)[j],
                                    (*im->Hit_True_Energy)[j], (*im->Hit_True_EvEnergy)[j], (*im->Hit_True_MainTrID)[j],
@@ -143,9 +142,9 @@ int main (int argc, char** argv) {
       int nnoisecluster = 0;
       std::vector<WireCluster*> vec_WireCluster;
       clusteng.ClusterHits2(vec_WireHit, vec_WireCluster);
-      wiretrigger.SetIsSelected(vec_WireCluster);
+      wiretrigger.IsTriggering(vec_WireCluster);
 
-      for (int c=0; c<vec_WireCluster.size(); ++c) {
+      for (size_t c=0; c<vec_WireCluster.size(); ++c) {
         WireCluster* clust = vec_WireCluster[c];
         if (clust->GetIsSelected()) {
           if (clust->GetType()) {
@@ -157,16 +156,6 @@ int main (int argc, char** argv) {
         }
       }
 
-      double VertStartX = im->True_Prim_VertStartX->at(0);
-      double VertStartY = im->True_Prim_VertStartY->at(0);
-      double VertStartZ = im->True_Prim_VertStartZ->at(0);
-      double VertEndX   = im->True_Prim_VertEndX  ->at(0);
-      double VertEndY   = im->True_Prim_VertEndY  ->at(0);
-      double VertEndZ   = im->True_Prim_VertEndZ  ->at(0);
-      double range = sqrt(( VertStartX - VertEndX ) * ( VertStartX - VertEndX ) +
-                          ( VertStartY - VertEndY ) * ( VertStartY - VertEndY ) +
-                          ( VertStartZ - VertEndZ ) * ( VertStartZ - VertEndZ ));
-     
       double KE = im->True_Prim_Energy->at(0) * 1000. - 0.511;
       effEnergy     [adc_threshold]->Fill(selected     , KE);
       nNoiseHit     [adc_threshold]->Fill(KE, nhit[1]      );

@@ -6,160 +6,95 @@
 #include "OpticalCluster.hh"
 
 class Trigger {
+public:
+  virtual ~Trigger(){};
+
 protected:
   Trigger (){};
-  ~Trigger(){};
 
-  virtual void SetIsSelected(Cluster*) const = 0;
-  virtual void SetIsSelected(const std::vector<Cluster*>& clust) const {
-    for(auto const& it: clust)
-      SetIsSelected(it);
+public:
+  virtual bool IsTriggering(WireCluster&    c) const { c. SetIsTriggering(true); return true; };
+  virtual bool IsTriggering(OpticalCluster& c) const { c. SetIsTriggering(true); return true; };
+  virtual bool IsTriggering(WireCluster*    c) const { c->SetIsTriggering(true); return true; };
+  virtual bool IsTriggering(OpticalCluster* c) const { c->SetIsTriggering(true); return true; };
+  virtual bool IsTriggering(const std::vector<WireCluster*   >& c) const {
+    bool trigger=false;
+    for (auto const& it: c)
+      if (IsTriggering(it)) trigger = true;
+    return trigger;
   };
-  virtual void SetIsSelected(const std::vector<Cluster*>* clust) const {
-    SetIsSelected(*clust);
+  virtual bool IsTriggering(const std::vector<OpticalCluster*>& c) const {
+    bool trigger=false;
+    for (auto const& it: c)
+      if (IsTriggering(it)) trigger = true;
+    return trigger;
   };
-
-
-  virtual size_t CountAreSelected(const std::vector<Cluster*>& clust) const {
-    size_t count = 0;
-    for (auto const& it:clust)
-      count += it->GetIsSelected();
-    return count;
+  // by default does an OR
+  virtual bool IsTriggering(const std::vector<WireCluster*   >& wc,
+                            const std::vector<OpticalCluster*>& oc) const {
+    for (auto const& it: wc)
+      if (IsTriggering(it)) return true;
+    for (auto const& it: oc)
+      if (IsTriggering(it)) return true;
+    return false;
   };
-  virtual size_t CountAreSelected(const std::vector<Cluster*>* clust) const {
-    return CountAreSelected(*clust);
-  };
-
-  virtual size_t CountAreNotSelected(const std::vector<Cluster*>& clust) const {
-    return clust.size() - CountAreSelected(clust);
-  };
-  
-  virtual size_t CountAreNotSelected(const std::vector<Cluster*>* clust) const {
-    return CountAreNotSelected(*clust);
-  };
-
 };
 
 
-class SimpleWireTrigger: public Trigger {
+
+// A simple trigger
+class SimpleTrigger: public Trigger {
 public:
-  SimpleWireTrigger(const int hit=0,
-                    const int chan=0,
-                    const double chanwidth=0,
-                    const double sadc=0):
-    Trigger(),
-    fNHitsMin(hit),
-    fNChanMin(chan),
-    fChanWidthMin(chanwidth),
-    fSADCMin(sadc) {};
+  SimpleTrigger(const size_t whit      =0,
+                const size_t wchan     =0,
+                const double wchanwidth=0,
+                const double wsadc     =0,
+                const size_t ohit      =0):
+    fWireNHitsMin    (whit      ),
+    fWireNChanMin    (wchan     ),
+    fWireChanWidthMin(wchanwidth),
+    fWireSADCMin     (wsadc     ),
+    fOptiNHitsMin    (ohit      ){};
   
-  ~SimpleWireTrigger(){};
+  ~SimpleTrigger(){};
   
-  void SetNHitsMin    (const int    i) { fNHitsMin     = i; };
-  void SetNChanMin    (const int    i) { fNChanMin     = i; };
-  void SetChanWidthMin(const double i) { fChanWidthMin = i; };
-  void SetSADCMin     (const double i) { fSADCMin      = i; };
+  void SetWireNHitsMin    (const int    i) { fWireNHitsMin     = i; };
+  void SetWireNChanMin    (const int    i) { fWireNChanMin     = i; };
+  void SetWireChanWidthMin(const double i) { fWireChanWidthMin = i; };
+  void SetWireSADCMin     (const double i) { fWireSADCMin      = i; };
+  void SetOptiNHitsMin    (const int    i) { fOptiNHitsMin     = i; };
+  
+  int    GetWireNHitsMin    () const { return fWireNHitsMin    ; };
+  int    GetWireNChanMin    () const { return fWireNChanMin    ; };
+  double GetWireChanWidthMin() const { return fWireChanWidthMin; };
+  double GetWireSADCMin     () const { return fWireSADCMin     ; };
+  int    GetOptiNHitsMin    () const { return fOptiNHitsMin    ; };
 
-  int    GetNHitsMin    () const { return fNHitsMin    ; };
-  int    GetNChanMin    () const { return fNChanMin    ; };
-  double GetChanWidthMin() const { return fChanWidthMin; };
-  double GetSADCMin     () const { return fSADCMin     ; };
-
+  using Trigger::IsTriggering;
   
-  void SetIsSelected(Cluster* c) const {
-    WireCluster* wc = (WireCluster*)c;
-    c->SetIsSelected(true);
-    if (wc->GetNHit()         < fNHitsMin    ) { c->SetIsSelected(false); return; }
-    if (wc->GetNChannel()     < fNChanMin    ) { c->SetIsSelected(false); return; }
-    if (wc->GetChannelWidth() < fChanWidthMin) { c->SetIsSelected(false); return; }
-    if (wc->GetHitSumADC()    < fSADCMin     ) { c->SetIsSelected(false); return; }
-  };
-  
-  void SetIsSelected(const std::vector<WireCluster*>& clust) const {
-    for(auto const& it: clust) {
-      SetIsSelected(it);
-    }
-  };
-  
-  void SetIsSelected(const std::vector<WireCluster*>* clust) const {
-    SetIsSelected(*clust);
+  bool IsTriggering(WireCluster* c) const {
+    c->SetIsTriggering(true);
+    if (c->GetNHit()         < fWireNHitsMin    ) { c->SetIsTriggering(false); return false; }
+    if (c->GetNChannel()     < fWireNChanMin    ) { c->SetIsTriggering(false); return false; }
+    if (c->GetChannelWidth() < fWireChanWidthMin) { c->SetIsTriggering(false); return false; }
+    if (c->GetHitSumADC()    < fWireSADCMin     ) { c->SetIsTriggering(false); return false; }
+    return true;
   };
 
-  virtual size_t CountAreSelected(const std::vector<WireCluster*>& clust) const {
-    size_t count = 0;
-    for (auto const& it:clust)
-      count += it->GetIsSelected();
-    return count;
-  };
-  virtual size_t CountAreSelected(const std::vector<WireCluster*>* clust) const {
-    return CountAreSelected(*clust);
+  bool IsTriggering(OpticalCluster* c) const {
+    c->SetIsTriggering(true);
+    if (c->GetNHit()         < fOptiNHitsMin    ) { c->SetIsTriggering(false); return false; }
+    return true;
   };
 
-  virtual size_t CountAreNotSelected(const std::vector<WireCluster*>& clust) const {
-    return clust.size() - CountAreSelected(clust);
-  };
-  
-  virtual size_t CountAreNotSelected(const std::vector<WireCluster*>* clust) const {
-    return CountAreNotSelected(*clust);
-  };
+
 
 private:
-  int    fNHitsMin;
-  int    fNChanMin;
-  double fChanWidthMin;
-  double fSADCMin;
-
-};
-
-
-class SimpleOpticalTrigger: public Trigger {
-public:
-  SimpleOpticalTrigger(const int hit=0):
-    Trigger(),
-    fNHitsMin(hit){};
-  
-  ~SimpleOpticalTrigger(){};
-  
-  void SetNHitsMin(const int i) { fNHitsMin = i; };
-  int  GetNHitsMin() const { return fNHitsMin; };
-
-  
-  void SetIsSelected(Cluster* c) const {
-    OpticalCluster* wc = (OpticalCluster*)c;
-    c->SetIsSelected(true);
-    if (wc->GetNHit() < fNHitsMin) { c->SetIsSelected(false); return; }
-  };
-  
-  void SetIsSelected(const std::vector<OpticalCluster*>& clust) const {
-    for(auto const& it: clust) {
-      SetIsSelected(it);
-    }
-  };
-  
-  void SetIsSelected(const std::vector<OpticalCluster*>* clust) const {
-    SetIsSelected(*clust);
-  };
-
-  virtual size_t CountAreSelected(const std::vector<OpticalCluster*>& clust) const {
-    size_t count = 0;
-    for (auto const& it:clust)
-      count += it->GetIsSelected();
-    return count;
-  };
-  virtual size_t CountAreSelected(const std::vector<OpticalCluster*>* clust) const {
-    return CountAreSelected(*clust);
-  };
-
-  virtual size_t CountAreNotSelected(const std::vector<OpticalCluster*>& clust) const {
-    return clust.size() - CountAreSelected(clust);
-  };
-  
-  virtual size_t CountAreNotSelected(const std::vector<OpticalCluster*>* clust) const {
-    return CountAreNotSelected(*clust);
-  };
-
-private:
-  int fNHitsMin;
+  size_t fWireNHitsMin    ;
+  size_t fWireNChanMin    ;
+  double fWireChanWidthMin;
+  double fWireSADCMin     ;
+  size_t fOptiNHitsMin    ;
 };
 
 

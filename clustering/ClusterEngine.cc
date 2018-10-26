@@ -175,7 +175,7 @@ void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
                   bucket[vec_TempHit[ii]].push_back(vec_TempHit[j]);
           }
       }
-      int max_threshold = 0;
+      size_t max_threshold = 0;
       OpticalHit* optical_hit_idx;
       for (size_t iii=0; iii<vec_TempHit.size(); iii++){
           size_t bucket_size = bucket[vec_TempHit[iii]].size();

@@ -64,7 +64,8 @@ void FillEventCountMap(int nhit,
   
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
-    if (in_GenType->size() < nhit) continue;
+    if ((int)in_GenType->size() < nhit) continue;
+
     if (in_Type == 1) {
       map_ConfigEventIndex_nSignCluster[in_Config][in_Event][in_MarleyIndex]++;
     } else {
@@ -83,23 +84,30 @@ void GetEfficiency(const int Config,
                    std::map<int,int> const& nMarleyEvent,
                    std::pair<double,double>& efficiency) {
 
-  for(auto const& it0 : map_ConfigEventIndex_nSignCluster) {
+  for (auto const& it0 : map_ConfigEventIndex_nSignCluster) {
+    
     int ThisConfig = it0.first;
     if (ThisConfig != Config) continue;
     std::map<int, std::map<int,int>> const& map_EventIndex_nSignCluster = it0.second;
     efficiency.first = 0;
-    for(auto const& it1 : map_EventIndex_nSignCluster) {
+    double nMarley=0;
+
+    for (auto const& it1: nMarleyEvent) {
       int ThisEvent = it1.first;
-      std::map<int,int> const& map_Index_nSignCluster = it1.second;
-      for (int iMarley=0; iMarley<nMarleyEvent.at(ThisEvent); ++iMarley) {
-        if (map_Index_nSignCluster.find(iMarley) != map_Index_nSignCluster.end())
-          if (map_Index_nSignCluster.at(iMarley) > 0)
-            efficiency.first++;
+      int nMarley_ThisEvent = it1.second;
+      nMarley += nMarley_ThisEvent;
+      
+      if (map_EventIndex_nSignCluster.find(ThisEvent) != map_EventIndex_nSignCluster.end()) {
+        std::map<int,int> const& map_Index_nSignCluster = map_EventIndex_nSignCluster.at(ThisEvent);
+
+        for (int iMarley=0; iMarley<nMarley_ThisEvent; ++iMarley) {
+          if (map_Index_nSignCluster.find(iMarley) != map_Index_nSignCluster.end())
+            if (map_Index_nSignCluster.at(iMarley) > 0)
+              efficiency.first++;
+        }
       }
     }
-    double nMarley=0;
-    for(auto const& itEvent : nMarleyEvent)
-      nMarley += itEvent.second;
+
     std::cout << efficiency.first << " signal events in config " << Config
               << " (" << nMarley << " were generated)." << std::endl;
     efficiency.second = sqrt(1./efficiency.first+1./((double)nMarley));
@@ -157,6 +165,7 @@ int main(int argc, char** argv) {
 
   if (nHit < 0) {
     std::cout << "You have to set nhit cut (option -h)" << std::endl;
+    std::cout << "For now, use all the cluster without any restriction on the number of hits." << std::endl;
   }
   
   Clustering c;
@@ -269,5 +278,9 @@ int main(int argc, char** argv) {
                << ", SN efficiency: " << map_Config_OpticalEff[c].first << " +/- " << map_Config_OpticalEff[c].second
                << " Background rate in 10kt (Hz): " << map_Config_OpticalBackRate[c].first << " +/- " << map_Config_OpticalBackRate[c].second << std::endl;
   }
+
+  
+
   return 0;
+
 }

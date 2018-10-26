@@ -75,12 +75,12 @@ int main(int argc, char** argv){
   }
 
   // Translate these from area normalised to actual fluxes
-  for (size_t i=0; i<flux_B8->GetN(); ++i) {
+  for (int i=0; i<flux_B8->GetN(); ++i) {
     double E, flux;
     flux_B8->GetPoint(i, E, flux);
     flux_B8->SetPoint(i, E, flux*5.69e+06);
   }
-  for (size_t i=0; i<flux_HEP->GetN(); ++i) {
+  for (int i=0; i<flux_HEP->GetN(); ++i) {
     double E, flux;
     flux_HEP->GetPoint(i, E, flux);
     flux_HEP->SetPoint(i, E, flux*7.93e+03);
@@ -132,14 +132,14 @@ int main(int argc, char** argv){
   //                   10  k     T->kg in g     
   double rate_factor = 10.*1000.*1000.*1000.*6.022140857e23/39.948*60.*60.*24./3.; // 10kT (in g) * avogadro number / molar mass of argon * (seconds/day) * oscillation probability (1./3.)
   
-  for (size_t i=0; i<flux_HEP->GetN(); ++i) {
+  for (int i=0; i<flux_HEP->GetN(); ++i) {
     double E, HEP;
     flux_HEP->GetPoint(i, E, HEP);
     double cross_section = xsec2->Eval(E);
     rate_HEP->SetPoint(i, E, HEP * rate_factor * cross_section);
   }
   
-  for (size_t i=0; i<flux_B8->GetN(); ++i) {
+  for (int i=0; i<flux_B8->GetN(); ++i) {
     double E, B8;
     flux_B8->GetPoint(i, E, B8);
     double cross_section = xsec2->Eval(E);
@@ -150,13 +150,13 @@ int main(int argc, char** argv){
   double dum;
   flux_HEP->GetPoint(flux_HEP->GetN()-1,E_max, dum);
   std::vector<double> E_all_vec;
-  for (size_t i=0; i<flux_HEP->GetN(); ++i) {
+  for (int i=0; i<flux_HEP->GetN(); ++i) {
     double E, HEP;
     flux_HEP->GetPoint(i, E, HEP);
     E_all_vec.push_back(E);
   }
   
-  for (size_t i=0; i<flux_B8->GetN(); ++i) {
+  for (int i=0; i<flux_B8->GetN(); ++i) {
     double E, B8;
     flux_B8->GetPoint(i, E, B8);
     E_all_vec.push_back(E);
@@ -213,7 +213,7 @@ int main(int argc, char** argv){
   leg_rate->Draw();
   c->Print("SolarWeights.pdf");
   TH1D* rate_tot_th1 = new TH1D("rate_tot_th1","",100,3,20);
-  for (size_t i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
+  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
     rate_tot_th1->SetBinContent(i, std::max(0.,rate_Tot->Eval(rate_tot_th1->GetBinCenter(i))));
     rate_tot_th1->SetBinError(i, 0);
   }
@@ -222,7 +222,7 @@ int main(int argc, char** argv){
   TH1D* integrated_rate_tot_th1 = new TH1D("integrated_rate_tot_th1",
                                            ";E_{threshold} [MeV];Events / 10 kT / day",
                                            100,3,20);
-  for (size_t i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
+  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
     integrated_rate_tot_th1->SetBinContent(i, rate_tot_th1->Integral(i, rate_tot_th1->GetXaxis()->GetNbins()));
   }
   

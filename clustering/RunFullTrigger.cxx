@@ -1,4 +1,7 @@
-#include "Clustering.hh"
+
+
+
+#include "AdvancedClustering.hh"
 
 int main(int argc, char** argv){
     int opt;
@@ -8,7 +11,6 @@ int main(int argc, char** argv){
 
   int nEvent=-1;
   int PrintLevel=-1;
-  int nAPA=-1;
   int Config=-1;
   int Offset=0;
   std::string InputFile    = "";
@@ -17,9 +19,6 @@ int main(int argc, char** argv){
   std::string InputTree    = "";
   while ( (opt = getopt(argc, argv, "n:p:i:o:t:e:a:c:s:f:")) != -1 ) {  // for each option...
     switch ( opt ) {
-    case 'a':
-      nAPA = atoi(optarg);
-      break;
     case 'n':
       nEvent = atoi(optarg);
       break;
@@ -41,25 +40,19 @@ int main(int argc, char** argv){
     case 't':
       InputTree = std::string(optarg);
       break;
-    case 'e':
-      ERecoXMLFile = std::string(optarg);
-      break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
       break;
     }
   }
-  Clustering c;
+
+  AdvancedClustering c;
   c.SetInputFile   (InputFile   );
-  c.SetConfig      (Config      );
   c.SetOffset      (Offset      );
-  c.SetNAPA        (nAPA        );
-  c.SetERecoXMLFile(ERecoXMLFile);
   c.SetInputTree   (InputTree   );
   c.SetOutputFile  (OutputFile  );
   c.SetPrintLevel  (PrintLevel  );
-  c.Initialise();
-  c.ClusterAll(nEvent);
-  
-  return 0;
+  return c.ClusterAll(nEvent  );
 };
+
+

@@ -15,17 +15,17 @@ struct ClusterEnsemble {
   ClusterEnsemble():
     nWireCluster      (0),
     nOpticalCluster   (0),
-    PeakWireCluster   (0),
-    PeakOpticalCluster(0), 
     nHitWireCluster   (0),
-    nHitOpticalCluster(0) {};
+    nHitOpticalCluster(0),
+    PeakWireCluster   (0),
+    PeakOpticalCluster(0){};
   ClusterEnsemble(const ClusterEnsemble& c):
     nWireCluster      (c.nWireCluster      ),
     nOpticalCluster   (c.nOpticalCluster   ),
-    PeakWireCluster   (c.PeakWireCluster   ),
-    PeakOpticalCluster(c.PeakOpticalCluster),
     nHitWireCluster   (c.nHitWireCluster   ),
-    nHitOpticalCluster(c.nHitOpticalCluster){};
+    nHitOpticalCluster(c.nHitOpticalCluster),
+    PeakWireCluster   (c.PeakWireCluster   ),
+    PeakOpticalCluster(c.PeakOpticalCluster){};
   
   size_t nWireCluster;
   size_t nOpticalCluster;
@@ -47,23 +47,12 @@ struct ClusterEnsemble {
 
 class BiTrigger: public Trigger{
 public:
-  BiTrigger(double tt, double ty, double tz):
-    Trigger(),
-    fTolerance_Time(tt),
-    fTolerance_YDir(ty),
-    fTolerance_ZDir(tz){};
   BiTrigger():
     Trigger(),
-    fTolerance_Time(0),
-    fTolerance_YDir(0),
-    fTolerance_ZDir(0),
     fTot_WireNCluster_Sign(0),
     fTot_WireNCluster_Back(0),
     fTot_OptiNCluster_Sign(0),
     fTot_OptiNCluster_Back(0){};
-  void SetIsSelected(Cluster* c) const { c->SetIsSelected(true); };
-  void SetIsSelected(std::vector<WireCluster*>&w,
-                     std::vector<OpticalCluster*>&o) {};
   void AddEventToStudy(const std::vector<std::unique_ptr<WireCluster>>& wc,
                        const std::vector<std::unique_ptr<OpticalCluster>>& oc);
   void FinishStudy();
@@ -96,10 +85,6 @@ public:
   };
   
 private:
-  double fTolerance_Time;
-  double fTolerance_YDir;
-  double fTolerance_ZDir;
-
   TGraph* fPt_nClu_Sign;
   TGraph* fPt_nClu_Back;
   TGraph* fPt_Peak_Sign;

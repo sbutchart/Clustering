@@ -7,31 +7,9 @@ void BiTrigger::AddEventToStudy(const std::vector<std::unique_ptr<WireCluster>>&
   std::map<size_t,std::vector<ClusterEnsemble>> apa_cluster_sign;
   std::map<size_t,std::vector<ClusterEnsemble>> apa_cluster_back;
 
-  // for (int iAPA=0; iAPA<12; ++iAPA) {
-  //   apa_cluster_sign[iAPA].push_back(ClusterEnsemble());
-  //   apa_cluster_back[iAPA].push_back(ClusterEnsemble());
-  // }
   apa_cluster_sign[0].push_back(ClusterEnsemble());
   apa_cluster_back[0].push_back(ClusterEnsemble());
   
-  // for (auto const& it: wc) {
-  //   if (it->GetType() == 1) {
-  //     apa_cluster_sign[it->GetAPA()].back().AddCluster(*it);
-  //   } else {
-  //     apa_cluster_sign[it->GetAPA()].back().AddCluster(*it);
-  //     apa_cluster_back[it->GetAPA()].back().AddCluster(*it);
-  //   }
-  // }
-
-  // for (auto const& it: oc) {
-  //   if (it->GetType() == 1) {
-  //     apa_cluster_sign[it->GetAPA()].back().AddCluster(*it);
-  //   } else {
-  //     apa_cluster_sign[it->GetAPA()].back().AddCluster(*it);
-  //     apa_cluster_back[it->GetAPA()].back().AddCluster(*it);
-  //   }
-  // }
-
   for (auto const& it: wc) {
     if (it->GetType() == 1) {
       apa_cluster_sign[0].back().AddCluster(*it);

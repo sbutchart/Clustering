@@ -42,6 +42,7 @@ std::map<GenType, TH2D*> PhotonWirePositionDisplay::SetUpHistos2D(const std::str
     map_h2[it.first] = new TH2D(("gr_"+it.second).c_str(), (it.second+";"+XAxis+";"+YAxis).c_str(),
                                 nbinX, minX, maxX, nbinY, minY, maxY);
     map_h2[it.first]->SetStats(0);
+    map_h2[it.first]->SetTitle(Title.c_str());
   }
   return map_h2;
 };
@@ -65,16 +66,17 @@ PhotonWirePositionDisplay::PhotonWirePositionDisplay(std::string F, std::string 
 
 
 void PhotonWirePositionDisplay::DisplayEvent(int event, int type){
+  (void)type;
   im.GetEntry(event);
 
   for (size_t hit=0; hit<im.PDS_OpHit_OpChannel->size(); ++hit) {
     GenType gen = ConvertIntToGenType((*im.PDS_OpHit_True_GenType)[hit]);
-    map_h2_PosHit  [gen]->Fill((*im.PDS_OpHit_Z        )[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
-    map_h2_PosHit  [kAll]->Fill((*im.PDS_OpHit_Z        )[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
+    map_h2_PosHit[gen] ->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
+    map_h2_PosHit[kAll]->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
   }
 
   for (size_t hit=0; hit<im.Hit_Chan->size(); ++hit) {
-    GenType gen =  ConvertIntToGenType((*im.Hit_True_GenType)[hit]);
+    GenType gen = ConvertIntToGenType((*im.Hit_True_GenType)[hit]);
     CreateGraphHit(map_map_gr_wire[gen],  hit);
     CreateGraphHit(map_map_gr_wire[kAll], hit);
   }

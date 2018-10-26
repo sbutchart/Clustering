@@ -12,8 +12,8 @@ public:
     fMC_UnderlyingE(0),
     fNElectron     (0){
   };
-    
-  ~WireCluster() {};
+  
+  virtual ~WireCluster() {};
   using Cluster::Print;
   bool   GetIsSelected    () const { return fIsSelected                  ; };
   double GetHitSumADC     () const { return fSumPeak                     ; };
@@ -22,6 +22,7 @@ public:
   
 protected:
   virtual void SetTypeFromSumHit(const std::map<GenType,double>& nHit) {
+    (void)nHit;
     fTrueGenType = kOther;
     int sign=0;
     for (auto const& it: fHit) {

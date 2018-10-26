@@ -24,7 +24,6 @@ public:
     fLookupDiscriminator = NULL;
   };
 
-  void SetIsSelected(Cluster* c) const {};
   void SetIsSelected(const std::vector<Cluster*>&) const;
 
   void ConstructLikelihood(const std::string, const std::string);
