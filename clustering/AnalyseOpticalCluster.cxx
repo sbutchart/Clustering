@@ -22,15 +22,14 @@ TProfile* SetUpTProfileGenType(std::string name, std::string title) {
   for(auto const& it : h.ShortGenName)
     p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
   return p_;
-  
-};
+}
 
 std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
   std::map<int,int> map_;
   for(std::vector<int>::const_iterator it=GenType->begin(); it!=GenType->end(); ++it)
     map_[*it]++;
   return map_;
-};
+}
 
 
 int main(int argc, char** argv){
@@ -422,5 +421,4 @@ int main(int argc, char** argv){
   c.Print((OutputFile+"]").c_str());
   return 1;
 
-};
-
+}

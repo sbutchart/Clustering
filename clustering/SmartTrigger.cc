@@ -9,7 +9,7 @@ SmartTrigger::SmartTrigger(const std::string f):
   fFeature(f),
   fConfig(-1),
   fThreshold(0) {
-};
+}
 
 
 void SmartTrigger::SetResultFromCache(const std::string f) {
@@ -23,7 +23,7 @@ void SmartTrigger::SetResultFromCache(const std::string f) {
   fLookupDiscriminator->SetDirectory(NULL);
 
   file->Close();
-};
+}
 
 
 void SmartTrigger::SetIsSelected(const std::vector<Cluster*>& c) const {
@@ -35,7 +35,7 @@ void SmartTrigger::SetIsSelected(const std::vector<Cluster*>& c) const {
   } else {
     for (auto const& it: c) it->SetIsSelected(false);
   }
-};
+}
 
 
 void SmartTrigger::SetBinning(const std::vector<double> binning) {
@@ -57,7 +57,7 @@ void SmartTrigger::SetBinning(const std::vector<double> binning) {
   fLikelihood_Sign->Sumw2();
   fLikelihood_Back->Sumw2();
   fLookupDiscriminator->Sumw2();
-};
+}
 
 
 void SmartTrigger::ConstructLikelihood(const std::string InputFile,
@@ -111,7 +111,4 @@ void SmartTrigger::ConstructLikelihood(const std::string InputFile,
   OutFile.Close();
   InFile .Close();
 
-};
-
-
-
+}

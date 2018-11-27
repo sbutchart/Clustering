@@ -21,24 +21,12 @@ int main(int argc, char** argv){
   extern char *optarg;
   extern int  optopt;
 
-  int nHitCut=-1, RequestedConfig=0;
   std::string InputFile;
   std::string OutputFile;
-  int nEvent = 0;
-
-  while ( (opt = getopt(argc, argv, "h:o:i:n:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "o:i:")) != -1 ) {  // for each option...
     switch ( opt ) {
-    case 'h':
-      nHitCut = atoi(optarg);
-      break;
     case 'i':
       InputFile = optarg;
-      break;
-    case 'c':
-      RequestedConfig = atoi(optarg);
-      break;
-    case 'n':
-      nEvent = atoi(optarg);
       break;
     case 'o':
       OutputFile = optarg;

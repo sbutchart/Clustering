@@ -5,12 +5,12 @@ PhotonTimingDisplay::PhotonTimingDisplay(const std::string F, const std::string 
   position = NULL;
   energy   = NULL;
   f_map_gen_th1_timing = GetHistos("timing", ";Time [#mus];n Hits", 140, -4, 10);
-};
+}
 
 
 PhotonTimingDisplay::~PhotonTimingDisplay() {
   ResetAll();
-};
+}
 
 
 void PhotonTimingDisplay::AddArrow(const double time, const GenType gen) {
@@ -20,7 +20,7 @@ void PhotonTimingDisplay::AddArrow(const double time, const GenType gen) {
   ar->SetFillColor(vec_colors[gen]);
   ar->SetLineColor(kBlack);
   f_map_gen_arrow_truthtiming[gen].push_back(ar);
-};
+}
 
 
 void PhotonTimingDisplay::ResetAll(){
@@ -41,7 +41,7 @@ void PhotonTimingDisplay::ResetAll(){
   delete energy;
   position = NULL;
   energy   = NULL;
-};
+}
 
 
 void PhotonTimingDisplay::PlotAll(){
@@ -82,7 +82,7 @@ void PhotonTimingDisplay::PlotAll(){
     energy->Draw();
   }
     
-};
+}
 
 
 void PhotonTimingDisplay::DisplayEvent(const int event, const int type, const double time) {
@@ -162,4 +162,4 @@ void PhotonTimingDisplay::DisplayEvent(const int event, const int type, const do
   }
   c->Print("PhotonTimingDisplay.pdf]");
   
-};
+}

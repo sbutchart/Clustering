@@ -70,7 +70,7 @@ void ClusterEngine::ClusterHits2_stable_sort(std::vector<WireHit*>& vec_Hits,
   }
   Clustering_Time.push_back(((float)(clock() - fStopwatch0))/((float)CLOCKS_PER_SEC));
   
-};
+}
 
 
 void ClusterEngine::ClusterHits2_sort(std::vector<WireHit*>& vec_Hits,
@@ -135,7 +135,7 @@ void ClusterEngine::ClusterHits2_sort(std::vector<WireHit*>& vec_Hits,
   }
   Clustering_Time.push_back(((float)(clock() - fStopwatch0))/((float)CLOCKS_PER_SEC));
   
-};
+}
 
 
 void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
@@ -217,7 +217,7 @@ void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
   }
   Clustering_Time.push_back(((float)(clock() - fStopwatch0))/((float)CLOCKS_PER_SEC));
 
-};
+}
 
 
 void ClusterEngine::ClusterOpticalHits2(std::vector<OpticalHit*>& vec_OptHit,
@@ -269,12 +269,11 @@ void ClusterEngine::ClusterOpticalHits2(std::vector<OpticalHit*>& vec_OptHit,
       }
     }
   }
-};
+}
 
 
 void ClusterEngine::ClusterHits3(const std::vector<WireHit*>& vec_Hits,
-                                 std::vector<WireCluster*>& vec_Clusters)
-{
+                                 std::vector<WireCluster*>& vec_Clusters) {
   vec_Clusters.clear();
   if(vec_Hits.size() < 2) return;
   for(size_t i = 0; i < vec_Hits.size()-1; i++){
@@ -302,13 +301,11 @@ void ClusterEngine::ClusterHits3(const std::vector<WireHit*>& vec_Hits,
     }
   }
 
-};
-
+}
 
 
 void ClusterEngine::ClusterHits(const std::vector<WireHit*>& vec_Hits,
-                                std::vector<WireCluster*>& vec_Clusters)
-{
+                                std::vector<WireCluster*>& vec_Clusters) {
   vec_Clusters.clear();
 
   std::vector<WireHit*> LocalHits = vec_Hits;
@@ -352,4 +349,4 @@ void ClusterEngine::ClusterHits(const std::vector<WireHit*>& vec_Hits,
 
   }
 
-};
+}

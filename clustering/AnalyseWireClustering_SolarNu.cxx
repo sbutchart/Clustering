@@ -25,14 +25,14 @@ TProfile* SetUpTProfileGenType(std::string name, std::string title) {
     p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
   return p_;
   
-};
+}
 
 std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
   std::map<int,int> map_;
   for(std::vector<int>::const_iterator it=GenType->begin(); it!=GenType->end(); ++it)
     map_[*it]++;
   return map_;
-};
+}
 
 int main(int argc, char** argv){
   int opt;
@@ -40,17 +40,14 @@ int main(int argc, char** argv){
   extern char *optarg;
   extern int  optopt;
 
-  int nHitCut=-1, RequestedConfig=0;
+  int RequestedConfig=0;
   std::string InputFile;
   std::string OutputFile;
   std::string WeightFile;
   int nEvent = 0;
 
-  while ( (opt = getopt(argc, argv, "h:o:i:n:w:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "o:i:n:w:")) != -1 ) {  // for each option...
     switch ( opt ) {
-    case 'h':
-      nHitCut = atoi(optarg);
-      break;
     case 'i':
       InputFile = optarg;
       break;
@@ -286,4 +283,4 @@ int main(int argc, char** argv){
 
   return 1;
 
-};
+}

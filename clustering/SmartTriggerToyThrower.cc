@@ -35,8 +35,8 @@ void SmartTriggerToyThrower::ThrowToys() {
 
   double max_b = *max_element(discriminator_Back_vec.begin(), discriminator_Back_vec.end());
   double min_b = *min_element(discriminator_Back_vec.begin(), discriminator_Back_vec.end());
-  double max_s = *max_element(discriminator_Sign_vec.begin(), discriminator_Sign_vec.end());
-  double min_s = *min_element(discriminator_Sign_vec.begin(), discriminator_Sign_vec.end());
+  // double max_s; // = *max_element(discriminator_Sign_vec.begin(), discriminator_Sign_vec.end());
+  // double min_s; // = *min_element(discriminator_Sign_vec.begin(), discriminator_Sign_vec.end());
   double max = max_b;
   double min = min_b;//std::min(0, min_b);
   fDiscriminator_Sign = new TH1D("Discriminator_Sign", ";Discriminator;nEvents", 1000, min, max*2.);
@@ -50,8 +50,8 @@ void SmartTriggerToyThrower::ThrowToys() {
   
   max_b = *max_element(number_Back_vec.begin(), number_Back_vec.end());
   min_b = *min_element(number_Back_vec.begin(), number_Back_vec.end());
-  max_s = *max_element(number_Sign_vec.begin(), number_Sign_vec.end());
-  min_s = *min_element(number_Sign_vec.begin(), number_Sign_vec.end());
+  // max_s = *max_element(number_Sign_vec.begin(), number_Sign_vec.end());
+  // min_s = *min_element(number_Sign_vec.begin(), number_Sign_vec.end());
   max = max_b*2.;
   min = min_b;//std::min(0, min_b);
   fNumber_Sign = new TH1D("Number_Sign", ";Number of clusters;nEvents", max-min, min, max);
@@ -65,4 +65,4 @@ void SmartTriggerToyThrower::ThrowToys() {
 
   fToyThrown = true;
 
-};
+}

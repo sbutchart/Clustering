@@ -17,10 +17,9 @@ ClusterEnergyEstimator::ClusterEnergyEstimator(std::string f):
   fOutputData_Mean  (),
   fOutputData_StdDev(),
   fMethod(kUnknown),
-  fTimeElapsed()
-{
+  fTimeElapsed() {
   ParseXMLFile();
-};
+}
 
 ClusterEnergyEstimator::~ClusterEnergyEstimator() {
   if (fXML) delete fXML;
@@ -34,7 +33,7 @@ ClusterEnergyEstimator::~ClusterEnergyEstimator() {
   fOutputData_Mean  .clear();
   fOutputData_StdDev.clear();
   fTimeElapsed.clear();
-};
+}
 
 double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const {
 
@@ -63,7 +62,7 @@ double ClusterEnergyEstimator::EstimateEnergy(const WireCluster& cluster) const 
   RecoverFeature(ereco, fOutputData_Mean, fOutputData_StdDev);
   
   return ereco(0);
-};
+}
 
 vector<double> ClusterEnergyEstimator::NeuralNetwork(const vector<double>& Feature) const {
 
@@ -74,7 +73,7 @@ vector<double> ClusterEnergyEstimator::NeuralNetwork(const vector<double>& Featu
   vector<double> output_layer = prod(layer_1,fWeight_out);
   output_layer += row(fBias_out,0);
   return output_layer;
-};
+}
 
 vector<double> ClusterEnergyEstimator::LinearRegression(const vector<double>& Feature) const {
 
@@ -82,27 +81,25 @@ vector<double> ClusterEnergyEstimator::LinearRegression(const vector<double>& Fe
   output = prod(Feature,fWeight_out);
   output += row(fBias_out,0);
   return output;
-};
-
+}
 
 void ClusterEnergyEstimator::NormaliseFeature(vector<double>& Feature,
                                               const vector<double> Mean,
                                               const vector<double> StdDev) const {
   Feature = element_div(Feature-Mean, StdDev);
-};
+}
 
 void ClusterEnergyEstimator::RecoverFeature(vector<double>& Feature,
                                             const vector<double> Mean,
                                             const vector<double> StdDev) const {
   Feature = element_prod(Feature, StdDev) + Mean;
-};
-
+}
 
 void ClusterEnergyEstimator::EstimateEnergy(const std::vector<WireCluster*>& clusters) const {
   for (auto& it : clusters)
     it->SetRecoEnergy(EstimateEnergy(*it));
   return;
-};
+}
 
 void ClusterEnergyEstimator::ParseXMLFile() {
 
@@ -196,9 +193,7 @@ void ClusterEnergyEstimator::ParseXMLFile() {
   fXML->FreeDoc(xmldoc);
   PrintTestCluster();
 
-};
-
-
+}
 
 void ClusterEnergyEstimator::PrintTestCluster() const {
 
@@ -224,8 +219,7 @@ void ClusterEnergyEstimator::PrintTestCluster() const {
     break;
   }
   
-};
-
+}
 
 void ClusterEnergyEstimator::ParseXMLFileLinearRegression(std::map<std::string,XMLNodePointer_t> map_main) {
   std::string content;
@@ -278,8 +272,7 @@ void ClusterEnergyEstimator::ParseXMLFileLinearRegression(std::map<std::string,X
   content = fXML->GetNodeContent(map_bias_out["Layer_1_0"]);
   double d = stod(content);
   fBias_out(0,0) = d;
-};
-
+}
 
 void ClusterEnergyEstimator::ParseXMLFileNeuralNetwork(std::map<std::string,XMLNodePointer_t> map_main) {
 
@@ -360,8 +353,7 @@ void ClusterEnergyEstimator::ParseXMLFileNeuralNetwork(std::map<std::string,XMLN
     fBias_out(0,0) = d;
   }
 
-};
-
+}
 
 void ClusterEnergyEstimator::LoadChildAndAssertExistance(const XMLNodePointer_t node,
                                                          std::map<std::string,XMLNodePointer_t>& map_name_node,
@@ -391,7 +383,4 @@ void ClusterEnergyEstimator::LoadChildAndAssertExistance(const XMLNodePointer_t 
   }
   std::cout << "DONE Checking node "  << fXML->GetNodeName(node) << std::endl;
     
-};
-
-
-
+}

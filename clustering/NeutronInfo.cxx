@@ -147,7 +147,7 @@ void NeutronInspector::ExecuteInLoop(){
       }
     }
   }
-};
+}
 
 int main(int argc, char** argv) {
 
@@ -156,4 +156,4 @@ int main(int argc, char** argv) {
   in.SaveHistos();
   return 1;
 
-};
+}

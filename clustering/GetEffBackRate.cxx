@@ -19,7 +19,7 @@ std::map<int,double> map_TypeToWeight;
 
 double getWeight(const int ClusterType) {
   return map_TypeToWeight[ClusterType];
-};
+}
 
 
 int getClusterType(const std::vector<int>* vec_GenType) {
@@ -38,7 +38,7 @@ int getClusterType(const std::vector<int>* vec_GenType) {
   }
 
   return type;
-};
+}
 
 
 void FillEventCountMap(int nhit,
@@ -76,7 +76,7 @@ void FillEventCountMap(int nhit,
   }
   return;
   
-};
+}
 
 
 void GetEfficiency(const int Config,
@@ -116,7 +116,7 @@ void GetEfficiency(const int Config,
     return;
   }
   
-};
+}
 
 void GetBackgroundRate(const int Config,
                        const std::map<int,double> map_Config_nBackCluster,
@@ -128,7 +128,7 @@ void GetBackgroundRate(const int Config,
   BackgroundRate.first = map_Config_nBackCluster.at(Config) / ((double) nEvent * EventTime) / (DetectorScaling); 
   BackgroundRate.second = sqrt(1./map_Config_nBackCluster.at(Config)+1./((double)nEvent)) * BackgroundRate.first;
   return;
-};
+}
 
 int main(int argc, char** argv) {
   int opt;

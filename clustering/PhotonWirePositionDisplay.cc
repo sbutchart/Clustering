@@ -29,8 +29,7 @@ std::map<GenType, TGraph*> PhotonWirePositionDisplay::SetUpGraph(const std::stri
   }
   return map_gr;
 
-};
-
+}
 
 std::map<GenType, TH2D*> PhotonWirePositionDisplay::SetUpHistos2D(const std::string Title,
                                                                   const std::string XAxis, const std::string YAxis,
@@ -45,10 +44,7 @@ std::map<GenType, TH2D*> PhotonWirePositionDisplay::SetUpHistos2D(const std::str
     map_h2[it.first]->SetTitle(Title.c_str());
   }
   return map_h2;
-};
-
-
-
+}
 
 PhotonWirePositionDisplay::PhotonWirePositionDisplay(std::string F, std::string T):
   Display(F,T),

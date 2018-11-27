@@ -442,7 +442,7 @@ inline void PrintProgress(int iter, int nloop){
     std::cout << "] " << int(progress * 100.0) << " % (" << iter << " of " << nloop << ")\r";
     std::cout.flush();
   }
-};
+}
 
 inline GenType ConvertIntToGenType(int i) {
   switch (i) {
@@ -460,7 +460,7 @@ inline GenType ConvertIntToGenType(int i) {
   case 11: return kAll;
   }
   return kOther;
-};
+}
 
 
 class Helper{
@@ -514,7 +514,7 @@ inline std::map<GenType,TH1D*> GetHistos(std::string name, std::string title,
     map_h[it.first]->SetLineColor(vec_colors[i++]);
   }
   return map_h;
-};
+}
 
 inline std::map<GenType,TH2D*> Get2DHistos(std::string name, std::string title,
                                            int nbinsx, double xbinmin, double xbinmax,
@@ -529,7 +529,7 @@ inline std::map<GenType,TH2D*> Get2DHistos(std::string name, std::string title,
     map_h[it.first]->SetStats(0);
   }
   return map_h;
-};
+}
 
 
 inline TH1D* GetSimpleHisto(std::string name, std::string title){
@@ -539,7 +539,7 @@ inline TH1D* GetSimpleHisto(std::string name, std::string title){
   for(auto const& it : help.ShortGenName)
     h->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
   return h;
-};
+}
 
 inline TLegend* GetNewLegend(double xmin=0.1, double ymin=0.1, double xmax=0.9, double ymax=0.9,
                       const std::map<GenType,TH1D*>& histos=std::map<GenType,TH1D*>()){
@@ -552,21 +552,21 @@ inline TLegend* GetNewLegend(double xmin=0.1, double ymin=0.1, double xmax=0.9, 
   for(auto const& it : histos)
     leg->AddEntry(it.second, h.GenName[it.first].c_str(), "L");
   return leg;
-};
-
+}
 
 inline void AddOverflow(TH1D* histo){
   histo->SetBinContent(histo->GetXaxis()->GetNbins(),
                        histo->GetBinContent(histo->GetXaxis()->GetNbins()  )+
                        histo->GetBinContent(histo->GetXaxis()->GetNbins()+1));
   histo->SetBinContent(histo->GetXaxis()->GetNbins()+1,0);
-};
+}
+
 inline void AddOverflow(TH1D& histo){
   histo.SetBinContent(histo.GetXaxis()->GetNbins(),
                       histo.GetBinContent(histo.GetXaxis()->GetNbins()  )+
                       histo.GetBinContent(histo.GetXaxis()->GetNbins()+1));
   histo.SetBinContent(histo.GetXaxis()->GetNbins()+1,0);
-};
+}
 
 inline TH1D* DoSignalOverNoise(const TH1D* signal,
                                const TH1D* noise) {
@@ -574,7 +574,7 @@ inline TH1D* DoSignalOverNoise(const TH1D* signal,
   TH1D* s_over_n = (TH1D*)signal->Clone();
   s_over_n->Divide(noise);
   return s_over_n;
-};
+}
 
 inline TH1D* DoIntegratedSignalOverNoise(const TH1D* signal,
                                          const TH1D* noise) {
@@ -593,7 +593,7 @@ inline TH1D* DoIntegratedSignalOverNoise(const TH1D* signal,
   }
   return s_over_n;
   
-};
+}
 
 inline TH1D* DoIntegratedSignalOverNoiseUnitNorm(const TH1D* signal,
                                                  const TH1D* noise) {
@@ -614,7 +614,7 @@ inline TH1D* DoIntegratedSignalOverNoiseUnitNorm(const TH1D* signal,
     }
   }
   return s_over_n;
-};
+}
 
 
 
@@ -655,7 +655,7 @@ inline double GetStatThreshold(const TH1D* signal,
 
   return std::min(max_sig, max_back);
 
-};
+}
 
 
 

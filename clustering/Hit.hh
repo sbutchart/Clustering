@@ -127,6 +127,6 @@ inline Hit::~Hit() {
   fPosition.clear();
   fSize    .clear();
   fExtent  .clear();
-};
+}
 
 #endif

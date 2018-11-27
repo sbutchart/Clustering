@@ -45,13 +45,13 @@ HitSimplePlot::HitSimplePlot(std::string InputFile, std::string InputTree):
   nbin_2D_y_Width[1] = 100 ; nbin_2D_y_Width[2] = 40  ; nbin_2D_y_Width[3] = 100 ; nbin_2D_y_Width[4] = 20 ;
   xmin_2D_y_Width[1] = 0   ; xmin_2D_y_Width[2] = 0   ; xmin_2D_y_Width[3] = 0   ; xmin_2D_y_Width[4] = 0  ;
   xmax_2D_y_Width[1] = 2000; xmax_2D_y_Width[2] = 1000; xmax_2D_y_Width[3] = 1000; xmax_2D_y_Width[4] = 20 ;
-};
+}
 
 
 HitSimplePlot::~HitSimplePlot(){
   delete c;
   c = NULL;
-};
+}
 
 
 void HitSimplePlot::GetDimension(const int inDim, int& dim1, int& dim2) const {
@@ -84,7 +84,7 @@ void HitSimplePlot::GetDimension(const int inDim, int& dim1, int& dim2) const {
     dim1 = 4;
     dim2 = inDim-40;
   }
-};
+}
 
 
 void HitSimplePlot::PlotRMS(const int dim) {
@@ -92,7 +92,7 @@ void HitSimplePlot::PlotRMS(const int dim) {
   GetDimension(dim, dim1, dim2);
   if (dim2 == -1) { PlotRMS1D(dim1); }
   else            { PlotRMS2D(dim1,dim2); }
-};
+}
 
 
 void HitSimplePlot::PlotWidth(const int dim) {
@@ -100,7 +100,7 @@ void HitSimplePlot::PlotWidth(const int dim) {
   GetDimension(dim, dim1, dim2);
   if (dim2 == -1) { PlotWidth1D(dim1); }
   else            { PlotWidth2D(dim1,dim2); }
-};
+}
 
 
 double HitSimplePlot::GetMean(std::vector<double> const vec) const {
@@ -110,7 +110,7 @@ double HitSimplePlot::GetMean(std::vector<double> const vec) const {
   }
   mean/=(double)vec.size();
   return mean;
-};
+}
 
 
 double HitSimplePlot::GetStdDev(std::vector<double> const vec) const {
@@ -121,14 +121,14 @@ double HitSimplePlot::GetStdDev(std::vector<double> const vec) const {
   stddev/=(double)vec.size();
   stddev = sqrt(stddev);
   return stddev;
-};
+}
 
 
 void HitSimplePlot::GetMinMax(std::vector<double> const vec, double& min, double& max) const {
   min=*std::min_element(vec.begin(), vec.end());
   max=*std::max_element(vec.begin(), vec.end());
   return;
-};
+}
 
 
 std::map<GenType, std::map<int,std::vector<double> > > HitSimplePlot::GetMap(std::vector<double> const* pos,
@@ -142,7 +142,7 @@ std::map<GenType, std::map<int,std::vector<double> > > HitSimplePlot::GetMap(std
   }
  
   return map_vec_pos;
-};
+}
 
 
 std::map<GenType, std::map<int,std::pair<std::vector<double>,std::vector<double> > > > HitSimplePlot::Get2DMap(
@@ -163,7 +163,7 @@ std::map<GenType, std::map<int,std::pair<std::vector<double>,std::vector<double>
   }
  
   return map_vec_pos;
-};
+}
 
 
 void HitSimplePlot::FillHistosRMS(std::vector<double>* vector, std::map<GenType, TH1D*>& RMS) {
@@ -182,7 +182,7 @@ void HitSimplePlot::FillHistosRMS(std::vector<double>* vector, std::map<GenType,
       }
     }
   }
-};
+}
 
 
 void HitSimplePlot::Fill2DHistosRMS(std::vector<double>* vecx,
@@ -207,7 +207,7 @@ void HitSimplePlot::Fill2DHistosRMS(std::vector<double>* vecx,
       }
     }
   }
-};
+}
 
 
 void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenType, TH1D*>& Width) {
@@ -228,7 +228,7 @@ void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenTyp
       }
     }
   }
-};
+}
 
 
 void HitSimplePlot::Fill2DHistosWidth(std::vector<double>* vecx,
@@ -253,7 +253,7 @@ void HitSimplePlot::Fill2DHistosWidth(std::vector<double>* vecx,
       }
     }
   }
-};
+}
 
 
 void HitSimplePlot::PlotRMS1D(const int dim) {
@@ -287,7 +287,7 @@ void HitSimplePlot::PlotRMS1D(const int dim) {
   }
   c->Print((filename+"]").c_str());
            
-};
+}
 
 
 void HitSimplePlot::PlotWidth1D(const int dim) {
@@ -321,7 +321,7 @@ void HitSimplePlot::PlotWidth1D(const int dim) {
     c->Print(filename.c_str());
   }
   c->Print((filename+"]").c_str());
-};
+}
 
 
 void HitSimplePlot::PlotRMS2D(const int dim1, const int dim2) {
@@ -363,7 +363,7 @@ void HitSimplePlot::PlotRMS2D(const int dim1, const int dim2) {
   }
   c->Print((filename+"]").c_str());
   
-};
+}
 
 void HitSimplePlot::PlotWidth2D(const int dim1, const int dim2) {
   std::string Title="";
@@ -404,4 +404,4 @@ void HitSimplePlot::PlotWidth2D(const int dim1, const int dim2) {
   }
   c->Print((filename+"]").c_str());
   
-};
+}

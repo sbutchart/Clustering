@@ -40,7 +40,7 @@ void BiTrigger::AddEventToStudy(const std::vector<std::unique_ptr<WireCluster>>&
     for (auto const& it_back: it.second)
       fBackCluster.push_back(it_back);
   }
-};
+}
 
 void BiTrigger::FinishStudy() {
   fPt_nClu_Sign = new TGraph(fSignCluster.size());
@@ -142,5 +142,4 @@ void BiTrigger::FinishStudy() {
   std::cout << "Tot_WireNCluster_Back " << fTot_WireNCluster_Back << std::endl;
   std::cout << "Tot_OptiNCluster_Sign " << fTot_OptiNCluster_Sign << std::endl;
   std::cout << "Tot_OptiNCluster_Back " << fTot_OptiNCluster_Back << std::endl;
-
-};
+}

@@ -8,10 +8,24 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
+find_program(LSB_RELEASE_EXEC lsb_release)
+
+include(${ROOT_USE_FILE})
+string(CONCAT CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -Wall -Wextra -Wpedantic -Werror")
+#grabs the distribution
+execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
+  OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+# if the distribution is scientific linux, then setup boost in a different way (not using the cmake file from boost)
+string(FIND "${LSB_RELEASE_ID_SHORT}" "Scientific" _cmp)
+if (_cmp GREATER -1)
+  set(Boost_NO_BOOST_CMAKE ON)
+endif()
+
 find_package(Boost REQUIRED)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
-include(${ROOT_USE_FILE})
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -Werror -std=c++11")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 

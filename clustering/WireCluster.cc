@@ -11,5 +11,4 @@ WireCluster::WireCluster(std::vector<Hit*>& vec_Hits):
     WireHit* hit = (WireHit*)it;
     fNElectron += hit->GetNElectron();
   }
-  
-};
+}

@@ -1,7 +1,6 @@
 #include "PhotonTimingDisplay.hh"
 #include "PhotonWirePositionDisplay.hh"
 #include "WirePositionTimingDisplay.hh"
-// #include "WireTimingDisplay.hh"
 
 #include <iostream>
 #include <unistd.h>
@@ -28,7 +27,7 @@ void PrintUsage() {
   std::cout << " -d 2 Wire Position and Timing display" << std::endl;
   std::cout << " -d 3 Wire Timing display"              << std::endl;
   exit(1);
-};
+}
 
 int main(int argc, char** argv){
   int opt;
@@ -88,5 +87,4 @@ int main(int argc, char** argv){
   }
 
 
-};
-
+}

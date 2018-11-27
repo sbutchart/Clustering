@@ -13,6 +13,5 @@ OpticalHit::OpticalHit(int GenType,
   fPosition[kT] = PeakTime;
   fSize[kT] = Width;
   fAPA = fGeom.GetAPAFromPosition(fPosition);
-  
-  
-};
+ 
+}
