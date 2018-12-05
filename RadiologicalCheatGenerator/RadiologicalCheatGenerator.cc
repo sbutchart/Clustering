@@ -12,10 +12,10 @@ int RadiologicalCheatGenerator::Run() {
     else if (fRequestedBackgroundType == kAr42 ) { GenerateAr42 (); }
     else if (fRequestedBackgroundType == kNi59 ) { GenerateNi59 (); }
     else if (fRequestedBackgroundType == kCo60 ) { GenerateCo60 (); }
-    else if (fRequestedBackgroundType == kKr85 ) { GenerateKr85 (); }kKryp
-    else if (fRequestedBackgroundType == kRn222) { GenerateRn222(); }kRdon
+    else if (fRequestedBackgroundType == kKr85 ) { GenerateKr85 (); }
+    else if (fRequestedBackgroundType == kRn222) { GenerateRn222(); }
     else if (fRequestedBackgroundType == kTh232) { GenerateTh232(); }
-    else if (fRequestedBackgroundType == kU238 ) { GenerateU238 (); }kNeut
+    else if (fRequestedBackgroundType == kU238 ) { GenerateU238 (); }
     else {
       std::cout << "Incorrect background type!!" << std::endl;
       return 1;
@@ -281,8 +281,7 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   d.Spectrum = NULL;
   fDecays[kRn222].push_back(d);
  
-};
-
+}
 
 void RadiologicalCheatGenerator::PrintParticle(const Part& p) {
   fFile << Form("1 %i 0 0 0 0 %f %f %f %f %f %f %f %f 0.", p.pdg, p.px, p.py, p.pz, p.E, p.M, p.x, p.y, p.z) << std::endl;
