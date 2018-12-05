@@ -9,29 +9,14 @@
 class ClusterEngine{
 
 public:
-  ClusterEngine(double ChannelWidth,  double TimeWindow, double MinHitADC,
-                double TimeWindowOpt, double PositionOpt):
+  ClusterEngine(double ChannelWidth=2,    double TimeWindow=20,   double MinHitADC=0,
+                double TimeWindowOpt=0.2, double PositionOpt=300, double BucketSize=1):
     fChannelWidth(ChannelWidth),
     fTimeWindow(TimeWindow),
     fMinHitADC(MinHitADC),
     fTimeWindowOpt(TimeWindowOpt),
     fPositionOpt(PositionOpt),
-    fBucketSize(0),
-    fStopwatch0(0),
-    fStopwatch1(0),
-    fSorting(0),
-    TimeOrdering_Time (),
-    SpaceOrdering_Time(),
-    Clustering_Time   (){
-  };
-  
-  ClusterEngine():
-    fChannelWidth(0),
-    fTimeWindow(0),
-    fMinHitADC(0),
-    fTimeWindowOpt(0),
-    fPositionOpt(0),
-    fBucketSize(0),
+    fBucketSize(BucketSize),
     fStopwatch0(0),
     fStopwatch1(0),
     fSorting(0),

@@ -47,7 +47,7 @@ void Clustering::RunClustering(){
     fSNIM->GetWireHits   (vec_WireHit);
     fSNIM->GetOpticalHits(vec_OptiHit);
 
-    // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
+    std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
@@ -79,7 +79,7 @@ void Clustering::RunClustering(){
       fTrigger->IsTriggering(vec_OptiCluster);
       fTrigger->IsTriggering(vec_WireCluster);
       
-      fSOM->FillClusterTimingInfo(fClustEng,fEReco);
+      fSOM->FillClusterTimingInfo(fClustEng,fEReco,vec_WireHit.size(), vec_OptiHit.size());
       
       if (fPrintLevel > -1) {
         std::cout << "----------------------------------------" << std::endl;

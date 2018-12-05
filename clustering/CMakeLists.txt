@@ -1,6 +1,5 @@
-# CMakeLists.txt for event package. It creates a library with dictionary and a main program
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(DAQWork)
+message("building clustering")
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
 #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
@@ -82,6 +81,12 @@ target_link_libraries(EfficiencyCalculator Clustering)
 
 add_executable(DumpSNRate DumpRate.cxx)
 target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
+
+add_executable(MakePEPlotForJose MakePEPlotForJose.C)
+target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})
+
+add_executable(TotalNEvents TotalNEvents.C)
+target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
 
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})

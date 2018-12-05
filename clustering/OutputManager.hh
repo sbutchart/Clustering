@@ -97,6 +97,8 @@ private:
   std::map<size_t, size_t> fOpticalClusterCount;
 
 public:
+  int nHitOpti;
+  int nHitWire;
   int    Event         ;
   int    MarleyIndex   ;
   int    Cluster       ;
@@ -268,7 +270,8 @@ public:
     fTrees["TimingInfo"] = new TTree("TimingInfo", "TimingInfo");
     fTrees["TimingInfo"]->Branch("Event",  &Event,  "Event/I" );
     fTrees["TimingInfo"]->Branch("Config", &Config, "Config/I");
-    fTrees["TimingInfo"]->Branch("nHit",   &NHits,  "nHit/I");
+    fTrees["TimingInfo"]->Branch("nHitWire",   &nHitWire,  "nHitWire/I");
+    fTrees["TimingInfo"]->Branch("nHitOpti",   &nHitOpti,  "nHitOpti/I");
     fTrees["TimingInfo"]->Branch("TimeOrdering_WireClustTime",         &TimeOrdering_WireClustTime        );
     fTrees["TimingInfo"]->Branch("SpaceOrdering_WireClustTime",        &SpaceOrdering_WireClustTime       );
     fTrees["TimingInfo"]->Branch("Clustering_WireClustTime",           &Clustering_WireClustTime          );
@@ -389,7 +392,8 @@ public:
   };
 
   void FillClusterTimingInfo(ClusterEngine* clusterEngine,
-                             ClusterEnergyEstimator* clusterEReco = NULL){
+                             ClusterEnergyEstimator* clusterEReco = NULL,
+                             int nWire=0, int nOpti=0){
     TimeOrdering_OptClustTime  .clear();
     TimeOrdering_WireClustTime .clear();
     SpaceOrdering_OptClustTime .clear();
@@ -398,6 +402,9 @@ public:
     Clustering_WireClustTime   .clear();
     EnergyReconstruction_WireClustTime.clear();
     EnergyReconstruction_OptClustTime = {0};
+
+    nHitWire=nWire;
+    nHitOpti=nOpti;
 
     Config = fCurrentConfig;
     Event  = fCurrentEvent;

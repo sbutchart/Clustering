@@ -1,5 +1,5 @@
 #ifndef CLUSTERING_HH
-#define CLUSTERING_HH
+#define CLUSTERING_HH 1
 
 #include <iostream>
 #include <vector>
@@ -23,7 +23,7 @@ public:
     fNAPA   (  -1),
     fSorting(   0){
     InitialiseBase();
-    
+
     fSNIM = new SNAnaInputManager    ();
     fSOM  = new StandardOutputManager();
     fSimpleTrigger = new SimpleTrigger();
@@ -55,7 +55,7 @@ public:
     SetupConfig_PositionOpt     ();
     SetupConfig_BucketSize      ();
     SetupConfig_OptHitInCluster ();
-    
+
     std::vector<size_t> sizes ={fcut_AdjChanTolerance.size(),
                                 fcut_HitsInWindow    .size(),
                                 fcut_MinChannels     .size(),
@@ -66,7 +66,7 @@ public:
                                 fcut_PositionOpt     .size(),
                                 fcut_BucketSize      .size(),
                                 fcut_OptHitInCluster .size()};
-    
+
     fNConfig = (int)(*std::min_element(sizes.begin(), sizes.end()));
     fWireClusterCount    = std::vector<float>(fNConfig,0);
     fOpticalClusterCount = std::vector<float>(fNConfig,0);
@@ -77,19 +77,19 @@ public:
 
   void SetERecoXMLFile(const std::string s="") { fERecoXMLFile   = s; };
   void SetConfig      (const int n=-1)         { fConfig         = n; };
-    
+
   virtual void SetupConfig_AdjChanTolerance(const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_AdjChanTolerance = cut; };
   virtual void SetupConfig_HitsInWindow    (const std::vector<float> cut = {6,6,6,6,6,6}            ) { fcut_HitsInWindow     = cut; };
   virtual void SetupConfig_MinChannels     (const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_MinChannels      = cut; };
   virtual void SetupConfig_MinChanWidth    (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_MinChanWidth     = cut; };
   virtual void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_TimeWindowSize   = cut; };
   virtual void SetupConfig_TotalADC        (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_TotalADC         = cut; };
-  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2,1}                ) { fcut_TimeWindowOpt    = cut; };
+  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2,1}                  ) { fcut_TimeWindowOpt    = cut; };
   virtual void SetupConfig_PositionOpt     (const std::vector<float> cut = {300,300,300,300,300,300}) { fcut_PositionOpt      = cut; };
-  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {1,20}                  ) { fcut_BucketSize       = cut; };
-  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = {0,0,15,20,20,20}        ) { fcut_OptHitInCluster  = cut; };
+  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {1,20}                   ) { fcut_BucketSize       = cut; };
+  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = {20,20,20}               ) { fcut_OptHitInCluster  = cut; };
 
-  
+
   void RunClustering();
 
   void ResetFillVariable();
@@ -99,13 +99,13 @@ public:
       if (fEReco) delete fEReco;
       fEReco = NULL;
     };
-  
+
 private:
   SimpleTrigger* fSimpleTrigger;
 
   std::string fERecoXMLFile;
   ClusterEnergyEstimator* fEReco;
-  
+
   std::vector<float> fWireClusterCount   ;
   std::vector<float> fOpticalClusterCount;
 
@@ -119,7 +119,7 @@ private:
   std::vector<float> fcut_PositionOpt     ;
   std::vector<float> fcut_BucketSize      ;
   std::vector<float> fcut_OptHitInCluster ;
-  
+
   int fNConfig;
   int fCurrentConfig;
   int fNAPA   ;
