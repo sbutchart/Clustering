@@ -278,14 +278,14 @@ int main(int argc, char** argv){
 
       bool fillneutron=0;
       for (auto const& genhit: map_gentype_nhit_back)
-        if (genhit.first == kNeut) fillneutron = 1;
+        if (genhit.first == kNeutron) fillneutron = 1;
       if (fillneutron)
         for (auto const& genhit: map_gentype_nhit_back)
           p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
 
       fillneutron=0;
       for (auto const& genhit: map_gentype_nhit_sign)
-        if (genhit.first == kNeut) fillneutron = 1;
+        if (genhit.first == kNeutron) fillneutron = 1;
       if (fillneutron)
         for (auto const& genhit: map_gentype_nhit_sign)
           p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
