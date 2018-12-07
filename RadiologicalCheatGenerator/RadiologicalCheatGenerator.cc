@@ -290,6 +290,14 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   d.Type = kAlpha;
   d.Spectrum = NULL;
   fDecays[kRn222].push_back(d);
+
+
+  // COBALT 60 on APA
+  d = Decay();
+  d.Spectrum = GetSpectrum("Concrete_DUNE1.root")[0];
+  d.Type = kNeutronD;
+  fDecays[kU238].push_back(d);
+  
  
 }
 

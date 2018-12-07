@@ -124,15 +124,6 @@ int main(int argc, char** argv){
   std::vector<double> * DirX     = NULL;
   std::vector<double> * DirY     = NULL;
   std::vector<double> * DirZ     = NULL;
-
-
-
-
-
-
-
-
-  
   
   TTree* t_Output_triggeredclusteredhits = (TTree*)f_Input->Get("ClusteredWireHit");
   t_Output_triggeredclusteredhits->SetBranchAddress("Cluster",        &Cluster      );
@@ -210,12 +201,20 @@ int main(int argc, char** argv){
   c.Print((OutputFile+"[").c_str());
   TProfile* p_gentype_sign_wire = SetUpTProfileGenType("p_gentype_sign_wire", ";;average number of hits in cluster");
   TProfile* p_gentype_back_wire = SetUpTProfileGenType("p_gentype_back_wire", ";;average number of hits in cluster");
+  TProfile* p_gentype_sign_neut_wire = SetUpTProfileGenType("p_gentype_sign_neut_wire", ";;average number of hits in cluster");
+  TProfile* p_gentype_back_neut_wire = SetUpTProfileGenType("p_gentype_back_neut_wire", ";;average number of hits in cluster");
   p_gentype_sign_wire->SetLineColor(kRed);
   p_gentype_back_wire->SetLineColor(kBlue);
+  p_gentype_sign_neut_wire->SetLineColor(kRed);
+  p_gentype_back_neut_wire->SetLineColor(kBlue);
   p_gentype_sign_wire->SetLineStyle(1);
   p_gentype_back_wire->SetLineStyle(1);
+  p_gentype_sign_neut_wire->SetLineStyle(1);
+  p_gentype_back_neut_wire->SetLineStyle(1);
   p_gentype_sign_wire->SetLineWidth(2);
   p_gentype_back_wire->SetLineWidth(2);
+  p_gentype_sign_neut_wire->SetLineWidth(2);
+  p_gentype_back_neut_wire->SetLineWidth(2);
 
   std::map<int,std::vector<int> > map_event_entry_wire;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
@@ -276,6 +275,20 @@ int main(int argc, char** argv){
       }
       for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
       for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+
+      bool fillneutron=0;
+      for (auto const& genhit: map_gentype_nhit_back)
+        if (genhit.first == kNeut) fillneutron = 1;
+      if (fillneutron)
+        for (auto const& genhit: map_gentype_nhit_back)
+          p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
+
+      fillneutron=0;
+      for (auto const& genhit: map_gentype_nhit_sign)
+        if (genhit.first == kNeut) fillneutron = 1;
+      if (fillneutron)
+        for (auto const& genhit: map_gentype_nhit_sign)
+          p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
     }
     if(SignDetected)
       ++nDetectedSignalEventWire;
@@ -299,6 +312,11 @@ int main(int argc, char** argv){
   gPad->SetGridx(false);
   gPad->SetGridy(false);
 
+  p_gentype_sign_neut_wire->Draw("E");
+  p_gentype_back_neut_wire->Draw("E SAME");
+  c.Print(OutputFile.c_str());
+
+  
   max = {h_ncluster_sign_wire->GetMaximum(),
          h_ncluster_back_wire->GetMaximum()};
 
