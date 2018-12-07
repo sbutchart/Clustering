@@ -72,8 +72,10 @@ class RadiologicalCheatGenerator {
 private:
   size_t fNEvent;
   std::string fOutputFileName;
+  std::string fOutputFCLFileName;
   RadType fRequestedBackgroundType;
   std::ofstream fFile;
+  std::ofstream fFCLFile;
   size_t fIter;
   std::map<std::string, RadType> fConvertor;
   TRandom3 rand;
@@ -83,6 +85,7 @@ private:
 public:
   void SetNEvent(const size_t e=1000) { fNEvent = e; };
   void SetOutputFile(const std::string f="out.txt") { fOutputFileName=f; };
+  void SetOutputFCLFile(const std::string f="out.fcl") { fOutputFCLFileName=f; };
   void SetBackgroundType(const std::string f="Ar39") {
     if (fConvertor.find(f) == fConvertor.end()) {
       std::cout << "Background type requested not in the list (" << f << ")" << std::endl;
@@ -95,7 +98,7 @@ public:
   };
   
   RadiologicalCheatGenerator();
-  
+  std::string CreateFCLFile(std::string);
   int Run();
   void GenerateAr39 ();
   void GenerateK40  ();
@@ -116,7 +119,13 @@ public:
 
   void FillParticleIsotropicDirection(Part& p);
   std::vector<TH1D*> GetSpectrum(std::string filename){
-    std::string dir = std::getenv("DECAYS");
+    std::string dir="";
+    try{
+      dir = std::string(std::getenv("DECAYS"));
+    } catch (...) {
+      std::cout << "you must source SourceMe.sh from the source before starting." << std::endl;
+      exit(1);
+    }
     if (dir == "") {
       std::cout << "you must source SourceMe.sh from the source before starting." << std::endl;
       exit(1);

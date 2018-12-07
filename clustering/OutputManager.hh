@@ -81,6 +81,7 @@ public:
   StandardOutputManager():
     fCurrentConfig      (0),
     fCurrentEvent       (0),
+    fOutputOffset       (0),
     fWireClusterCount   (),
     fOpticalClusterCount()
     { };
@@ -89,10 +90,12 @@ public:
   size_t GetCurrentEvent  () const { return fCurrentEvent ; };  
   void   SetCurrentConfig (size_t s=0) { fCurrentConfig = s; };
   void   SetCurrentEvent  (size_t s=0) { fCurrentEvent  = s; };  
+  void   SetOutputOffset  (size_t s=0) { fOutputOffset  = s; };  
 
 private:
   size_t fCurrentConfig;
   size_t fCurrentEvent ;
+  size_t fOutputOffset ;
   std::map<size_t, size_t> fWireClusterCount;
   std::map<size_t, size_t> fOpticalClusterCount;
 
@@ -286,7 +289,7 @@ public:
   void FillClusterInfo(OpticalCluster* clust) {
     Config         = fCurrentConfig;
     Cluster        = fOpticalClusterCount[fCurrentConfig];
-    Event          = fCurrentEvent;
+    Event          = fCurrentEvent+fOutputOffset;
     MarleyIndex    = clust->GetMarleyIndex();
     APA            = clust->GetAPA();
     YWidth         = clust->GetSize(kY);
@@ -327,7 +330,7 @@ public:
   };
   
   void FillClusterInfo(WireCluster* clust) {
-    Event          = fCurrentEvent;
+    Event          = fCurrentEvent+fOutputOffset;
     Config         = fCurrentConfig;
     Cluster        = fWireClusterCount[fCurrentConfig];
     MarleyIndex    = clust->GetMarleyIndex();
@@ -407,7 +410,7 @@ public:
     nHitOpti=nOpti;
 
     Config = fCurrentConfig;
-    Event  = fCurrentEvent;
+    Event  = fCurrentEvent+fOutputOffset;
     
     TimeOrdering_OptClustTime   = clusterEngine->GetElapsedTime_TimeOrdering ();
     TimeOrdering_WireClustTime  = clusterEngine->GetElapsedTime_TimeOrdering ();
@@ -437,7 +440,7 @@ public:
     DirZ    .clear();
     
     for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlSample->size(); ++MarleyEvent) {
-      Event = fCurrentEvent;
+      Event = fCurrentEvent+fOutputOffset;
       MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
       ENu     .push_back((*im.True_ENu)     [MarleyEvent]);
       ENu_Lep .push_back((*im.True_ENu_Lep) [MarleyEvent]);

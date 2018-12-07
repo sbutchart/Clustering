@@ -3,6 +3,7 @@
 
 int RadiologicalCheatGenerator::Run() {
   
+  fFile.open(fOutputFileName);
   for (fIter=0; fIter<fNEvent; ++fIter) {
     fParticles.clear();
     //enum PType{kAPA, kCPA, kNeut, kKryp, kPlon, kRdon};
@@ -21,14 +22,23 @@ int RadiologicalCheatGenerator::Run() {
       return 1;
     }
 
-    fFile.open(fOutputFileName+Form("_%i",(int)fIter));
     fFile << Form("%i %i",(int)fIter, (int)fParticles.size()) << std::endl;
     for (auto const& it: fParticles)
       PrintParticle(it);
-    fFile.close();
-
+    
   }
+  fFCLFile.open(fOutputFCLFileName);
+  fFCLFile << CreateFCLFile(fOutputFileName);
+  fFCLFile.close();
   return 0;
+}
+
+std::string RadiologicalCheatGenerator::CreateFCLFile(std::string textfilename) {
+  std::string text="#include \"prodtext_dune1x2x6.fcl\"\n";
+  textfilename = std::string(std::getenv("PWD"))+"/"+textfilename;
+  text+="physics.producers.generator.InputFileName: \""+textfilename+"\"\n";
+  return text;
+    
 }
 
 void RadiologicalCheatGenerator::GenerateAr39() {
@@ -187,15 +197,15 @@ void RadiologicalCheatGenerator::FillParticleIsotropicDirection(Part& p) {
 RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   fNEvent(0),
   fOutputFileName("") {
-  fConvertor["Ar39"   ] = kAr39    ;
-  fConvertor["K40"    ] = kK40     ;
-  fConvertor["Ar42"   ] = kAr42    ;
-  // fConvertor["Neutron"] = kNeutron ;
-  // fConvertor["CPA"    ] = kCPA     ;
-  // fConvertor["Kr85"   ] = kKr85    ;
-  fConvertor["Rn222"  ] = kRn222   ;
-  fConvertor["Co60"   ] = kCo60   ;
-  // fConvertor["Po210"  ] = kPo210   ;
+  fConvertor["Ar39"   ] = kAr39;
+  fConvertor["K40"    ] = kK40;
+  fConvertor["Ar42"   ] = kAr42;
+  // fConvertor["Neutron"] = kNeutron;
+  // fConvertor["CPA"    ] = kCPA;
+  // fConvertor["Kr85"   ] = kKr85;
+  fConvertor["Rn222"  ] = kRn222;
+  fConvertor["Co60"   ] = kCo60;
+  // fConvertor["Po210"  ] = kPo210;
   gRandom = &rand;
   Decay d;
   // ARGON 39

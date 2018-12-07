@@ -9,16 +9,20 @@ int main(int argc, char** argv){
   extern int  optopt;
 
   std::string OutputFile="";
+  std::string OutputFCLFile="";
   std::string Generator="";
   int nEvent=1000;
   
-  while ( (opt = getopt(argc, argv, "o:g:n:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "o:g:n:f:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'o':
       OutputFile = optarg;
       break;
     case 'g':
       Generator = optarg;
+      break;
+    case 'f':
+      OutputFCLFile = optarg;
       break;
     case 'n':
       nEvent = atoi(optarg);
@@ -34,6 +38,11 @@ int main(int argc, char** argv){
     exit(1);
   }
 
+  if (OutputFCLFile == "") {
+    std::cout << "Need to provide an output fcl file with -f" << std::endl;
+    exit(1);
+  }
+  
   if (Generator == "") {
     std::cout << "Need to provide a background file with -g:" << std::endl;
     std::cout << "-g Ar39" << std::endl;
@@ -47,6 +56,7 @@ int main(int argc, char** argv){
   RadiologicalCheatGenerator rcg;
   rcg.SetNEvent(nEvent);
   rcg.SetOutputFile(OutputFile);
+  rcg.SetOutputFCLFile(OutputFCLFile);
   rcg.SetBackgroundType(Generator);
   return rcg.Run();
 }

@@ -3,7 +3,7 @@ import os,sys
 import glob, os
 import ntpath
 
-RunOver=10
+RunOver=10000
 TreeName="SNSimTree"
 TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
          "snanaEFF15cm0100Hz5snrNonRefl",
@@ -25,13 +25,19 @@ Config=" -c 0 "
 
 Executable="/dune/app/users/plasorak/Clustering/build/clustering/RunDAQClustering"
 NCompletedFile=0
-for FileName in glob.glob(InputDirectory+FilePatern):
+AllTheFile=glob.glob(InputDirectory+FilePatern)
+for FileName in AllTheFile:
+    print(str(NCompletedFile)+" / "+str(len(AllTheFile)))
     for CurrentTreeDir in TreeDir:
         CurrentTree = CurrentTreeDir+"/"+TreeName
         FileNameOutput = "Clustered_"+CurrentTreeDir+"_"+ntpath.basename(FileName)
-        print(Executable+" -i "+FileName+" -t "+CurrentTree+" -o "+OutputDirectory+FileNameOutput+Config)
-        os.system(Executable+" -i "+FileName+" -t "+CurrentTree+" -o "+OutputDirectory+FileNameOutput+Config)
+        #my_file = Path(OutputDirectory+FileNameOutput)
+        if not os.path.isfile(OutputDirectory+FileNameOutput):
+            print(Executable+" -i "+FileName+" -t "+CurrentTree+" -o "+OutputDirectory+FileNameOutput+Config)
+            os.system(Executable+" -i "+FileName+" -t "+CurrentTree+" -o "+OutputDirectory+FileNameOutput+Config)
+
     NCompletedFile = NCompletedFile+1
+
     if NCompletedFile>=RunOver:
         break
     

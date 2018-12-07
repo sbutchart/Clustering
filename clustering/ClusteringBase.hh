@@ -27,6 +27,7 @@ protected:
     fPrintLevel     = -1;
     fNAPA           = -1;
     fOffset         =  0;
+    fOutputOffset   =  0;
     fIM             = NULL;
     fOM             = NULL;
     fmap_APA_Channel[-1] = std::numeric_limits<int>::max();
@@ -60,6 +61,7 @@ public:
   void SetInputTree   (const std::string s="") { fInputTreeName  = s; };
   void SetOutputFile  (const std::string s="") { fOutputFileName = s; };
   void SetOffset      (const size_t n= 0)      { fOffset         = n; };
+  void SetOutputOffset(const size_t n= 0)      { fOutputOffset   = n; };
   void SetNAPA        (const int n=-1)         { fNAPA           = n; };
 
   virtual void ClusterAll(int inNEvent) {
@@ -104,6 +106,7 @@ protected:
   int fPrintLevel;
   int fNAPA;
   size_t fOffset;
+  size_t fOutputOffset;
   size_t fNEvent;
   size_t fCurrentEvent;
 

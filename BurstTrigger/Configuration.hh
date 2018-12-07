@@ -114,33 +114,35 @@ public:
   }
 
   Configuration():
-    fName                   (""),
-    fLegendEntry            (""),
-    fNClusterCut            (0),
-    fClusterAlgorithm       (0),
-    fBackgroundRate         (0),
-    fBackgroundRateError    (0),    
-    fBurstTimeWindow        (0),
-    fClusterEfficiency      (0),
-    fClusterEfficiencyError (0),
-    fTargetFakeRate         (0),
-    fActualFakeRate         (0),
-    fFakeRate_Cut           (),
-    fEfficiency_Burst       (),
-    fEfficiency_Distance    (),
-    fCoverage               (),
-    fLatency_Burst          (),
-    fLatency_Distance       (),
-    fLatency_Burst95CL      (),
-    fLatency_Distance95CL   (),
-    fTH1DFakeRate_Cut       (NULL),
-    fTH1DEfficiency_Burst   (NULL),
-    fTH1DEfficiency_Distance(NULL),
-    fTH1DCoverage           (NULL),
-    fTH1DLatency_Burst      (NULL),
-    fTH1DLatency_Distance   (NULL),
-    fDistanceParametrisation(NULL),
-    fDistanceProbability    (NULL),
+    fName                    (""),
+    fLegendEntry             (""),
+    fNClusterCut             (0),
+    fClusterAlgorithm        (0),
+    fBackgroundRate          (0),
+    fBackgroundRateError     (0),    
+    fBurstTimeWindow         (0),
+    fClusterEfficiency       (0),
+    fClusterEfficiencyError  (0),
+    fTargetFakeRate          (0),
+    fActualFakeRate          (0),
+    fFakeRate_Cut            (),
+    fEfficiency_Burst        (),
+    fEfficiency_Distance     (),
+    fCoverage                (),
+    fLatency_Burst           (),
+    fLatency_Distance        (),
+    fLatency_Burst95CL       (),
+    fLatency_Distance95CL    (),
+    fTH1DFakeRate_Cut        (NULL),
+    fTH1DEfficiency_Burst    (NULL),
+    fTH1DEfficiency_Distance (NULL),
+    fTH1DCoverage            (NULL),
+    fTH1DLatency_Burst       (NULL),
+    fTH1DLatency_Distance    (NULL),
+    fDistanceParametrisation (NULL),
+    fDistanceProbability     (NULL),
+    fTH1DLatency_Burst95CL   (NULL),
+    fTH1DLatency_Distance95CL(NULL),
     fTH1DList               (){
   };
   
@@ -181,6 +183,10 @@ public:
 
     if (Input == NULL) return;
     if (fDistanceParametrisation == NULL) return;
+    if (Output) {
+      delete Output;
+      Output=NULL;
+    }
 
     std::cout << "Configuration::ConvertToDistance(): Converting histogram " << Input->GetName() << std::endl;
 
@@ -218,7 +224,10 @@ public:
     if (fDistanceProbability == NULL) return;
 
     std::cout << "Configuration::ConvertToCoverage(): Converting histogram " << Input->GetName() << std::endl;
-
+    if (Output) {
+      delete Output;
+      Output=NULL;
+    }
     Output = (TH1D*)Input->Clone();
     Output->SetTitle(";Distance [kpc];Triggering efficiency #times SN probability");
     
