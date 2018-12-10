@@ -183,6 +183,7 @@ public:
 
     if (Input == NULL) return;
     if (fDistanceParametrisation == NULL) return;
+
     if (Output) {
       delete Output;
       Output=NULL;

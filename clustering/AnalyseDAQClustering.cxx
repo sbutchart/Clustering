@@ -242,6 +242,7 @@ int main(int argc, char** argv){
 
   t_Output_triggeredclusteredhits->Project("h_nhit_sign_wire", "NHits", Form("Type==1 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
   t_Output_triggeredclusteredhits->Project("h_nhit_back_wire", "NHits", Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
+  std::cout << h_nhit_back_wire->GetEntries() << std::endl;
   std::vector<double> max = {h_nhit_sign_wire->GetMaximum(),
                              h_nhit_back_wire->GetMaximum()};
   
@@ -276,16 +277,12 @@ int main(int argc, char** argv){
       for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
       for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
 
-      bool fillneutron=0;
-      for (auto const& genhit: map_gentype_nhit_back)
-        if (genhit.first == kNeutron) fillneutron = 1;
+      bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
       if (fillneutron)
         for (auto const& genhit: map_gentype_nhit_back)
           p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
 
-      fillneutron=0;
-      for (auto const& genhit: map_gentype_nhit_sign)
-        if (genhit.first == kNeutron) fillneutron = 1;
+      fillneutron=map_gentype_nhit_sign[kNeutron]>0;
       if (fillneutron)
         for (auto const& genhit: map_gentype_nhit_sign)
           p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);

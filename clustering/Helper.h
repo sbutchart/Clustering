@@ -384,14 +384,14 @@ inline void autoColorHists(TPad* pad, int whichColours=kBrewerSet1Palette)
 enum GenType{
   kOther=0,
   kSNnu=1,
-  kAPA,
-  kCPA,
-  kAr39,
-  kNeutron,
-  kKrypton,
-  kPolonium,
-  kRadon,
-  kAr42,
+  kAPA=2,
+  kCPA=3,
+  kAr39=4,
+  kNeutron=5,
+  kKrypton=6,
+  kPolonium=7,
+  kRadon=8,
+  kAr42=9,
   kAllBackground,
   kAll            
 };

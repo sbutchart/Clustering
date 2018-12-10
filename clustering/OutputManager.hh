@@ -377,8 +377,10 @@ public:
     
     std::vector<Hit*> hits = clust->GetHit();
     E_deposited=0.;
+
     for(auto const& hit : hits) {
       WireHit* wh = (WireHit*)hit;
+      if (wh->GetGenType() != 1 )std::cout << wh->GetGenType() << std::endl;
       HitView.push_back(wh->GetHitView());
       GenType.push_back(wh->GetGenType());
       HitChan.push_back(wh->GetHitChan());

@@ -8,15 +8,16 @@ int RadiologicalCheatGenerator::Run() {
     fParticles.clear();
     //enum PType{kAPA, kCPA, kNeut, kKryp, kPlon, kRdon};
 
-    if      (fRequestedBackgroundType == kAr39 ) { GenerateAr39 (); }
-    else if (fRequestedBackgroundType == kK40  ) { GenerateK40  (); }
-    else if (fRequestedBackgroundType == kAr42 ) { GenerateAr42 (); }
-    else if (fRequestedBackgroundType == kNi59 ) { GenerateNi59 (); }
-    else if (fRequestedBackgroundType == kCo60 ) { GenerateCo60 (); }
-    else if (fRequestedBackgroundType == kKr85 ) { GenerateKr85 (); }
-    else if (fRequestedBackgroundType == kRn222) { GenerateRn222(); }
-    else if (fRequestedBackgroundType == kTh232) { GenerateTh232(); }
-    else if (fRequestedBackgroundType == kU238 ) { GenerateU238 (); }
+    if      (fRequestedBackgroundType == kAr39   ) { GenerateAr39   (); }
+    else if (fRequestedBackgroundType == kK40    ) { GenerateK40    (); }
+    else if (fRequestedBackgroundType == kAr42   ) { GenerateAr42   (); }
+    else if (fRequestedBackgroundType == kNi59   ) { GenerateNi59   (); }
+    else if (fRequestedBackgroundType == kCo60   ) { GenerateCo60   (); }
+    else if (fRequestedBackgroundType == kKr85   ) { GenerateKr85   (); }
+    else if (fRequestedBackgroundType == kRn222  ) { GenerateRn222  (); }
+    else if (fRequestedBackgroundType == kTh232  ) { GenerateTh232  (); }
+    else if (fRequestedBackgroundType == kU238   ) { GenerateU238   (); }
+    else if (fRequestedBackgroundType == kNeutron) { GenerateNeutron(); }
     else {
       std::cout << "Incorrect background type!!" << std::endl;
       return 1;
@@ -33,13 +34,37 @@ int RadiologicalCheatGenerator::Run() {
   return 0;
 }
 
+
 std::string RadiologicalCheatGenerator::CreateFCLFile(std::string textfilename) {
   std::string text="#include \"prodtext_dune1x2x6.fcl\"\n";
   textfilename = std::string(std::getenv("PWD"))+"/"+textfilename;
   text+="physics.producers.generator.InputFileName: \""+textfilename+"\"\n";
   return text;
-    
 }
+
+
+void RadiologicalCheatGenerator::GenerateNeutron() {
+  double chan = rand.Uniform(1.);
+  std::vector<Part> particle;
+  for (auto const& it: fDecays[kNeutron]) {
+    if (chan<it.BranchingRatio) {
+      Part p;
+      p.pdg=2112;
+      p.M = 0.9395654133;
+      while(p.p<0) {
+        p.E = it.Spectrum->GetRandom()*1.e-6 + p.M;
+        p.p = p.E*p.E - p.M*p.M;
+      }
+      p.p = sqrt(p.p);
+      FillParticlePoistionFromSurrounding(p);
+      FillParticleIsotropicDirection(p);
+      fParticles.push_back(p);
+      break;
+    }
+  }
+  
+}
+
 
 void RadiologicalCheatGenerator::GenerateAr39() {
 
@@ -139,6 +164,30 @@ void RadiologicalCheatGenerator::GenerateCo60() {
 }
 
 void RadiologicalCheatGenerator::GenerateKr85() {
+
+  double chan = rand.Uniform(1.);
+  for (auto const& it: fDecays[kKr85]) {
+    if (chan<it.BranchingRatio) {
+      Part p;
+      if (it.Type == kBeta) {
+        p.pdg=11;
+        p.M = 0.000510999;
+      } else {
+        p.pdg=22;
+        p.M = 0.;
+      }
+      while(p.p<0) {
+        p.E = it.Spectrum->GetRandom()*1.e-6 + p.M;
+        p.p = p.E*p.E - p.M*p.M;
+      }
+      p.p = sqrt(p.p);
+      FillParticlePositionInArgon(p);
+      FillParticleIsotropicDirection(p);
+      fParticles.push_back(p);
+      break;
+    }
+  }
+  
 }
 
 void RadiologicalCheatGenerator::GenerateRn222() {
@@ -194,18 +243,60 @@ void RadiologicalCheatGenerator::FillParticleIsotropicDirection(Part& p) {
   p.pz = p.p*z;
 }
 
+void RadiologicalCheatGenerator::FillParticlePoistionFromSurrounding(Part& p) {
+  bool good=false;
+  double x;
+  double y;
+  double z;
+  while (!good) {
+    x = -0.5 + 350.5 * rand.Uniform();
+    y = -600 + 1201. * rand.Uniform();
+    z = -0.5 + 1396 * rand.Uniform();
+    if (0 < x && x < 350) {
+      if (-600 < y && y < 600) {
+        if (-0.5 < z && z < 1394.5) {
+          good = true;
+        }
+        if (1394.5 < z && z < 1395.5) {
+          good = true;
+        }
+      }
+      if (-601 < y && y < -600) {
+        if (0 < z && z < 1395) {
+          good = true;
+        }
+      }
+      if (600 < y && y < 601) {
+        if (0 < z && z < 1395) {
+          good = true;
+        } 
+      }
+    }
+    if (-0.5 < x && x < 0.5) {
+      if (-600 < y && y < 600) {
+        if (0 < z && z < 1395) {
+          good = true;
+        }
+      }
+    }
+  }
+  p.x=x;
+  p.y=y;
+  p.z=z;  
+}
+
+
 RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   fNEvent(0),
   fOutputFileName("") {
   fConvertor["Ar39"   ] = kAr39;
   fConvertor["K40"    ] = kK40;
   fConvertor["Ar42"   ] = kAr42;
-  // fConvertor["Neutron"] = kNeutron;
-  // fConvertor["CPA"    ] = kCPA;
-  // fConvertor["Kr85"   ] = kKr85;
-  fConvertor["Rn222"  ] = kRn222;
   fConvertor["Co60"   ] = kCo60;
-  // fConvertor["Po210"  ] = kPo210;
+  fConvertor["Kr85"   ] = kKr85;
+  fConvertor["Rn222"  ] = kRn222;
+  fConvertor["Neutron"] = kNeutron;
+  //fConvertor["Po210"  ] = kPo210;
   gRandom = &rand;
   Decay d;
   // ARGON 39
@@ -291,13 +382,25 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   d.Spectrum = NULL;
   fDecays[kRn222].push_back(d);
 
-
-  // COBALT 60 on APA
+  // Neutron
   d = Decay();
   d.Spectrum = GetSpectrum("Concrete_DUNE1.root")[0];
   d.Type = kNeutronD;
-  fDecays[kU238].push_back(d);
+  fDecays[kNeutron].push_back(d);
+
+  // Krypton
+  d = Decay();
+  spectra = GetSpectrum("Krpyton_85.root");
+  d.Spectrum = spectra[0];
+  d.BranchingRatio = spectra[0]->Integral() / (spectra[0]->Integral() +
+                                               spectra[1]->Integral());
+  d.Type = kBeta;
+  fDecays[kKr85].push_back(d);
   
+  d = Decay();
+  d.Spectrum = spectra[1];
+  d.Type = kGamma;
+  fDecays[kKr85].push_back(d);
  
 }
 

@@ -7,7 +7,7 @@ RunOver=10000
 TreeName="SNSimTree"
 TreeDir=["snanatrigprim2000"]
 
-OutputDirectory="/dune/data2/users/plasorak/PhilHitPrim/"
+OutputDirectory="."
 Config=" -c 0 "
 f = open("/dune/app/users/rodriges/run-snana-on-grid/snana-output-files-defaultnoise.list", "r")
 

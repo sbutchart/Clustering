@@ -41,7 +41,8 @@ enum RadType{
   kAr42 ,
   kRn222,
   kTh232,
-  kU238
+  kU238 ,
+  kNeutron
 };
 
 enum DecayType{
@@ -100,22 +101,24 @@ public:
   RadiologicalCheatGenerator();
   std::string CreateFCLFile(std::string);
   int Run();
-  void GenerateAr39 ();
-  void GenerateK40  ();
-  void GenerateAr42 ();
-  void GenerateNi59 ();
-  void GenerateCo60 ();
-  void GenerateKr85 ();
-  void GenerateRn222();
-  void GenerateTh232();
-  void GeneratePo210();
-  void GenerateU238 ();
-
+  void GenerateAr39   ();
+  void GenerateK40    ();
+  void GenerateAr42   ();
+  void GenerateNi59   ();
+  void GenerateCo60   ();
+  void GenerateKr85   ();
+  void GenerateRn222  ();
+  void GenerateTh232  ();
+  void GeneratePo210  ();
+  void GenerateU238   ();
+  void GenerateNeutron();
+  
   void PrintParticle(const Part& p);
-  void FillParticlePositionInArgon(Part& p);
-  void FillParticlePositionOnPDS  (Part& p);
-  void FillParticlePositionOnAPA  (Part& p);
-  void FillParticlePositionOnCPA  (Part& p);
+  void FillParticlePositionInArgon        (Part& p);
+  void FillParticlePositionOnPDS          (Part& p);
+  void FillParticlePositionOnAPA          (Part& p);
+  void FillParticlePositionOnCPA          (Part& p);
+  void FillParticlePoistionFromSurrounding(Part& p);
 
   void FillParticleIsotropicDirection(Part& p);
   std::vector<TH1D*> GetSpectrum(std::string filename){
@@ -130,7 +133,7 @@ public:
       std::cout << "you must source SourceMe.sh from the source before starting." << std::endl;
       exit(1);
     }
-    std::cout <<"Opening file "<< dir+filename << std::endl;
+    std::cout <<"Opening file "<< dir+"/"+filename << std::endl;
     TFile* file = new TFile((dir+"/"+filename).c_str(), "READ");
 
     
@@ -167,7 +170,7 @@ public:
     if (alpha) {
       double x, y;
       alpha->GetPoint(alpha->GetN()-1, x, y);
-      TH1D* s = new TH1D((filename+"_gamma").c_str(), "", 3*alpha->GetN(), 0, x);
+      TH1D* s = new TH1D((filename+"_alphas").c_str(), "", 3*alpha->GetN(), 0, x);
       for (int i=0; i<s->GetXaxis()->GetNbins(); ++i) {
         s->SetBinContent(i, alpha->Eval(s->GetBinCenter(i)));
       }
@@ -175,6 +178,20 @@ public:
       s->Draw();
       Spectrum.push_back(s);
       c.SaveAs((filename+"_alpha_Spectrum.png").c_str());
+    }
+
+    TGraph* neutron = (TGraph*)file->Get("Neutrons");
+    if (neutron) {
+      double x, y;
+      neutron->GetPoint(neutron->GetN()-1, x, y);
+      TH1D* s = new TH1D((filename+"_neutrons").c_str(), "", 3*neutron->GetN(), 0, x);
+      for (int i=0; i<s->GetXaxis()->GetNbins(); ++i) {
+        s->SetBinContent(i, neutron->Eval(s->GetBinCenter(i)));
+      }
+      TCanvas c;
+      s->Draw();
+      Spectrum.push_back(s);
+      c.SaveAs((filename+"_neutron_Spectrum.png").c_str());
     }
     
     return Spectrum;
