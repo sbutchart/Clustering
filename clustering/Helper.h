@@ -393,7 +393,7 @@ enum GenType{
   kRadon,
   kAr42,
   kAllBackground,
-  kAll            
+  kAll
 };
 
 

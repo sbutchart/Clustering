@@ -1,89 +1,43 @@
-#ifndef EFFICIENCYPLOT_HH
-#define EFFICIENCYPLOT_HH 1
+#ifndef EFFICIENCYPLOTMARLEY_HH
+#define EFFICIENCYPLOTMARLEY_HH 1
 
-#include <exception>
-#include <iostream>
-#include <regex>
-#include <string>
+#include "EfficiencyPlot.hh"
 
-#include "TCanvas.h"
-#include "TEfficiency.h"
-#include "TFile.h"
-#include "TH2D.h"
-#include "TLegend.h"
-#include "TProfile.h"
-#include "TTree.h"
 
-#include "Helper.h"
-#include "ClusterEngine.hh"
 
-struct WrongFileException : public std::exception{
-  const char * what () const throw () {
-      return "The file isn't of the right format!";
-    }
-};
+class EfficiencyPlotMarley: public EfficiencyPlot {
+
   
-  
-class EfficiencyPlot {
-public:
-  std::string fFileName;
-  TFile * fInputFile;
-  std::map<int, TLegend*>                  fLegend;
-  TLegend*                                 fLegendGroup;
-  std::map<int, std::vector<TEfficiency*>> fPlotClusterEfficiency;
-    std::map<int, std::vector<TProfile*>>    fPlotNHitProfile;
-    std::map<int, std::vector<TH2D*>>        fPlotNHitTH2D;
-    std::map<int, std::vector<TTree*>>       fTree;
-    std::map<int, TH1D*>                     f5MeVEfficiency;
-    std::map<int, std::vector<std::string>>  fTreeName;
-  ClusterEngine c;
-  
-  EfficiencyPlot(std::string filename):
-    fFileName(filename),
-    fInputFile(NULL),
-    fLegend(),
-    fLegendGroup(NULL),
-    fPlotClusterEfficiency(),
-    fPlotNHitProfile(),
-    fPlotNHitTH2D(),
-    fTree(),
-    f5MeVEfficiency(),
-    fTreeName(),
-    c(){
+  void SetUpTreeName() {
+    fTreeName[0].push_back("snanafasthit10"   );
+    fTreeName[0].push_back("snanafasthit15"   );
+    fTreeName[0].push_back("snanafasthit20"   );
+    fTreeName[0].push_back("snanafasthit25"   );
+    fTreeName[0].push_back("snanafasthit30"   );
+    fTreeName[0].push_back("snanafasthit35"   );
+    fTreeName[0].push_back("snanafasthit40"   );
     
-    fInputFile = new TFile(fFileName.c_str(), "READ");
-    SetUpTreeName();
-    Run();
-
-  }
-  virtual void SetUpTreeName() {
-    fTreeName[0].push_back("arbitraryanafasthit10"   );
-    fTreeName[0].push_back("arbitraryanafasthit15"   );
-    fTreeName[0].push_back("arbitraryanafasthit20"   );
-    fTreeName[0].push_back("arbitraryanafasthit25"   );
-    fTreeName[0].push_back("arbitraryanafasthit30"   );
-    fTreeName[0].push_back("arbitraryanafasthit35"   );
-    fTreeName[0].push_back("arbitraryanafasthit40"   );
+    fTreeName[1].push_back("snanagaushit10"   );
+    fTreeName[1].push_back("snanagaushit15"   );
+    fTreeName[1].push_back("snanagaushit20"   );
+    fTreeName[1].push_back("snanagaushit25"   );
+    fTreeName[1].push_back("snanagaushit30"   );
+    fTreeName[1].push_back("snanagaushit35"   );
+    fTreeName[1].push_back("snanagaushit40"   );
     
-    fTreeName[1].push_back("arbitraryanagaushit10"   );
-    fTreeName[1].push_back("arbitraryanagaushit15"   );
-    fTreeName[1].push_back("arbitraryanagaushit20"   );
-    fTreeName[1].push_back("arbitraryanagaushit25"   );
-    fTreeName[1].push_back("arbitraryanagaushit30"   );
-    fTreeName[1].push_back("arbitraryanagaushit35"   );
-    fTreeName[1].push_back("arbitraryanagaushit40"   );
-    
-    fTreeName[2].push_back("arbitraryanatrigprim1500");
-    fTreeName[2].push_back("arbitraryanatrigprim2000");
-    fTreeName[2].push_back("arbitraryanatrigprim2500");
-    fTreeName[2].push_back("arbitraryanatrigprim3000");
-    fTreeName[2].push_back("arbitraryanatrigprim3500");
-    fTreeName[2].push_back("arbitraryanatrigprim4000");
+    fTreeName[2].push_back("snanatrigprim1500");
+    fTreeName[2].push_back("snanatrigprim2000");
+    fTreeName[2].push_back("snanatrigprim2500");
+    fTreeName[2].push_back("snanatrigprim3000");
+    fTreeName[2].push_back("snanatrigprim3500");
+    fTreeName[2].push_back("snanatrigprim4000");
   }
 
-  virtual void Run() {
-    std::vector<double> *ParticleE=NULL;
-    std::vector<int>    *ParticlePDG=NULL;
+  using EfficiencyPlot::EfficiencyPlot;
+
+  void Run() {
+    std::vector<float>  *LepE=NULL;
+    std::vector<float>  *ENu=NULL;
     std::vector<int>    *Hit_View=NULL;
     std::vector<int>    *Hit_Chan=NULL;
     std::vector<double> *Hit_Time=NULL;
@@ -122,9 +76,9 @@ public:
         TEfficiency*& ef = fPlotClusterEfficiency[group].back();
         TProfile*& pr = fPlotNHitProfile[group].back();
         TH2D*& th = fPlotNHitTH2D[group].back();
-        t->SetBranchAddress("True_Geant4_E",   &ParticleE);
-        t->SetBranchAddress("True_Geant4_PDG", &ParticlePDG);
-        t->SetBranchAddress("NColHit",         &NColHit);
+        t->SetBranchAddress("True_ENu_Lep", &LepE);
+        t->SetBranchAddress("True_ENu",     &ENu);
+        t->SetBranchAddress("NColHit",  &NColHit);
         t->SetBranchAddress("Hit_View", &Hit_View);
         t->SetBranchAddress("Hit_Chan", &Hit_Chan);
         t->SetBranchAddress("Hit_Time", &Hit_Time);
@@ -157,8 +111,8 @@ public:
       
         for (int i=0; i<t->GetEntries(); ++i) {
           t->GetEntry(i);
-          pr->Fill(ParticleE->at(0)*1000., NColHit);
-          th->Fill(ParticleE->at(0)*1000., NColHit);
+          pr->Fill(ENu->at(0)*1000., NColHit);
+          th->Fill(ENu->at(0)*1000., NColHit);
 
           std::vector<WireHit*> hit_collection;
           hit_collection.clear();
@@ -189,7 +143,7 @@ public:
           if (correctly_backtracked!=NColHit) std::cout << title << " " << entry << ": " << correctly_backtracked << " / " << NColHit << std::endl;
           std::vector<WireCluster*> cluster_collection;
           c.ClusterHits2(hit_collection,cluster_collection);
-          ef->Fill(cluster_collection.size()>0, ParticleE->at(0)*1000.);
+          ef->Fill(cluster_collection.size()>0, ENu->at(0)*1000.);
           
         }
         f5MeVEfficiency[group]->SetBinContent(f5MeVEfficiency[group]->FindBin(threshold), ef->GetEfficiency(ef->FindFixBin(5)));
@@ -198,84 +152,8 @@ public:
       }
     }
     Plot();
-  };
-  
+  }
 
-  
-  ~EfficiencyPlot() {
-    fInputFile->Close();
-    // for (auto& it: fPlotClusterEfficiency) {
-    //   if (it) {
-    //     delete it;
-    //     it = NULL;
-    //   }
-    // }
-    // fPlotClusterEfficiency.clear();
-    
-    // for (auto& it: fPlotNHitProfile) {
-    //   if (it) {
-    //     delete it;
-    //     it = NULL;
-    //   }
-    // }
-    // fPlotNHitProfile.clear();
-    
-    // for (auto& it: fPlotNHitTH2D) {
-    //   if (it) {
-    //     delete it;
-    //     it = NULL;
-    //   }
-    // }
-    // fPlotNHitTH2D.clear();
-  };
-  
-  void Plot() const{
-    TCanvas* c = new TCanvas();
-    c->Print("TDRPlots.pdf[");
-
-
-    for (auto const& it: fPlotNHitProfile) {
-      if (it.second.size() > 0) {
-         it.second[0]->SetMinimum(0);
-        it.second[0]->Draw();
-        for (auto const& it2: it.second) it2->Draw("SAME");
-        fLegend.at(it.first)->Draw();
-        c->Print("TDRPlots.pdf");
-      }
-    }
-
-    for (auto const& it: fPlotClusterEfficiency) {
-      if (it.second.size() > 0) {
-        // it.second[0]->SetMinimum(0);
-        // it.second[0]->SetMaximum(1.2);
-        it.second[0]->Draw();
-        for (auto const& it2: it.second) it2->Draw("SAME");
-        fLegend.at(it.first)->SetX1NDC(0.6);
-        fLegend.at(it.first)->SetX2NDC(0.9);
-        fLegend.at(it.first)->SetY1NDC(0.1);
-        fLegend.at(it.first)->SetY2NDC(0.4);
-        fLegend.at(it.first)->Draw();
-        c->Print("TDRPlots.pdf");
-      }
-    }
-    
-    if (f5MeVEfficiency.size() > 0) {
-      f5MeVEfficiency.at(0)->SetMaximum(1.2);
-      f5MeVEfficiency.at(0)->SetMinimum(0.0);
-      gPad->SetGridx();
-      f5MeVEfficiency.at(0)->Draw();
-      for (auto const& it: f5MeVEfficiency)
-        it.second->Draw("SAME");
-      gPad->RedrawAxis();
-      fLegendGroup->Draw();
-    }
-    c->Print("TDRPlots.pdf");
-    c->Print("TDRPlots.pdf]");
-    delete c;
-    c = NULL;
-  };
-
-  
 };
 
 #endif

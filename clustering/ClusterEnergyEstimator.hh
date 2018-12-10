@@ -7,16 +7,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#if GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic warning "-Wmisleading-indentation"
+#endif
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#if GCC
 #pragma GCC diagnostic pop
-
+#endif
 class ClusterEnergyEstimator {
 
 public:

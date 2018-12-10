@@ -1,4 +1,5 @@
 #include "EfficiencyPlot.hh"
+#include "EfficiencyPlotMarley.hh"
 
 int main(int argc, char** argv){
 
@@ -22,7 +23,11 @@ int main(int argc, char** argv){
     std::cout << "Need to provide an input file with -i" << std::endl;
     exit(1);
   }
-  EfficiencyPlot e(InputFile);
-  
+  try{
+    EfficiencyPlot e(InputFile);
+  }catch(...) {
+    std::cout << "Probably not the right file, trying with another input format." << std::endl;
+    EfficiencyPlotMarley r(InputFile);
+  }
   return 0;
 }
