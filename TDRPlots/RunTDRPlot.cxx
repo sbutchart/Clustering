@@ -25,9 +25,11 @@ int main(int argc, char** argv){
   }
   try{
     EfficiencyPlot e(InputFile);
+    e.Run();
   }catch(...) {
     std::cout << "Probably not the right file, trying with another input format." << std::endl;
     EfficiencyPlotMarley r(InputFile);
+    r.Run();
   }
   return 0;
 }

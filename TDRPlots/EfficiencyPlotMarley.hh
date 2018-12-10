@@ -7,8 +7,14 @@
 
 class EfficiencyPlotMarley: public EfficiencyPlot {
 
-  
-  void SetUpTreeName() {
+public:
+  std::map<int, std::vector<TEfficiency*>> fPlotClusterEfficiencyENU;
+  std::map<int, std::vector<TProfile*>>    fPlotNHitProfileENU;
+  std::map<int, std::vector<TH2D*>>        fPlotNHitTH2DENU;
+  std::map<int, TH1D*>                     f5MeVEfficiencyENU;
+
+  virtual void SetUpTreeName() {
+    std::cout << "Setting up the correct tree" << std::endl;
     fTreeName[0].push_back("snanafasthit10"   );
     fTreeName[0].push_back("snanafasthit15"   );
     fTreeName[0].push_back("snanafasthit20"   );
@@ -35,7 +41,10 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
 
   using EfficiencyPlot::EfficiencyPlot;
 
-  void Run() {
+  virtual void Run() {
+    fInputFile = new TFile(fFileName.c_str(), "READ");
+    SetUpTreeName();
+    
     std::vector<float>  *LepE=NULL;
     std::vector<float>  *ENu=NULL;
     std::vector<int>    *Hit_View=NULL;
@@ -48,18 +57,24 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
     int NColHit=0;
     fLegendGroup = new TLegend(0.6,0.1,0.9,0.3);
     std::vector<int> color = getColors(0);
+
     for (auto const&treegroup: fTreeName) {
       int group=treegroup.first;
       int iter=0;
       fLegend[group] = new TLegend(0.1,0.6,0.4,0.9);
-      f5MeVEfficiency[group] = new TH1D(Form("f5MeVEfficiency_%i",group), ";ADC Threshold;Efficiency @5MeV", 7, 7.5, 42.5);
+      f5MeVEfficiency[group] = new TH1D(Form("f5MeVEfficiency_%i",group), ";ADC Threshold;Efficiency @E_{e}=5MeV", 7, 7.5, 42.5);
       f5MeVEfficiency[group]->SetLineColor(color[group]);
       f5MeVEfficiency[group]->SetLineWidth(2);
       f5MeVEfficiency[group]->SetStats(0);
+      f5MeVEfficiencyENU[group] = new TH1D(Form("f5MeVEfficiencyENU_%i",group), ";ADC Threshold;Efficiency @E_{#nu}=5MeV", 7, 7.5, 42.5);
+      f5MeVEfficiencyENU[group]->SetLineColor(color[group]);
+      f5MeVEfficiencyENU[group]->SetLineWidth(2);
+      f5MeVEfficiencyENU[group]->SetStats(0);
       std::string algorithm = treegroup.second[0];
       algorithm = std::regex_replace(algorithm, std::regex(R"([0-9])"), "");
-      algorithm = std::regex_replace(algorithm, std::regex("arbitraryana"), "");
+      algorithm = std::regex_replace(algorithm, std::regex("snana"), "");
       fLegendGroup->AddEntry(f5MeVEfficiency[group], algorithm.c_str());
+      
       for (auto const&tree: treegroup.second) {
         fTree[group].push_back((TTree*) fInputFile->Get((tree+"/SNSimTree").c_str()));
         if (fTree[group].back() == NULL) {
@@ -71,11 +86,21 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
                                                              ";Electron energy [MeV];NHit", 30, 0, 30));
         fPlotNHitTH2D[group]         .push_back(new TH2D((tree+"TH2D").c_str(),
                                                          ";Electron energy [MeV];NHit", 30, 0, 30, 10, 0, 10));
+
+        fPlotClusterEfficiencyENU[group].push_back(new TEfficiency((tree+"EffENU").c_str(),
+                                                                ";Neutrino energy [MeV];Clustering efficiency", 30, 0, 30));
+        fPlotNHitProfileENU[group]      .push_back(new TProfile((tree+"ProfENU").c_str(),
+                                                             ";Neutrino energy [MeV];NHit", 30, 0, 30));
+        fPlotNHitTH2DENU[group]         .push_back(new TH2D((tree+"TH2DENU").c_str(),
+                                                         ";Neutrino energy [MeV];NHit", 30, 0, 30, 10, 0, 10));
       
         TTree* t = fTree[group].back();
         TEfficiency*& ef = fPlotClusterEfficiency[group].back();
         TProfile*& pr = fPlotNHitProfile[group].back();
         TH2D*& th = fPlotNHitTH2D[group].back();
+        TEfficiency*& efENU = fPlotClusterEfficiencyENU[group].back();
+        TProfile*& prENU = fPlotNHitProfileENU[group].back();
+        TH2D*& thENU = fPlotNHitTH2D[group].back();
         t->SetBranchAddress("True_ENu_Lep", &LepE);
         t->SetBranchAddress("True_ENu",     &ENu);
         t->SetBranchAddress("NColHit",  &NColHit);
@@ -87,17 +112,21 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
         t->SetBranchAddress("Hit_True_GenType", &Hit_True_GenType);
         pr->SetStats(0);
         th->SetStats(0);
+        prENU->SetStats(0);
+        thENU->SetStats(0);
         pr->SetLineColor(color[iter]);
         ef->SetLineColor(color[iter]);
+        prENU->SetLineColor(color[iter]);
+        efENU->SetLineColor(color[iter]);
         ++iter;
 
         std::string title = tree;
         std::string entry = tree;
         title = std::regex_replace(title, std::regex(R"([0-9])"), "");
-        title = std::regex_replace(title, std::regex("arbitraryana"), "");
-        entry = std::regex_replace(entry, std::regex("arbitraryanagaushit"), "");
-        entry = std::regex_replace(entry, std::regex("arbitraryanafasthit"), "");
-        entry = std::regex_replace(entry, std::regex("arbitraryanatrigprim"), "");
+        title = std::regex_replace(title, std::regex("snana"), "");
+        entry = std::regex_replace(entry, std::regex("snanagaushit"), "");
+        entry = std::regex_replace(entry, std::regex("snanafasthit"), "");
+        entry = std::regex_replace(entry, std::regex("snanatrigprim"), "");
         std::size_t found = entry.find("000");
         if (found!=std::string::npos) entry.erase(found+1, found+2);
         found = entry.find("00");
@@ -111,8 +140,10 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
       
         for (int i=0; i<t->GetEntries(); ++i) {
           t->GetEntry(i);
-          pr->Fill(ENu->at(0)*1000., NColHit);
-          th->Fill(ENu->at(0)*1000., NColHit);
+          pr->Fill(LepE->at(0)*1000., NColHit);
+          th->Fill(LepE->at(0)*1000., NColHit);
+          prENU->Fill(ENu->at(0)*1000., NColHit);
+          thENU->Fill(ENu->at(0)*1000., NColHit);
 
           std::vector<WireHit*> hit_collection;
           hit_collection.clear();
@@ -143,16 +174,103 @@ class EfficiencyPlotMarley: public EfficiencyPlot {
           if (correctly_backtracked!=NColHit) std::cout << title << " " << entry << ": " << correctly_backtracked << " / " << NColHit << std::endl;
           std::vector<WireCluster*> cluster_collection;
           c.ClusterHits2(hit_collection,cluster_collection);
-          ef->Fill(cluster_collection.size()>0, ENu->at(0)*1000.);
+          ef->Fill(cluster_collection.size()>0, LepE->at(0)*1000.);
+          efENU->Fill(cluster_collection.size()>0, ENu->at(0)*1000.);
           
         }
         f5MeVEfficiency[group]->SetBinContent(f5MeVEfficiency[group]->FindBin(threshold), ef->GetEfficiency(ef->FindFixBin(5)));
         f5MeVEfficiency[group]->SetBinError  (f5MeVEfficiency[group]->FindBin(threshold), 0.5*(ef->GetEfficiencyErrorLow(ef->FindFixBin(5))+ef->GetEfficiencyErrorLow(ef->FindFixBin(5))));
 
+        f5MeVEfficiencyENU[group]->SetBinContent(f5MeVEfficiencyENU[group]->FindBin(threshold), efENU->GetEfficiency(efENU->FindFixBin(5)));
+        f5MeVEfficiencyENU[group]->SetBinError  (f5MeVEfficiencyENU[group]->FindBin(threshold), 0.5*(efENU->GetEfficiencyErrorLow(efENU->FindFixBin(5))+efENU->GetEfficiencyErrorLow(efENU->FindFixBin(5))));
+
       }
     }
     Plot();
   }
+  virtual void Plot() const{
+    TCanvas* c = new TCanvas();
+    c->Print("TDRPlots.pdf[");
+
+
+    for (auto const& it: fPlotNHitProfile) {
+      if (it.second.size() > 0) {
+        it.second[0]->SetMinimum(0);
+        it.second[0]->Draw();
+        for (auto const& it2: it.second) it2->Draw("SAME");
+        fLegend.at(it.first)->Draw();
+        c->Print("TDRPlots.pdf");
+      }
+    }
+
+    for (auto const& it: fPlotClusterEfficiency) {
+      if (it.second.size() > 0) {
+        // it.second[0]->SetMinimum(0);
+        // it.second[0]->SetMaximum(1.2);
+        it.second[0]->Draw();
+        for (auto const& it2: it.second) it2->Draw("SAME");
+        fLegend.at(it.first)->SetX1NDC(0.6);
+        fLegend.at(it.first)->SetX2NDC(0.9);
+        fLegend.at(it.first)->SetY1NDC(0.1);
+        fLegend.at(it.first)->SetY2NDC(0.4);
+        fLegend.at(it.first)->Draw();
+        c->Print("TDRPlots.pdf");
+      }
+    }
+    std::cout << f5MeVEfficiency.size() << std::endl;
+    if (f5MeVEfficiency.size() > 0) {
+      f5MeVEfficiency.at(0)->SetMaximum(1.2);
+      f5MeVEfficiency.at(0)->SetMinimum(0.0);
+      gPad->SetGridx();
+      f5MeVEfficiency.at(0)->Draw();
+      for (auto const& it: f5MeVEfficiency)
+        it.second->Draw("SAME");
+      gPad->RedrawAxis();
+      fLegendGroup->Draw();
+      c->Print("TDRPlots.pdf");
+    }
+    gPad->SetGridx(false);
+
+    for (auto const& it: fPlotNHitProfileENU) {
+      if (it.second.size() > 0) {
+        it.second[0]->SetMinimum(0);
+        it.second[0]->Draw();
+        for (auto const& it2: it.second) it2->Draw("SAME");
+        fLegend.at(it.first)->Draw();
+        c->Print("TDRPlots.pdf");
+      }
+    }
+
+    for (auto const& it: fPlotClusterEfficiencyENU) {
+      if (it.second.size() > 0) {
+        // it.second[0]->SetMinimum(0);
+        // it.second[0]->SetMaximum(1.2);
+        it.second[0]->Draw();
+        for (auto const& it2: it.second) it2->Draw("SAME");
+        fLegend.at(it.first)->SetX1NDC(0.6);
+        fLegend.at(it.first)->SetX2NDC(0.9);
+        fLegend.at(it.first)->SetY1NDC(0.1);
+        fLegend.at(it.first)->SetY2NDC(0.4);
+        fLegend.at(it.first)->Draw();
+        c->Print("TDRPlots.pdf");
+      }
+    }
+    
+    if (f5MeVEfficiencyENU.size() > 0) {
+      f5MeVEfficiencyENU.at(0)->SetMaximum(1.2);
+      f5MeVEfficiencyENU.at(0)->SetMinimum(0.0);
+      gPad->SetGridx();
+      f5MeVEfficiencyENU.at(0)->Draw();
+      for (auto const& it: f5MeVEfficiencyENU)
+        it.second->Draw("SAME");
+      gPad->RedrawAxis();
+      fLegendGroup->Draw();
+      c->Print("TDRPlots.pdf");
+    }
+    c->Print("TDRPlots.pdf]");
+    delete c;
+    c = NULL;
+  };
 
 };
 

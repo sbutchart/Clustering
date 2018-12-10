@@ -31,11 +31,11 @@ public:
   std::map<int, TLegend*>                  fLegend;
   TLegend*                                 fLegendGroup;
   std::map<int, std::vector<TEfficiency*>> fPlotClusterEfficiency;
-    std::map<int, std::vector<TProfile*>>    fPlotNHitProfile;
-    std::map<int, std::vector<TH2D*>>        fPlotNHitTH2D;
-    std::map<int, std::vector<TTree*>>       fTree;
-    std::map<int, TH1D*>                     f5MeVEfficiency;
-    std::map<int, std::vector<std::string>>  fTreeName;
+  std::map<int, std::vector<TProfile*>>    fPlotNHitProfile;
+  std::map<int, std::vector<TH2D*>>        fPlotNHitTH2D;
+  std::map<int, std::vector<TTree*>>       fTree;
+  std::map<int, TH1D*>                     f5MeVEfficiency;
+  std::map<int, std::vector<std::string>>  fTreeName;
   ClusterEngine c;
   
   EfficiencyPlot(std::string filename):
@@ -50,13 +50,10 @@ public:
     f5MeVEfficiency(),
     fTreeName(),
     c(){
-    
-    fInputFile = new TFile(fFileName.c_str(), "READ");
-    SetUpTreeName();
-    Run();
-
   }
+
   virtual void SetUpTreeName() {
+    std::cout << "Setting up the wrong tree" << std::endl;
     fTreeName[0].push_back("arbitraryanafasthit10"   );
     fTreeName[0].push_back("arbitraryanafasthit15"   );
     fTreeName[0].push_back("arbitraryanafasthit20"   );
@@ -82,6 +79,10 @@ public:
   }
 
   virtual void Run() {
+  
+    fInputFile = new TFile(fFileName.c_str(), "READ");
+    SetUpTreeName();
+  
     std::vector<double> *ParticleE=NULL;
     std::vector<int>    *ParticlePDG=NULL;
     std::vector<int>    *Hit_View=NULL;
@@ -203,7 +204,7 @@ public:
 
   
   ~EfficiencyPlot() {
-    fInputFile->Close();
+    if(fInputFile)  fInputFile->Close();
     // for (auto& it: fPlotClusterEfficiency) {
     //   if (it) {
     //     delete it;
@@ -236,7 +237,7 @@ public:
 
     for (auto const& it: fPlotNHitProfile) {
       if (it.second.size() > 0) {
-         it.second[0]->SetMinimum(0);
+        it.second[0]->SetMinimum(0);
         it.second[0]->Draw();
         for (auto const& it2: it.second) it2->Draw("SAME");
         fLegend.at(it.first)->Draw();
