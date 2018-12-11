@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if __GNUC__
+#if defined(__GNUC__) && (__GNUC___ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic warning "-Wmisleading-indentation"
 #endif
@@ -16,7 +16,7 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#if __GNUCC__
+#if defined(__GNUC__) && (__GNUC___ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
 #pragma GCC diagnostic pop
 #endif
 class ClusterEnergyEstimator {

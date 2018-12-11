@@ -1,5 +1,5 @@
 #ifndef CONFIGURATION_HH
-#define CONFIGURATION_HH
+#define CONFIGURATION_HH 1
 
 #include <algorithm>
 #include <map>
@@ -34,6 +34,10 @@ public:
   std::map<double,double> fLatency_Distance;
   std::map<double,double> fLatency_Burst95CL;
   std::map<double,double> fLatency_Distance95CL;
+  std::map<double,double> fLatency_NoBurstBurst;
+  std::map<double,double> fLatency_NoBurstDistance;
+  std::map<double,double> fLatency_NoBurstBurst95CL;
+  std::map<double,double> fLatency_NoBurstDistance95CL;
 
   TH1D* fTH1DFakeRate_Cut;
   TH1D* fTH1DEfficiency_Burst;
@@ -43,6 +47,10 @@ public:
   TH1D* fTH1DLatency_Distance;
   TH1D* fTH1DLatency_Burst95CL;
   TH1D* fTH1DLatency_Distance95CL;
+  TH1D* fTH1DLatency_NoBurstBurst;
+  TH1D* fTH1DLatency_NoBurstDistance;
+  TH1D* fTH1DLatency_NoBurstBurst95CL;
+  TH1D* fTH1DLatency_NoBurstDistance95CL;
 
   std::vector<TH1D*> fTH1DList;
 
@@ -60,26 +68,30 @@ public:
   
   
   Configuration(const Configuration& c) {
-    fNClusterCut            = c.fNClusterCut;
-    fClusterAlgorithm       = c.fClusterAlgorithm;
-    fBackgroundRate         = c.fBackgroundRate;
-    fBackgroundRateError    = c.fBackgroundRateError;
-    fBurstTimeWindow        = c.fBurstTimeWindow;
-    fFractionInTimeWindow   = c.fFractionInTimeWindow;
-    fClusterEfficiency      = c.fClusterEfficiency;
-    fClusterEfficiencyError = c.fClusterEfficiencyError;
-    fLegendEntry            = c.fLegendEntry;
-    fTargetFakeRate         = c.fTargetFakeRate;
-    fActualFakeRate         = c.fActualFakeRate;
-
-    fFakeRate_Cut        = c.fFakeRate_Cut;
-    fEfficiency_Burst    = c.fEfficiency_Burst;
-    fEfficiency_Distance = c.fEfficiency_Distance;
-    fCoverage            = c.fCoverage;
-    fLatency_Burst       = c.fLatency_Burst;
-    fLatency_Distance    = c.fLatency_Distance;
-    fLatency_Burst95CL       = c.fLatency_Burst95CL;
-    fLatency_Distance95CL    = c.fLatency_Distance95CL;
+    fNClusterCut                 = c.fNClusterCut;
+    fClusterAlgorithm            = c.fClusterAlgorithm;
+    fBackgroundRate              = c.fBackgroundRate;
+    fBackgroundRateError         = c.fBackgroundRateError;
+    fBurstTimeWindow             = c.fBurstTimeWindow;
+    fFractionInTimeWindow        = c.fFractionInTimeWindow;
+    fClusterEfficiency           = c.fClusterEfficiency;
+    fClusterEfficiencyError      = c.fClusterEfficiencyError;
+    fLegendEntry                 = c.fLegendEntry;
+    fTargetFakeRate              = c.fTargetFakeRate;
+    fActualFakeRate              = c.fActualFakeRate;
+    
+    fFakeRate_Cut                = c.fFakeRate_Cut;
+    fEfficiency_Burst            = c.fEfficiency_Burst;
+    fEfficiency_Distance         = c.fEfficiency_Distance;
+    fCoverage                    = c.fCoverage;
+    fLatency_Burst               = c.fLatency_Burst;
+    fLatency_Distance            = c.fLatency_Distance;
+    fLatency_Burst95CL           = c.fLatency_Burst95CL;
+    fLatency_Distance95CL        = c.fLatency_Distance95CL;
+    fLatency_NoBurstBurst        = c.fLatency_NoBurstBurst       ;
+    fLatency_NoBurstDistance     = c.fLatency_NoBurstDistance    ;
+    fLatency_NoBurstBurst95CL    = c.fLatency_NoBurstBurst95CL   ;
+    fLatency_NoBurstDistance95CL = c.fLatency_NoBurstDistance95CL;
 
     fTH1DList = c.fTH1DList;
     if (c.fTH1DFakeRate_Cut) { fTH1DFakeRate_Cut = (TH1D*)c.fTH1DFakeRate_Cut->Clone(); }
@@ -106,6 +118,18 @@ public:
     if (c.fTH1DLatency_Distance95CL) { fTH1DLatency_Distance95CL = (TH1D*)c.fTH1DLatency_Distance95CL->Clone(); }
     else                             { fTH1DLatency_Distance95CL = NULL; }
 
+    if (c.fTH1DLatency_NoBurstBurst) { fTH1DLatency_NoBurstBurst = (TH1D*)c.fTH1DLatency_NoBurstBurst->Clone(); }
+    else                             { fTH1DLatency_NoBurstBurst = NULL; }
+    
+    if (c.fTH1DLatency_NoBurstDistance) { fTH1DLatency_NoBurstDistance = (TH1D*)c.fTH1DLatency_NoBurstDistance->Clone(); }
+    else                                { fTH1DLatency_NoBurstDistance = NULL; }
+
+    if (c.fTH1DLatency_NoBurstBurst95CL) { fTH1DLatency_NoBurstBurst95CL = (TH1D*)c.fTH1DLatency_NoBurstBurst95CL->Clone(); }
+    else                                 { fTH1DLatency_NoBurstBurst95CL = NULL; }
+    
+    if (c.fTH1DLatency_NoBurstDistance95CL) { fTH1DLatency_NoBurstDistance95CL = (TH1D*)c.fTH1DLatency_NoBurstDistance95CL->Clone(); }
+    else                                    { fTH1DLatency_NoBurstDistance95CL = NULL; }
+
     if (c.fDistanceParametrisation) { fDistanceParametrisation = (TF1*)c.fDistanceParametrisation->Clone(); }
     else                      { fDistanceParametrisation = NULL; }
     
@@ -114,36 +138,44 @@ public:
   }
 
   Configuration():
-    fName                    (""),
-    fLegendEntry             (""),
-    fNClusterCut             (0),
-    fClusterAlgorithm        (0),
-    fBackgroundRate          (0),
-    fBackgroundRateError     (0),    
-    fBurstTimeWindow         (0),
-    fClusterEfficiency       (0),
-    fClusterEfficiencyError  (0),
-    fTargetFakeRate          (0),
-    fActualFakeRate          (0),
-    fFakeRate_Cut            (),
-    fEfficiency_Burst        (),
-    fEfficiency_Distance     (),
-    fCoverage                (),
-    fLatency_Burst           (),
-    fLatency_Distance        (),
-    fLatency_Burst95CL       (),
-    fLatency_Distance95CL    (),
-    fTH1DFakeRate_Cut        (NULL),
-    fTH1DEfficiency_Burst    (NULL),
-    fTH1DEfficiency_Distance (NULL),
-    fTH1DCoverage            (NULL),
-    fTH1DLatency_Burst       (NULL),
-    fTH1DLatency_Distance    (NULL),
-    fDistanceParametrisation (NULL),
-    fDistanceProbability     (NULL),
-    fTH1DLatency_Burst95CL   (NULL),
-    fTH1DLatency_Distance95CL(NULL),
-    fTH1DList               (){
+    fName                           (""),
+    fLegendEntry                    (""),
+    fNClusterCut                    (0),
+    fClusterAlgorithm               (0),
+    fBackgroundRate                 (0),
+    fBackgroundRateError            (0),    
+    fBurstTimeWindow                (0),
+    fClusterEfficiency              (0),
+    fClusterEfficiencyError         (0),
+    fTargetFakeRate                 (0),
+    fActualFakeRate                 (0),
+    fFakeRate_Cut                   (),
+    fEfficiency_Burst               (),
+    fEfficiency_Distance            (),
+    fCoverage                       (),
+    fLatency_Burst                  (),
+    fLatency_Distance               (),
+    fLatency_Burst95CL              (),
+    fLatency_Distance95CL           (),
+    fLatency_NoBurstBurst           (),
+    fLatency_NoBurstDistance        (),
+    fLatency_NoBurstBurst95CL       (),
+    fLatency_NoBurstDistance95CL    (),
+    fTH1DFakeRate_Cut               (NULL),
+    fTH1DEfficiency_Burst           (NULL),
+    fTH1DEfficiency_Distance        (NULL),
+    fTH1DCoverage                   (NULL),
+    fTH1DLatency_Burst              (NULL),
+    fTH1DLatency_Distance           (NULL),
+    fTH1DLatency_Burst95CL          (NULL),
+    fTH1DLatency_Distance95CL       (NULL),
+    fTH1DLatency_NoBurstBurst       (NULL),
+    fTH1DLatency_NoBurstDistance    (NULL),
+    fTH1DLatency_NoBurstBurst95CL   (NULL),
+    fTH1DLatency_NoBurstDistance95CL(NULL),
+    fDistanceParametrisation        (NULL),
+    fDistanceProbability            (NULL),
+    fTH1DList                       (){
   };
   
   void FillHistograms(const std::map<double,double> input,
@@ -248,9 +280,15 @@ public:
                    "Latency_Burst", "N SN interactions / 10 kT", "Latency [ms]");
     FillHistograms(fLatency_Burst95CL, fTH1DLatency_Burst95CL,
                    "Latency_Burst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95\%CL");
+    FillHistograms(fLatency_NoBurstBurst, fTH1DLatency_NoBurstBurst,
+                   "Latency_NoBurstBurst", "N SN interactions / 10 kT", "Latency [ms] (no burst)");
+    FillHistograms(fLatency_NoBurstBurst95CL, fTH1DLatency_NoBurstBurst95CL,
+                   "Latency_NoBurstBurst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95\%CL (no burst)");
     ConvertToDistance(fTH1DEfficiency_Burst   , fTH1DEfficiency_Distance );
     ConvertToDistance(fTH1DLatency_Burst      , fTH1DLatency_Distance    );
     ConvertToDistance(fTH1DLatency_Burst95CL  , fTH1DLatency_Distance95CL);
+    ConvertToDistance(fTH1DLatency_NoBurstBurst      , fTH1DLatency_NoBurstDistance    );
+    ConvertToDistance(fTH1DLatency_NoBurstBurst95CL  , fTH1DLatency_NoBurstDistance95CL);
     ConvertToCoverage(fTH1DEfficiency_Distance, fTH1DCoverage            );
     std::cout << "Configuration::FillHistograms(): Finished filling histograms" << std::endl;
   };
@@ -302,13 +340,17 @@ public:
   }
   
   ~Configuration() {
-    fFakeRate_Cut        .clear();
-    fEfficiency_Distance .clear();
-    fCoverage            .clear();
-    fLatency_Burst       .clear();
-    fLatency_Distance    .clear();
-    fLatency_Burst95CL   .clear();
-    fLatency_Distance95CL.clear();
+    fFakeRate_Cut               .clear();
+    fEfficiency_Distance        .clear();
+    fCoverage                   .clear();
+    fLatency_Burst              .clear();
+    fLatency_Distance           .clear();
+    fLatency_Burst95CL          .clear();
+    fLatency_Distance95CL       .clear();
+    fLatency_NoBurstBurst       .clear();
+    fLatency_NoBurstDistance    .clear();
+    fLatency_NoBurstBurst95CL   .clear();
+    fLatency_NoBurstDistance95CL.clear();
     for (auto& it: fTH1DList) {
       if (it) delete it;
       it = NULL;

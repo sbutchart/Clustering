@@ -26,3 +26,6 @@ target_link_libraries(RequirementEfficiency SNBurstTrigger)
 
 add_executable(MakeSNTheoryDistributions MakeSNTheoryDistributions.C)
 target_link_libraries(MakeSNTheoryDistributions ${ROOT_LIBRARIES})
+
+add_executable(TimingDistribMarley TimingDistribMarley.C)
+target_link_libraries(TimingDistribMarley ${ROOT_LIBRARIES})
