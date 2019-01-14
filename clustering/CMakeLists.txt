@@ -85,6 +85,9 @@ target_link_libraries(EfficiencyCalculator Clustering)
 add_executable(DumpSNRate DumpRate.cxx)
 target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
 
+add_executable(SolarPlot SolarPlot.cxx)
+target_link_libraries(SolarPlot Clustering)
+
 add_executable(MakePEPlotForJose MakePEPlotForJose.C)
 target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})
 

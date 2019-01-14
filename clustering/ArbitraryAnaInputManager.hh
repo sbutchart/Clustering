@@ -180,6 +180,7 @@ public:
     delete True_Sec_Energy       ; True_Sec_Energy      = NULL;
     delete True_Sec_PDG          ; True_Sec_PDG         = NULL;
     delete True_Sec_ID           ; True_Sec_ID          = NULL;
+
     if (f_Input) f_Input->Close();
   };
 
@@ -247,9 +248,6 @@ public:
     t_Input->SetBranchAddress("True_Sec_Energy"     , &True_Sec_Energy     );
     t_Input->SetBranchAddress("True_Sec_PDG"        , &True_Sec_PDG        );
     t_Input->SetBranchAddress("True_Sec_ID"         , &True_Sec_ID         );
-
-
-
 
 
 

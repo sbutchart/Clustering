@@ -50,6 +50,7 @@ public:
   
   size_t GetHitView     () const { return fHitView;         };
   int    GetHitChan     () const { return (int)fChannel;    };
+  int    GetGenType     () const { return fTrueGenType;     };
   double GetHitTime     () const { return fPosition.at(kT); };
   double GetHitSADC     () const { return fPeak;            };
   double GetHitRMS      () const { return fSize.at(kT);     };

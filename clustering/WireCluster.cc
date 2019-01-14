@@ -10,5 +10,8 @@ WireCluster::WireCluster(std::vector<Hit*>& vec_Hits):
   for (auto const& it: fHit) {
     WireHit* hit = (WireHit*)it;
     fNElectron += hit->GetNElectron();
+    fPartGenType.push_back(hit->GetGenType());
+    fTrackIDs.insert(hit->GetTrIDPart());
+    fPartEnergies.push_back(hit->GetTrEPart());
   }
 }
