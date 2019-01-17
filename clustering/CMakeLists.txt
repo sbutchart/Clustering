@@ -82,6 +82,12 @@ target_link_libraries(AnalyseWireClustering_SolarNu ${ROOT_LIBRARIES})
 add_executable(EfficiencyCalculator EfficiencyCalculator.cxx)
 target_link_libraries(EfficiencyCalculator Clustering)
 
+add_executable(RunThreshold RunThreshold.cxx)
+target_link_libraries(RunThreshold Clustering)
+
+add_executable(AnalyseTreshold AnalyseTreshold.cxx)
+target_link_libraries(AnalyseTreshold Clustering)
+
 add_executable(DumpSNRate DumpRate.cxx)
 target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
 

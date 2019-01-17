@@ -15,7 +15,7 @@
 #include "TTree.h"
 #include "TLegend.h"
 #include "TEfficiency.h"
-
+#include "TStyle.h"
 
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
   Helper h;
@@ -104,7 +104,7 @@ int main(int argc, char** argv){
   double pur_Ar42      ;
   
   std::vector<int>    * HitView  = NULL;
-  std::vector<int>    * GenType  = NULL;
+  std::vector<int>    * HitGenType = NULL;
   std::vector<int>    * HitChan  = NULL;
   std::vector<double> * HitTime  = NULL;
   std::vector<double> * HitSADC  = NULL;
@@ -113,6 +113,7 @@ int main(int argc, char** argv){
   std::vector<double> * TrPosY   = NULL; 
   std::vector<double> * TrPosZ   = NULL;
 
+  int MarleyIndex;
   int EventTrue;
   std::vector<double> * MarlTime = NULL;
   std::vector<double> * ENu      = NULL;
@@ -127,6 +128,7 @@ int main(int argc, char** argv){
   
   TTree* t_Output_triggeredclusteredhits = (TTree*)f_Input->Get("ClusteredWireHit");
   t_Output_triggeredclusteredhits->SetBranchAddress("Cluster",        &Cluster      );
+  t_Output_triggeredclusteredhits->SetBranchAddress("MarleyIndex",    &MarleyIndex  );
   t_Output_triggeredclusteredhits->SetBranchAddress("Event",          &Event        );
   t_Output_triggeredclusteredhits->SetBranchAddress("Config",         &Config       );
   t_Output_triggeredclusteredhits->SetBranchAddress("StartChan",      &StartChan    );
@@ -158,7 +160,7 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Radon"   ,   &pur_Radon   );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar42"    ,   &pur_Ar42    );
   t_Output_triggeredclusteredhits->SetBranchAddress("HitView",        &HitView);
-  t_Output_triggeredclusteredhits->SetBranchAddress("GenType",        &GenType);
+  t_Output_triggeredclusteredhits->SetBranchAddress("GenType",        &HitGenType);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitChan",        &HitChan);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitTime",        &HitTime);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitSADC",        &HitSADC);
@@ -197,6 +199,7 @@ int main(int argc, char** argv){
     nMarleyEvent += (int)ENu->size();
   }
   
+  std::cout << "nMarleyEvent " << nMarleyEvent << std::endl;
   TCanvas c;
   c.Print((OutputFile+"[").c_str());
   TProfile* p_gentype_sign_wire = SetUpTProfileGenType("p_gentype_sign_wire", ";;average number of hits in cluster");
@@ -216,6 +219,14 @@ int main(int argc, char** argv){
   p_gentype_sign_neut_wire->SetLineWidth(2);
   p_gentype_back_neut_wire->SetLineWidth(2);
 
+  Helper h;
+
+  TH1D* h_rate_back = new TH1D("rates", ";;Rate [Hz]", h.GenName.size(), -0.5, (double)h.GenName.size()-0.5);
+  //h_rate_back->SetStats(0);
+  h_rate_back->SetLineWidth(2);
+  for(auto const& it : h.ShortGenName)
+    h_rate_back->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
+  
   std::map<int,std::vector<int> > map_event_entry_wire;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
     t_Output_triggeredclusteredhits->GetEntry(i);
@@ -239,7 +250,7 @@ int main(int argc, char** argv){
   h_nhit_back_wire->SetLineStyle(1);
   h_nhit_sign_wire->SetLineWidth(2);
   h_nhit_back_wire->SetLineWidth(2);
-
+  
   t_Output_triggeredclusteredhits->Project("h_nhit_sign_wire", "NHits", Form("Type==1 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
   t_Output_triggeredclusteredhits->Project("h_nhit_back_wire", "NHits", Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut));
   std::cout << h_nhit_back_wire->GetEntries() << std::endl;
@@ -253,48 +264,77 @@ int main(int argc, char** argv){
   h_nhit_back_wire->Draw("SAME");
   c.Print(OutputFile.c_str());
 
-  int nEventWire=0;
-  int nDetectedSignalEventWire=0;
+  TH1D* h_maxADChit_sign_wire = new TH1D("h_maxADChit_sign_wire", ";Max hit ADC;Clusters", 150, 0, 15000);
+  TH1D* h_maxADChit_back_wire = new TH1D("h_maxADChit_back_wire", ";Max hit ADC;Clusters", 150, 0, 15000);
+  h_maxADChit_sign_wire->SetLineColor(kRed);
+  h_maxADChit_back_wire->SetLineColor(kBlue);
+  h_maxADChit_sign_wire->SetLineStyle(1);
+  h_maxADChit_back_wire->SetLineStyle(1);
+  h_maxADChit_sign_wire->SetLineWidth(2);
+  h_maxADChit_back_wire->SetLineWidth(2);
+
   int nBackgroundEventWire=0;
-  for(auto const& it : map_Event_TrueEntry) {
-    int ncluster_sign=0;
-    int ncluster_back=0;
-    ++nEventWire;
-    bool SignDetected=false;
-    for (auto const& it2 : map_event_entry_wire[it.first]) {
-      std::map<int, int> map_gentype_nhit_sign;
-      std::map<int, int> map_gentype_nhit_back;
-      t_Output_triggeredclusteredhits->GetEntry(it2);
-      if (Type==0) {
-        map_gentype_nhit_back = GetMapOfHit(GenType);
-        ++ncluster_back;
-        ++nBackgroundEventWire;
-      } else {
-        SignDetected=true;
-        map_gentype_nhit_sign = GetMapOfHit(GenType);
-        ++ncluster_sign;
-      }
-      for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
-      for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+  int ncluster_sign=0;
+  int ncluster_back=0;
 
-      bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
-      if (fillneutron)
-        for (auto const& genhit: map_gentype_nhit_back)
-          p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
-
-      fillneutron=map_gentype_nhit_sign[kNeutron]>0;
-      if (fillneutron)
-        for (auto const& genhit: map_gentype_nhit_sign)
-          p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
+  std::map<std::pair<int,int>,bool> nDetectedEvent;
+  for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
+    t_Output_triggeredclusteredhits->GetEntry(i);
+    std::map<int, int> map_gentype_nhit_sign;
+    std::map<int, int> map_gentype_nhit_back;
+    //t_Output_triggeredclusteredhits->GetEntry(it2);
+    if (Type==0) {
+      std::cout << "----------" << std::endl;
+      std::cout << "Entry " << i << std::endl;
+      std::cout << "Event " << Event << std::endl;
+      std::cout << "StartChan " << StartChan << std::endl;
+      //map_gentype_nhit_back = GetMapOfHit(HitGenType);
+      std::map<int, int> m_gentype;
+      for (auto const& it:(*HitGenType))
+        m_gentype[it]++;
+      int tpe = GetMax(m_gentype).first;
+      ++ncluster_back;
+      ++nBackgroundEventWire;
+      h_rate_back->Fill(tpe);
+      double MaxADC=0;
+      for (auto const& adc:(*HitSADC))
+        if (MaxADC<adc)MaxADC=adc;
+      h_maxADChit_back_wire->Fill(MaxADC);
+    } else {
+      nDetectedEvent[std::make_pair(Event,MarleyIndex)] = true;
+      //map_gentype_nhit_sign = GetMapOfHit(HitGenType);
+      double MaxADC=0;
+      for (auto const& adc:(*HitSADC))
+        if (MaxADC<adc)MaxADC=adc;
+      h_maxADChit_sign_wire->Fill(MaxADC);
+      ++ncluster_sign;
     }
-    if(SignDetected)
-      ++nDetectedSignalEventWire;
-    h_ncluster_sign_wire->Fill(ncluster_sign);
-    h_ncluster_back_wire->Fill(ncluster_back);
+    // for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
+    // for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+
+    bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
+    if (fillneutron)
+      for (auto const& genhit: map_gentype_nhit_back)
+        p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
+
+    fillneutron=map_gentype_nhit_sign[kNeutron]>0;
+    if (fillneutron)
+      for (auto const& genhit: map_gentype_nhit_sign)
+        p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
   }
 
+  int ntotaldetected=0;
+  for (auto const& it: nDetectedEvent) {
+    (void)it;
+    ntotaldetected++;
+  }
+  std::cout <<"totaldetected " << ntotaldetected << std::endl;
+  std::cout <<"Efficiency " << (double)ntotaldetected / nMarleyEvent << std::endl;
+  h_ncluster_sign_wire->Fill(ncluster_sign);
+  h_ncluster_back_wire->Fill(ncluster_back);
+  
   gPad->SetLogy(true);
-
+  
   max = {p_gentype_sign_wire->GetMaximum(),
          p_gentype_back_wire->GetMaximum()};
   
@@ -313,7 +353,30 @@ int main(int argc, char** argv){
   p_gentype_back_neut_wire->Draw("E SAME");
   c.Print(OutputFile.c_str());
 
-  
+  gPad->SetTicks();
+  gPad->SetGridx();
+  gPad->SetGridy();
+  //                  ksiourmen
+  gStyle->SetOptStat(       10);
+  // gStyle->SetStatX(0.88);
+  // gStyle->SetStatY(0.8);
+  // gStyle->SetStatH(0.1);
+  // gStyle->SetStatW(0.2);
+  h_rate_back->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
+  int nentries = h_rate_back->GetEntries();
+  double errorint;
+  double integral = h_rate_back->IntegralAndError(1,10,errorint);
+  h_rate_back->SetBinContent(11, integral);
+  h_rate_back->SetBinError(11, errorint);
+  h_rate_back->SetEntries(nentries);
+  h_rate_back->Draw();
+  std::cout << "TOTAL Background rate " << integral << std::endl;
+  for (int i=3; i<=10; i++){
+    std::cout <<h_rate_back->GetXaxis()->GetBinLabel(i) << " : " << h_rate_back->GetBinContent(i) << std::endl;
+  }
+  h_rate_back->GetXaxis()->SetRangeUser(2,10);
+  c.Print(OutputFile.c_str());
+
   max = {h_ncluster_sign_wire->GetMaximum(),
          h_ncluster_back_wire->GetMaximum()};
 
@@ -323,6 +386,12 @@ int main(int argc, char** argv){
 
   h_ncluster_sign_wire->Draw("");
   h_ncluster_back_wire->Draw("SAME");
+  c.Print(OutputFile.c_str());
+
+  gPad->SetLogx(false);
+
+  h_maxADChit_sign_wire->Draw();
+  h_maxADChit_back_wire->Draw("SAME");
   c.Print(OutputFile.c_str());
 
   gPad->Clear();

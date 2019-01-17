@@ -38,7 +38,7 @@ private:
     fPosition        (c.fPosition       ),
     fSize            (c.fSize           ),
     fExtent          (c.fExtent         ),
-    fIsSelected      (c.fIsSelected     ),
+    // fIsSelected      (c.fIsSelected     ),
     fTruePurity      (c.fTruePurity     ),
     fSumPeak         (c.fSumPeak        ),
     fRecoEnergy      (c.fRecoEnergy     ),
@@ -63,7 +63,7 @@ protected:
     fPosition        (),
     fSize            (),
     fExtent          (),
-    fIsSelected      (0),
+    // fIsSelected      (0),
     fTruePurity      (),
     fSumPeak         (0),
     fRecoEnergy      (0),
@@ -87,7 +87,7 @@ protected:
     fPosition        (),
     fSize            (),
     fExtent          (),
-    fIsSelected      (0),
+    // fIsSelected      (0),
     fTruePurity      (),
     fSumPeak         (0),
     fRecoEnergy      (0),
@@ -117,7 +117,7 @@ protected:
       apa[it->GetAPA()] += it->GetPeak();
       hittype_peak[it->GetGenType()] += it->GetPeak();
     }
-    fIsSelected = true;
+    // fIsSelected = true;
     fAPA = GetMax(apa).first;
     fNChannel = channel.size();
     fChannelExtent.first  = *channel.begin();
@@ -164,7 +164,7 @@ protected:
               << " Extent[Y]: "      << fExtent[kY].first << "-" << fExtent[kY].second 
               << " Extent[Z]: "      << fExtent[kZ].first << "-" << fExtent[kZ].second 
               << " Extent[T]: "      << fExtent[kT].first << "-" << fExtent[kT].second << std::endl;
-    std::cout << " IsSelected: "     << fIsSelected  << std::endl;
+    // std::cout << " IsSelected: "     << fIsSelected  << std::endl;
     std::cout << " IsTriggering: "   << fIsTriggering  << std::endl;
     std::cout << " SumPeak: "        << fSumPeak     << std::endl;
     std::cout << " APA: "            << fAPA         << std::endl;
@@ -190,7 +190,7 @@ public:
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };
-  bool   GetIsSelected   ()                  const { return fIsSelected;                   };
+  // bool   GetIsSelected   ()                  const { return fIsSelected;                   };
   bool   GetIsTriggering ()                  const { return fIsTriggering;                 };
   double GetRecoEnergy   ()                  const { return fRecoEnergy;                   };
   size_t GetMarleyIndex  ()                  const { return fTrueMarleyIndex;              };
@@ -209,7 +209,7 @@ public:
   void SetExtent       (const Direction d, const extent e) { fExtent       [d] = e; };
   void SetTruePosition (const Direction d, const double e) { fTruePosition [d] = e; };
   void SetTrueDirection(const Direction d, const double e) { fTrueDirection[d] = e; };
-  void SetIsSelected   (const bool b=true)                 { fIsSelected       = b; };
+  // void SetIsSelected   (const bool b=true)                 { fIsSelected       = b; };
   void SetIsTriggering (const bool b=true)                 { fIsTriggering     = b; };
   void SetRecoEnergy   (const double d)                    { fRecoEnergy       = d; };
   void SetMarleyIndex  (const size_t d)                    { fTrueMarleyIndex  = d; };
@@ -225,7 +225,7 @@ protected:
   std::map<Direction,double> fPosition;
   std::map<Direction,double> fSize;
   std::map<Direction,std::pair<double,double>> fExtent;
-  bool fIsSelected;
+  // bool fIsSelected;
   std::map<GenType,double> fTruePurity;
   double  fSumPeak;
   double  fRecoEnergy;

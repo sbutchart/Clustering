@@ -31,9 +31,9 @@ void SmartTrigger::SetIsSelected(const std::vector<Cluster*>& c) const {
   for (auto const& it: c) disc_val += GetDiscriminator(*it);
 
   if (disc_val>fThreshold) {
-    for (auto const& it: c) it->SetIsSelected(true);
+    for (auto const& it: c) it->SetIsTriggering(true);
   } else {
-    for (auto const& it: c) it->SetIsSelected(false);
+    for (auto const& it: c) it->SetIsTriggering(false);
   }
 }
 

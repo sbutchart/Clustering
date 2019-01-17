@@ -18,7 +18,7 @@ public:
   
   virtual ~WireCluster() {};
   using Cluster::Print;
-  bool   GetIsSelected        () const { return fIsSelected                  ; };
+  // bool   GetIsSelected        () const { return fIsSelected                  ; };
   double GetHitSumADC         () const { return fSumPeak                     ; };
   double GetMC_UnderlyingE    () const { return fMC_UnderlyingE              ; };
   double GetNElectron         () const { return fNElectron                   ; };

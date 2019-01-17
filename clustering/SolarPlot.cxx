@@ -13,7 +13,7 @@
 #include "TProfile.h"
 #include "TTree.h"
 #include "TMultiGraph.h"
-
+#include "TLine.h"
 #include <iostream>
 #include <unistd.h>
 
@@ -71,9 +71,15 @@ int main (int argc, char** argv) {
   TH1D* th1d_ProtonEnergies;
   TH1D* th1d_nClusters;
   TH1D* th1d_nPartInCluster;
+  TH1D* th1d_SignalElectronDiff;
+  TH1D* th1d_background_truth;
 
   ClusterEngine clusteng;
   SimpleTrigger wiretrigger;
+
+  std::vector<double> Signals;
+  std::vector<double> Electrons;
+  std::vector<double> Differences;
 
   clusteng.SetTimeWindow   (20);
   clusteng.SetChannelWidth (2);
@@ -86,6 +92,7 @@ int main (int argc, char** argv) {
   wiretrigger.SetWireChanWidthMin(0);
   wiretrigger.SetWireSADCMin     (0);
   int fNEvent = nEvent;
+  int numberOfEvents = 0;
   for (auto const& it: aaim) {
 
     int adc_threshold = it.first;
@@ -96,22 +103,28 @@ int main (int argc, char** argv) {
     } else {
       fNEvent = im->GetEntries();
     }
+
+
     
     th1d_signalEnergy          = new TH1D(Form("SignalClusterEnergies_Th%i"     , adc_threshold),
 					  "Solar;Cluster Energy [MeV];Rate [Solar Event/100-kton year]", 
-					  45, 5, 20);
+					  25, 0, 10);
 
     th1d_backgroundEnergy      = new TH1D(Form("BackgroundClusterEnergies_Th%i" , adc_threshold),
 					  "Solar;Cluster Energy [MeV];Rate [Solar Event/100-kton year]", 
-					  45, 5, 20);
+					  25, 0, 10);
 
     th1d_BackgroundFatElectron = new TH1D(Form("BackgroundLargestElectron_Th%i" , adc_threshold),
 					  "Solar;Cluster Energy [MeV];Rate [Solar Event/100-kton year]", 
-					  45, 5, 20);
+					  25, 0, 10);
 
     th1d_SignalFatElectron     = new TH1D(Form("SignalLargestElectron_Th%i"     , adc_threshold),
 					  "Solar;Cluster Energy [MeV];Rate [Solar Event/100-kton year]", 
-					  45, 5, 20);
+					  25, 0, 10);
+
+    th1d_SignalElectronDiff    = new TH1D(Form("DeltaSignalElectron_TH%i"       , adc_threshold),
+    					  "Solar;Cluster Energy [MeV];",
+    					  100, 0, 10);
 
     th1d_ElectronEnergies      = new TH1D(Form("ElectronEnergies_Th%i"          , adc_threshold ),
 					  "Solar, E_{e^{-}};Energy [MeV];"            , 50, 0, 50);
@@ -129,12 +142,13 @@ int main (int argc, char** argv) {
 					  "Solar, E_{p};Energy [MeV];"                , 50, 0, 50);
 
     th1d_nPartInCluster        = new TH1D(Form("nPartInCluster_Th%i"             , adc_threshold ),
-					      "Solar;nParticles [#];"           , 10, 0, 10);
+					  "Solar;nParticles [#];"           , 10, 0, 10);
 
     th1d_nClusters             = new TH1D(Form("nCluster_Th%i"             , adc_threshold ),
-					      "Solar;nClusters [#];"            , 10, 0, 10);
+					  "Solar;nClusters [#];"            , 10, 0, 10);
 
-
+    th1d_background_truth      = new TH1D("", "", 25, 0, 10);
+    
     for (int CurrentEvent=0; CurrentEvent<fNEvent; ++CurrentEvent) {
       im->GetEntry(CurrentEvent);
       std::vector<WireHit*> vec_WireHit;
@@ -183,11 +197,14 @@ int main (int argc, char** argv) {
 
 	th1d_nPartInCluster->Fill(TrIDs.size());
 	
-	PDGToEnergy[11  ] = 0.511;
+	PDGToEnergy[ 11 ] = 0.511;
 	PDGToEnergy[-11 ] = 0.511;
 	PDGToEnergy[2112] = 938.27231;
-	PDGToEnergy[22  ] = 0;
+	PDGToEnergy[ 22 ] = 0;
 
+	if (1000*(*im->True_ENu)[0] < 20) {
+	  numberOfEvents ++;
+	}
 	int WhichBin  = solarWeight->FindBin(1000*(*im->True_ENu)[0]);
 	double weight = solarWeight->GetBinContent(WhichBin);
 
@@ -226,14 +243,28 @@ int main (int argc, char** argv) {
 	    }
 	  }
 	}
-	
 
 	th1d_SignalFatElectron     -> Fill( FatSignalElectron - 0.511, weight);
 	th1d_signalEnergy          -> Fill( ClusterSignalEnergy      , weight);
 	th1d_BackgroundFatElectron -> Fill( FatBackgroundElectron - 0.511    );
 	th1d_backgroundEnergy      -> Fill( ClusterBackgroundEnergy          );
       }
+      // for (int i=0; i<(*im->True_Bck_Energy).size(); ++i) {
+      // 	if (abs((*im->True_Bck_PDG)[i]) == 11) {
+      // 	  th1d_background_truth->Fill((*im->True_Bck_Energy)[i]);
+      // 	}
+      // }
       
+      for (int i=0; i<th1d_SignalFatElectron->GetNbinsX(); ++i) {
+	Differences.push_back(0);
+	Signals.push_back(0);
+	Electrons.push_back(0);
+      }
+      for (int i=0; i<th1d_SignalFatElectron->GetNbinsX(); ++i) {
+	Signals[i]   += th1d_signalEnergy     ->GetBinContent(i);
+	Electrons[i] += th1d_SignalFatElectron->GetBinContent(i);
+      }
+
       // GET THE MOTHER F**KING MEMORY MANAGEMENT!!!!!!!!!
       for (auto& it: vec_WireCluster) {	delete it; it = NULL; } // CLEAN UP THE VECTOR OF WIRE HITS
       for (auto& it: vec_WireHit    ) { delete it; it = NULL; } // CLEAN UP THE VECTOR OF WIRE CLUSTERS
@@ -242,19 +273,47 @@ int main (int argc, char** argv) {
     }
   }
 
-  // THIS IS FOR 100kton-year: 10 years (in seconds) / vol-ratio * number of events * time of LArSoft Event 
-  // double ScaleFactor = (10.0*365.0*24.0*60.0*60.0)/(0.12*static_cast<double>(fNEvent)*2.246e-3);
+  for (int i=0; i<th1d_SignalFatElectron->GetNbinsX(); ++i) {
+    if (Signals[i] == 0) continue;
+    Differences[i] += (Signals[i] - Electrons[i])/Signals[i];
+    th1d_SignalElectronDiff->SetBinContent(i, Differences[i]);
+  }
 
-  // THIS IS FOR 10kton-day: 1 dat (in seconds) / vol-ratio * number of events * time of LArSoft Event 
+  for (int i=0; i<th1d_backgroundEnergy->GetXaxis()->GetNbins(); ++i) {
+    std::cout << i << " " << th1d_backgroundEnergy->GetBinContent(i) << std::endl;
+  }
+
+  // THIS IS FOR 100kton-year: 10 years (in seconds) / vol-ratio * number of events * time of LArSoft Event 
+  double ScaleFactor = (10.0*365.0*24.0*60.0*60.0)/(0.12*static_cast<double>(fNEvent)*2.246e-3);
+
+  // THIS IS FOR 10kton-day: 1 day (in seconds) / vol-ratio * number of events * time of LArSoft Event 
+  // double ScaleFactor = (1.0)/(0.12*static_cast<double>(fNEvent)*2.246e-3); [Hz]
   // double ScaleFactor = (24.0*60.0*60.0)/(0.12*static_cast<double>(fNEvent)*2.246e-3);
-  double ScaleFactor = (1.0/(10.0*365.0));
+  // double ScaleFactor = (1.0/(10.0*365.0));
 
   TCanvas c;
   c.Print((OutFileName+"[").c_str());
   c.SetLogy();
 
+  TPad *upperCanvas = new TPad("upperCanvas", "upperCanvas", 0.00, 0.00, 1.00, 1.00);
+  // upperCanvas->SetBottomMargin(0.00);
+  upperCanvas->Draw();
+  c.cd();
+
+  // TPad *lowerCanvas = new TPad("lowerCanvas", "lowerCanvas", 0.00, 0.00, 1.00, 0.30);
+  // lowerCanvas->SetTopMargin(0.00);
+  // lowerCanvas->SetBottomMargin(0.40);
+  // lowerCanvas->Draw();
+  // lowerCanvas->cd();
+  upperCanvas->cd();
+  upperCanvas->SetLogy();
+
   th1d_backgroundEnergy->Scale(ScaleFactor);
-  th1d_backgroundEnergy->SetMaximum( th1d_backgroundEnergy->GetMaximum()*100 );
+  th1d_backgroundEnergy->SetMaximum( 100000 );
+  th1d_backgroundEnergy->SetMinimum( 0.1 );
+  for (int i=0; i<th1d_backgroundEnergy->GetXaxis()->GetNbins(); ++i) {
+    std::cout << i << " " << th1d_backgroundEnergy->GetBinContent(i) << std::endl;
+  }
   th1d_backgroundEnergy->Draw(); 
   th1d_backgroundEnergy->SetLineColor(kRed); 
   th1d_backgroundEnergy->SetStats(0);
@@ -265,8 +324,8 @@ int main (int argc, char** argv) {
   th1d_BackgroundFatElectron->SetStats(0);
 
   // double SignalScaleFactor = th1d_backgroundEnergy->GetBinContent(th1d_backgroundEnergy->GetMaximumBin())/th1d_signalEnergy->GetMaximum();
-  double SignalScaleFactor = 1.0/static_cast<double>(fNEvent);
-
+  double SignalScaleFactor = (365.0*10.0*1.0)/static_cast<double>(numberOfEvents);
+ 
   th1d_signalEnergy->Scale(SignalScaleFactor);  
   th1d_signalEnergy->Draw("SAME"); 
   th1d_signalEnergy->SetLineColor(kBlue);
@@ -276,6 +335,19 @@ int main (int argc, char** argv) {
   th1d_SignalFatElectron->Draw("SAME"); 
   th1d_SignalFatElectron->SetLineColor(kGreen); 
   th1d_SignalFatElectron->SetStats(0);
+
+  // lowerCanvas->cd();
+  // TLine *line = new TLine(5, 0, 20, 0);
+  // line->SetLineColor(kBlack);
+
+  // th1d_SignalElectronDiff->SetTitle("");
+  // th1d_SignalElectronDiff->SetStats(0);
+  // th1d_SignalElectronDiff->SetMinimum(-1.2);
+  // th1d_SignalElectronDiff->SetMaximum(1.2);
+  // th1d_SignalElectronDiff->SetMarkerStyle(2);
+  // th1d_SignalElectronDiff->Draw("P");
+  // th1d_SignalElectronDiff->SetNdivisions(505);
+  // line->Draw("SAME");
 
   c.Print(OutFileName.c_str());  
 
@@ -310,6 +382,11 @@ int main (int argc, char** argv) {
   th1d_ProtonEnergies->SetStats(0);
   c.Print(OutFileName.c_str());  
 
+  th1d_background_truth->Scale(ScaleFactor);
+  th1d_background_truth->Draw();
+  th1d_background_truth->SetStats(0);
+  c.Print(OutFileName.c_str());  
+  
   c.Clear();
   TLegend *legend1 = new TLegend(0.1, 0.1, 0.9, 0.9);
   legend1->SetFillStyle(0);
