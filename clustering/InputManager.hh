@@ -230,6 +230,7 @@ public:
   double              singles_True_Time                ;
                                                               
   std::vector<int>                 * True_Bck_Mode            ;
+  std::vector<int>                 * True_Bck_EndProcess      ;
   std::vector<double>              * True_Bck_VertX           ;
   std::vector<double>              * True_Bck_VertY           ;
   std::vector<double>              * True_Bck_VertZ           ;
@@ -249,6 +250,12 @@ public:
   std::vector<double>              * True_Bck_EnergyAll       ;
   std::vector<int>                 * True_Bck_PDGAll          ;
   std::vector<int>                 * True_Bck_IDAll           ;
+
+  std::vector<double>              * True_Bck_EndX            ;
+  std::vector<double>              * True_Bck_EndY            ;
+  std::vector<double>              * True_Bck_EndZ            ;  
+  std::vector<double>              * True_Bck_EndT            ;
+  
 
   void GetWireHits(std::vector<WireHit*>& wire) {
     for(int j = 0; j < NColHit; j++) {
@@ -400,6 +407,7 @@ public:
     delete True_Time                ; True_Time                 = NULL;
                                                                
     delete True_Bck_Mode            ; True_Bck_Mode             = NULL;
+    delete True_Bck_EndProcess      ; True_Bck_EndProcess       = NULL;
     delete True_Bck_VertX           ; True_Bck_VertX            = NULL;
     delete True_Bck_VertY           ; True_Bck_VertY            = NULL;
     delete True_Bck_VertZ           ; True_Bck_VertZ            = NULL;
@@ -419,6 +427,11 @@ public:
     delete True_Bck_EnergyAll       ; True_Bck_EnergyAll        = NULL;
     delete True_Bck_PDGAll          ; True_Bck_PDGAll           = NULL;
     delete True_Bck_IDAll           ; True_Bck_IDAll            = NULL;
+
+    delete True_Bck_EndX            ; True_Bck_EndX             = NULL;   
+    delete True_Bck_EndY            ; True_Bck_EndY             = NULL;
+    delete True_Bck_EndZ            ; True_Bck_EndZ             = NULL;
+    delete True_Bck_EndT            ; True_Bck_EndT             = NULL;
     
     if (f_Input) f_Input->Close();
 
@@ -588,6 +601,7 @@ public:
     singles_True_Time             (-1),
     
     True_Bck_Mode            (NULL),
+    True_Bck_EndProcess      (NULL),
     True_Bck_VertX           (NULL),
     True_Bck_VertY           (NULL),
     True_Bck_VertZ           (NULL),
@@ -606,7 +620,11 @@ public:
     // True_Bck_EndTimeAll      (NULL),
     True_Bck_EnergyAll       (NULL),
     True_Bck_PDGAll          (NULL),
-    True_Bck_IDAll           (NULL){
+    True_Bck_IDAll           (NULL),
+    True_Bck_EndX            (NULL),
+    True_Bck_EndY            (NULL),
+    True_Bck_EndZ            (NULL),
+    True_Bck_EndT            (NULL){
 
     f_Input = NULL;
     t_Input = NULL;
@@ -830,6 +848,7 @@ public:
       t_Input->SetBranchAddress("PDS_OpHit_True_IndexAll"  , &PDS_OpHit_True_IndexAll  );
                                                                                      
       t_Input->SetBranchAddress("True_Bck_Mode"            , &True_Bck_Mode            );
+      t_Input->SetBranchAddress("True_Bck_EndProcess"      , &True_Bck_EndProcess      );
       t_Input->SetBranchAddress("True_Bck_VertX"           , &True_Bck_VertX           );
       t_Input->SetBranchAddress("True_Bck_VertY"           , &True_Bck_VertY           );
       t_Input->SetBranchAddress("True_Bck_VertZ"           , &True_Bck_VertZ           );
@@ -849,6 +868,11 @@ public:
       t_Input->SetBranchAddress("True_Bck_EnergyAll"       , &True_Bck_EnergyAll       );
       t_Input->SetBranchAddress("True_Bck_PDGAll"          , &True_Bck_PDGAll          );
       t_Input->SetBranchAddress("True_Bck_IDAll"           , &True_Bck_IDAll           );
+      t_Input->SetBranchAddress("True_Bck_EndX"            , &True_Bck_EndX            );
+      t_Input->SetBranchAddress("True_Bck_EndY"            , &True_Bck_EndY            );      
+      t_Input->SetBranchAddress("True_Bck_EndZ"            , &True_Bck_EndZ            );
+      t_Input->SetBranchAddress("True_Bck_EndT"            , &True_Bck_EndT            );
+      
     } else {
       t_Input->SetBranchAddress("NTotHits"   , &NTotHit   );
       t_Input->SetBranchAddress("NColHits"   , &NColHit   );
@@ -964,6 +988,7 @@ public:
 private:
   int fNAPA;
 };
-  
+
+
 #endif
 

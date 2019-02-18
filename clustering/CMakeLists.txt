@@ -88,11 +88,20 @@ target_link_libraries(RunThreshold Clustering)
 add_executable(AnalyseTreshold AnalyseTreshold.cxx)
 target_link_libraries(AnalyseTreshold Clustering)
 
+add_executable(TriggerParameterSpace TriggerParameterSpace.cxx)
+target_link_libraries(TriggerParameterSpace Clustering)
+
 add_executable(DumpSNRate DumpRate.cxx)
 target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
 
 add_executable(SolarPlot SolarPlot.cxx)
 target_link_libraries(SolarPlot Clustering)
+
+add_executable(PrintSource PrintSource.cxx)
+target_link_libraries(PrintSource Clustering)
+
+add_executable(TriggerStudies TriggerStudies.cxx)
+target_link_libraries(TriggerStudies Clustering)
 
 add_executable(MakePEPlotForJose MakePEPlotForJose.C)
 target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})

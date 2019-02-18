@@ -95,8 +95,16 @@ void Clustering::RunClustering(){
       }
 
       for(size_t i=0; i<vec_WireCluster.size(); ++i) {
-        if (vec_WireCluster[i]->GetIsTriggering())
-          fSOM->FillClusterInfo(vec_WireCluster[i]);
+
+	////////////////////////// Added by Aran as a test //////////////////////////
+
+	std::vector<float> ClusterHitTimes = vec_WireCluster[i]->GetPartTimes();
+	float TimeDifference = ClusterHitTimes[ClusterHitTimes.size() - 1] -  ClusterHitTimes[0];
+	if (TimeDifference > 20 ) {
+	  ////////////////////////////////////////////////////////////////////////////////////////
+	  if (vec_WireCluster[i]->GetIsTriggering())
+	    fSOM->FillClusterInfo(vec_WireCluster[i]);
+	}
         delete vec_WireCluster[i];
         vec_WireCluster[i]=NULL;
       }

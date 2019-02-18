@@ -13,5 +13,9 @@ WireCluster::WireCluster(std::vector<Hit*>& vec_Hits):
     fPartGenType.push_back(hit->GetGenType());
     fTrackIDs.insert(hit->GetTrIDPart());
     fPartEnergies.push_back(hit->GetTrEPart());
+    fPartTimes   .push_back(hit->GetHitTime());
+    fPartChannels.push_back(hit->GetHitChan());
+    fPartSADCs   .push_back(hit->GetHitSADC());
+    fPartGenTypes.push_back(hit->GetGenType());
   }
 }

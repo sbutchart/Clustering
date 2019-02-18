@@ -658,5 +658,4 @@ inline double GetStatThreshold(const TH1D* signal,
 }
 
 
-
 #endif
