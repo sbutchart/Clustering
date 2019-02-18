@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
   std::string TheoryFile = "";
   std::string InputTextFile = "";
   std::string InputRootFile = "";
+  std::string OutputRootFile = "";
   extern char *optarg;
   extern int  optopt;
   while ( (opt = getopt(argc, argv, "t:i:r:o:")) != -1 ) {  // for each option...
@@ -41,6 +42,9 @@ int main(int argc, char** argv) {
       break;
     case 'r':
       InputRootFile = optarg;
+      break;
+    case 'o':
+      OutputRootFile = optarg;
       break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
@@ -64,6 +68,12 @@ int main(int argc, char** argv) {
     std::cout << Configs.size() << " config parsed." << std::endl;
   }
     
+  
+  if (OutputRootFile == "") {
+    std::cout << "No output file parsed!! Exiting." << std::endl;
+    exit(1);
+  }
+  
   if (TheoryFile == "") {
     std::cout << "No theory file parsed!! Exiting." << std::endl;
     exit(1);
@@ -82,12 +92,16 @@ int main(int argc, char** argv) {
   fInverse->SetParameter(1, gradient);
   
   SNBurstTrigger snb;
-    snb.SetPoissonStatThreshold(100);
+  snb.SetPoissonStatThreshold(100);
+  
   //LOOP AROUND THE CLUSTERING CONFIGURATIONS.    
   for(auto& it : Configs){
     it.SetDistanceProbability    (hSNProbabilityVDistance);
     it.SetDistanceParametrisation(fInverse);
     it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
+    std::cout << "In a time window of " << it.fBurstTimeWindow
+              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
+
     if(it.fFractionInTimeWindow<0 || it.fFractionInTimeWindow>1.01){
       std::cout << "The fraction in TimeWindow is bonkers!! ("
                 << it.fFractionInTimeWindow << ")" << std::endl;
@@ -101,9 +115,11 @@ int main(int argc, char** argv) {
     snb.FindOnePerMonthFakeRate(it);
     std::cout << "c.fNClusterCut " << it.fNClusterCut <<std::endl;
     snb.FillEfficiencyBurst(it, 10, 11);
+    snb.FillEfficiencyBurst(it);
     // it.FillHistograms();
     // it.DumpAndPlot();
   }
+
 
   TCanvas can;
   can.Print("NeutronBurstRate.pdf[");
@@ -135,5 +151,37 @@ int main(int argc, char** argv) {
   CutLMC->Draw();
   can.Print("NeutronBurstRate.pdf");
   can.Print("NeutronBurstRate.pdf]");
+
+
+  std::cout << "Now saving all the configuration in the output tree." << std::endl;
+  Configuration *Con = NULL;
+  TFile* fOutput = new TFile(OutputRootFile.c_str(), "RECREATE");
+  TTree* tree = new TTree("Configurations","Configurations");
+  tree->Branch("Configuration", &Con);
+  for (auto& it: Configs) {
+    Con = &it;
+    tree->Fill();
+  }
+  tree->Write();
+  fOutput->Close();
+  // fTheory->Close();
+
+
+  TCanvas can;
+  can.Print("BurstTrigger.pdf[");
+  int globalIt=0;
+  std::vector<int> vec_Colors = getColors(2);
+
+  TGraph* effLMC = new TGraph(40);
+  effLMC->SetLineWidth(2);
+
+  int globalIt=0;
+  for (auto& ThisConfig : Configs) {
+    double f=globalIt*0.02;
+    effLMC->SetPoint(globalIt, f, ThisConfig->fEfficiency_Burst.at(10));
+  }
+  effLMC->Draw();
+  can.Print("BurstTrigger.pdf]");
+
   return 0;
 }

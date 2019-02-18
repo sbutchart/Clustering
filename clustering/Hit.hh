@@ -16,7 +16,12 @@ protected:
     fPeak    (0),
     fChannel (0),
     fAPA     (0),
+    fTrueMarleyIndex(-1),
     fGeom    (){
+    fTruePosition[kX] = 0.;
+    fTruePosition[kY] = 0.;
+    fTruePosition[kZ] = 0.;
+    fTruePosition[kT] = 0.;
     fPosition[kX] = 0.;
     fPosition[kY] = 0.;
     fPosition[kZ] = 0.;
@@ -74,7 +79,7 @@ public:
   size_t  GetAPA         () const { return fAPA;             };
   GenType GetGenType     () const { return fTrueGenType;     };
   double  GetTrueEnergy  () const { return fTrueEnergy;      };
-  size_t  GetMarleyIndex () const { return fTrueMarleyIndex; };
+  int  GetMarleyIndex () const { return fTrueMarleyIndex; };
   
   void SetPosition    (const Direction d, const double p) { fPosition    [d] = p; };
   void SetTruePosition(const Direction d, const double p) { fTruePosition[d] = p; };
@@ -85,7 +90,7 @@ public:
   void SetAPA         (const size_t  i) { fAPA             = i; };
   void SetGenType     (const GenType i) { fTrueGenType     = i; };
   void SetTrueEnergy  (const double  i) { fTrueEnergy      = i; };
-  void SetMarleyIndex (const size_t  i) { fTrueMarleyIndex = i; };
+  void SetMarleyIndex (const int     i) { fTrueMarleyIndex = i; };
   
   virtual void Print() const {
     std::cout << "- - - - - - - - - - - - - - - - - - - - - " << std::endl;
@@ -119,7 +124,7 @@ protected:
   size_t  fAPA;
   GenType fTrueGenType;
   double  fTrueEnergy;
-  size_t  fTrueMarleyIndex;
+  int     fTrueMarleyIndex;
   SimpleGeom fGeom;
 };
 

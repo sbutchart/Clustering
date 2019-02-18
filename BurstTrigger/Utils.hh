@@ -24,18 +24,22 @@ std::vector<Configuration> GetConfigurationTextFile(std::string InputFile) {
   std::vector<Configuration> conf;
   if (InputFile == "") return conf;
   int Config;
-  double TimeWindow, Eff, Bkgd, BkgdErr;
+  double TimeWindow, Eff, EffErr, Bkgd, BkgdErr;
+  std::string title;
   std::ifstream inFile;
   inFile.open(InputFile.c_str());
 
-  while(inFile >> Config >> TimeWindow >> Eff >> Bkgd >> BkgdErr){
+  while(inFile >> Config >> TimeWindow >> Eff >> EffErr >> Bkgd >> BkgdErr >> title){
     Configuration c;
     c.fClusterAlgorithm    = Config;
     c.fBurstTimeWindow     = TimeWindow;
     c.fClusterEfficiency   = Eff;
+    c.fClusterEfficiencyError = EffErr;
     c.fBackgroundRate      = Bkgd;
     c.fBackgroundRateError = BkgdErr;
-    conf.push_back(c);
+    c.fName = title;
+    c.fLegendEntry = title;
+    if (Eff>0 && Bkgd>0) conf.push_back(c);
   }
   return conf;
   

@@ -204,6 +204,30 @@ public:
   std::vector<float>               * True_Diry                ;
   std::vector<float>               * True_Dirz                ;
   std::vector<float>               * True_Time                ;
+
+  int                singles_True_VertexChan          ;
+  int                singles_True_Nu_Type             ;
+  int                singles_True_Nu_Lep_Type         ;
+  int                singles_True_Mode                ;
+  int                singles_True_CCNC                ;
+  int                singles_True_HitNucleon          ;
+  int                singles_True_Target              ;
+  int                singles_True_MarlSample          ;
+  double              singles_True_MarlTime            ;
+  double              singles_True_MarlWeight          ;
+  double              singles_True_ENu                 ;
+  double              singles_True_ENu_Lep             ;
+  double              singles_True_VertX               ;
+  double              singles_True_VertY               ;
+  double              singles_True_VertZ               ;
+  double              singles_True_VertexT             ;
+  double              singles_True_Px                  ;
+  double              singles_True_Py                  ;
+  double              singles_True_Pz                  ;
+  double              singles_True_Dirx                ;
+  double              singles_True_Diry                ;
+  double              singles_True_Dirz                ;
+  double              singles_True_Time                ;
                                                               
   std::vector<int>                 * True_Bck_Mode            ;
   std::vector<double>              * True_Bck_VertX           ;
@@ -218,10 +242,10 @@ public:
   std::vector<double>              * True_Bck_VertYAll        ;
   std::vector<double>              * True_Bck_VertZAll        ;
   std::vector<double>              * True_Bck_TimeAll         ;
-  std::vector<double>              * True_Bck_EndVertXAll     ;
-  std::vector<double>              * True_Bck_EndVertYAll     ;
-  std::vector<double>              * True_Bck_EndVertZAll     ;
-  std::vector<double>              * True_Bck_EndTimeAll      ;
+  // std::vector<double>              * True_Bck_EndVertXAll     ;
+  // std::vector<double>              * True_Bck_EndVertYAll     ;
+  // std::vector<double>              * True_Bck_EndVertZAll     ;
+  // std::vector<double>              * True_Bck_EndTimeAll      ;
   std::vector<double>              * True_Bck_EnergyAll       ;
   std::vector<int>                 * True_Bck_PDGAll          ;
   std::vector<int>                 * True_Bck_IDAll           ;
@@ -390,10 +414,10 @@ public:
     delete True_Bck_VertYAll        ; True_Bck_VertYAll         = NULL;
     delete True_Bck_VertZAll        ; True_Bck_VertZAll         = NULL;
     delete True_Bck_TimeAll         ; True_Bck_TimeAll          = NULL;
-    delete True_Bck_EndVertXAll     ; True_Bck_EndVertXAll      = NULL;
-    delete True_Bck_EndVertYAll     ; True_Bck_EndVertYAll      = NULL;
-    delete True_Bck_EndVertZAll     ; True_Bck_EndVertZAll      = NULL;
-    delete True_Bck_EndTimeAll      ; True_Bck_EndTimeAll       = NULL;
+    // delete True_Bck_EndVertXAll     ; True_Bck_EndVertXAll      = NULL;
+    // delete True_Bck_EndVertYAll     ; True_Bck_EndVertYAll      = NULL;
+    // delete True_Bck_EndVertZAll     ; True_Bck_EndVertZAll      = NULL;
+    // delete True_Bck_EndTimeAll      ; True_Bck_EndTimeAll       = NULL;
     delete True_Bck_EnergyAll       ; True_Bck_EnergyAll        = NULL;
     delete True_Bck_PDGAll          ; True_Bck_PDGAll           = NULL;
     delete True_Bck_IDAll           ; True_Bck_IDAll            = NULL;
@@ -541,6 +565,30 @@ public:
     True_Dirz                (NULL),
     True_Time                (NULL),
 
+    singles_True_VertexChan       (-1),
+    singles_True_Nu_Type          (-1),
+    singles_True_Nu_Lep_Type      (-1),
+    singles_True_Mode             (-1),
+    singles_True_CCNC             (-1),
+    singles_True_HitNucleon       (-1),
+    singles_True_Target           (-1),
+    singles_True_MarlSample       (-1),
+    singles_True_MarlTime         (-1),
+    singles_True_MarlWeight       (-1),
+    singles_True_ENu              (-1),
+    singles_True_ENu_Lep          (-1),
+    singles_True_VertX            (-1),
+    singles_True_VertY            (-1),
+    singles_True_VertZ            (-1),
+    singles_True_VertexT          (-1),
+    singles_True_Px               (-1),
+    singles_True_Py               (-1),
+    singles_True_Pz               (-1),
+    singles_True_Dirx             (-1),
+    singles_True_Diry             (-1),
+    singles_True_Dirz             (-1),
+    singles_True_Time             (-1),
+    
     True_Bck_Mode            (NULL),
     True_Bck_VertX           (NULL),
     True_Bck_VertY           (NULL),
@@ -554,10 +602,10 @@ public:
     True_Bck_VertYAll        (NULL),
     True_Bck_VertZAll        (NULL),
     True_Bck_TimeAll         (NULL),
-    True_Bck_EndVertXAll     (NULL),
-    True_Bck_EndVertYAll     (NULL),
-    True_Bck_EndVertZAll     (NULL),
-    True_Bck_EndTimeAll      (NULL),
+    // True_Bck_EndVertXAll     (NULL),
+    // True_Bck_EndVertYAll     (NULL),
+    // True_Bck_EndVertZAll     (NULL),
+    // True_Bck_EndTimeAll      (NULL),
     True_Bck_EnergyAll       (NULL),
     True_Bck_PDGAll          (NULL),
     True_Bck_IDAll           (NULL){
@@ -571,6 +619,31 @@ public:
   void GetEntry (const int i=0) {
     t_Input->GetEntry(i);
     if (vec_Hit_True_nIDEs!=NULL) {
+      Hit_View         ->clear();
+      Hit_Size         ->clear();
+      Hit_TPC          ->clear();
+      Hit_Chan         ->clear();
+      Hit_X_start      ->clear();
+      Hit_Y_start      ->clear();
+      Hit_Z_start      ->clear();
+      Hit_X_end        ->clear();
+      Hit_Y_end        ->clear();
+      Hit_Z_end        ->clear();
+      Hit_Time         ->clear();
+      Hit_RMS          ->clear();
+      Hit_SADC         ->clear();
+      Hit_Int          ->clear();
+      Hit_Peak         ->clear();
+      Hit_True_GenType ->clear();
+      Hit_True_MainTrID->clear();
+      Hit_True_EvEnergy->clear();
+      Hit_True_X       ->clear();
+      Hit_True_Y       ->clear();
+      Hit_True_Z       ->clear();
+      Hit_True_Energy  ->clear();
+      Hit_True_nElec   ->clear();
+      Hit_True_nIDEs   ->clear();
+
       for (int i=0; i<NColHit; ++i) {
         Hit_View         ->push_back(vec_Hit_View         [i]);
         Hit_Size         ->push_back(vec_Hit_Size         [i]);
@@ -598,6 +671,58 @@ public:
         Hit_True_nIDEs   ->push_back(vec_Hit_True_nIDEs   [i]);
       }
     }
+    
+    if (singles_True_VertexChan != -1) {
+      True_VertexChan  ->clear();
+      True_Nu_Type     ->clear();
+      True_Nu_Lep_Type ->clear();
+      True_Mode        ->clear();
+      True_CCNC        ->clear();
+      True_HitNucleon  ->clear();
+      True_Target      ->clear();
+      True_MarlSample  ->clear();
+      True_MarlTime    ->clear();
+      True_MarlWeight  ->clear();
+      True_ENu         ->clear();
+      True_ENu_Lep     ->clear();
+      True_VertX       ->clear();
+      True_VertY       ->clear();
+      True_VertZ       ->clear();
+      True_VertexT     ->clear();
+      True_Px          ->clear();
+      True_Py          ->clear();
+      True_Pz          ->clear();
+      True_Dirx        ->clear();
+      True_Diry        ->clear();
+      True_Dirz        ->clear();
+      True_Time        ->clear();
+      
+      True_VertexChan        ->push_back(singles_True_VertexChan      );  
+      True_Nu_Type           ->push_back(singles_True_Nu_Type         );  
+      True_Nu_Lep_Type       ->push_back(singles_True_Nu_Lep_Type     );  
+      True_Mode              ->push_back(singles_True_Mode            );  
+      True_CCNC              ->push_back(singles_True_CCNC            );  
+      True_HitNucleon        ->push_back(singles_True_HitNucleon      );  
+      True_Target            ->push_back(singles_True_Target          );  
+      True_MarlSample        ->push_back(singles_True_MarlSample      );  
+      True_MarlTime          ->push_back(singles_True_MarlTime        );  
+      True_MarlWeight        ->push_back(singles_True_MarlWeight      );  
+      True_ENu               ->push_back(singles_True_ENu             );  
+      True_ENu_Lep           ->push_back(singles_True_ENu_Lep         );  
+      True_VertX             ->push_back(singles_True_VertX           );  
+      True_VertY             ->push_back(singles_True_VertY           );  
+      True_VertZ             ->push_back(singles_True_VertZ           );  
+      True_VertexT           ->push_back(singles_True_VertexT         );  
+      True_Px                ->push_back(singles_True_Px              );  
+      True_Py                ->push_back(singles_True_Py              );  
+      True_Pz                ->push_back(singles_True_Pz              );  
+      True_Dirx              ->push_back(singles_True_Dirx            );  
+      True_Diry              ->push_back(singles_True_Diry            );  
+      True_Dirz              ->push_back(singles_True_Dirz            );  
+      True_Time              ->push_back(singles_True_Time            );  
+    }
+
+       
   };
 
   void LoadTree(){
@@ -638,37 +763,175 @@ public:
       t_Input->SetBranchAddress("Hit_True_Energy"          , &Hit_True_Energy          );
       t_Input->SetBranchAddress("Hit_True_nElec"           , &Hit_True_nElec           );
       t_Input->SetBranchAddress("Hit_True_nIDEs"           , &Hit_True_nIDEs           );
+      t_Input->SetBranchAddress("True_VertexChan"          , &True_VertexChan          );
+      t_Input->SetBranchAddress("True_Nu_Type"             , &True_Nu_Type             );
+      t_Input->SetBranchAddress("True_Nu_Lep_Type"         , &True_Nu_Lep_Type         );
+      t_Input->SetBranchAddress("True_Mode"                , &True_Mode                );
+      t_Input->SetBranchAddress("True_CCNC"                , &True_CCNC                );
+      t_Input->SetBranchAddress("True_HitNucleon"          , &True_HitNucleon          );
+      t_Input->SetBranchAddress("True_Target"              , &True_Target              );
+      t_Input->SetBranchAddress("True_MarlSample"          , &True_MarlSample          );
+      t_Input->SetBranchAddress("True_MarlTime"            , &True_MarlTime            );
+      t_Input->SetBranchAddress("True_MarlWeight"          , &True_MarlWeight          );
+      t_Input->SetBranchAddress("True_ENu"                 , &True_ENu                 );
+      t_Input->SetBranchAddress("True_ENu_Lep"             , &True_ENu_Lep             );
+      t_Input->SetBranchAddress("True_VertX"               , &True_VertX               );
+      t_Input->SetBranchAddress("True_VertY"               , &True_VertY               );
+      t_Input->SetBranchAddress("True_VertZ"               , &True_VertZ               );
+      t_Input->SetBranchAddress("True_VertexT"             , &True_VertexT             );
+      t_Input->SetBranchAddress("True_Px"                  , &True_Px                  );
+      t_Input->SetBranchAddress("True_Py"                  , &True_Py                  );
+      t_Input->SetBranchAddress("True_Pz"                  , &True_Pz                  );
+      t_Input->SetBranchAddress("True_Dirx"                , &True_Dirx                );
+      t_Input->SetBranchAddress("True_Diry"                , &True_Diry                );
+      t_Input->SetBranchAddress("True_Dirz"                , &True_Dirz                );
+      t_Input->SetBranchAddress("True_Time"                , &True_Time                );
+    
+      t_Input->SetBranchAddress("Hit_AdjM5SADC"            , &Hit_AdjM5SADC            );
+      t_Input->SetBranchAddress("Hit_AdjM2SADC"            , &Hit_AdjM2SADC            );
+      t_Input->SetBranchAddress("Hit_AdjM1SADC"            , &Hit_AdjM1SADC            );
+      t_Input->SetBranchAddress("Hit_AdjP1SADC"            , &Hit_AdjP1SADC            );
+      t_Input->SetBranchAddress("Hit_AdjP2SADC"            , &Hit_AdjP2SADC            );
+      t_Input->SetBranchAddress("Hit_AdjP5SADC"            , &Hit_AdjP5SADC            );
+      t_Input->SetBranchAddress("Hit_AdjM5Chan"            , &Hit_AdjM5Chan            );
+      t_Input->SetBranchAddress("Hit_AdjM2Chan"            , &Hit_AdjM2Chan            );
+      t_Input->SetBranchAddress("Hit_AdjM1Chan"            , &Hit_AdjM1Chan            );
+      t_Input->SetBranchAddress("Hit_AdjP1Chan"            , &Hit_AdjP1Chan            );
+      t_Input->SetBranchAddress("Hit_AdjP2Chan"            , &Hit_AdjP2Chan            );
+      t_Input->SetBranchAddress("Hit_AdjP5Chan"            , &Hit_AdjP5Chan            );
+                                                                                     
+      t_Input->SetBranchAddress("PDS_Flash_FlashID"        , &PDS_Flash_FlashID        );
+      t_Input->SetBranchAddress("PDS_Flash_YCenter"        , &PDS_Flash_YCenter        );
+      t_Input->SetBranchAddress("PDS_Flash_ZCenter"        , &PDS_Flash_ZCenter        );
+      t_Input->SetBranchAddress("PDS_Flash_YWidth"         , &PDS_Flash_YWidth         );
+      t_Input->SetBranchAddress("PDS_Flash_ZWidth"         , &PDS_Flash_ZWidth         );
+      t_Input->SetBranchAddress("PDS_Flash_Time"           , &PDS_Flash_Time           );
+      t_Input->SetBranchAddress("PDS_Flash_TimeWidth"      , &PDS_Flash_TimeWidth      );
+      t_Input->SetBranchAddress("PDS_Flash_TotalPE"        , &PDS_Flash_TotalPE        );
+      t_Input->SetBranchAddress("PDS_Flash_True_Distance"  , &PDS_Flash_True_Distance  );
+      t_Input->SetBranchAddress("PDS_Flash_True_GenType"   , &PDS_Flash_True_GenType   );
+                                                                                     
+      t_Input->SetBranchAddress("PDS_OpHit_OpChannel"      , &PDS_OpHit_OpChannel      );
+      t_Input->SetBranchAddress("PDS_OpHit_X"              , &PDS_OpHit_X              );
+      t_Input->SetBranchAddress("PDS_OpHit_Y"              , &PDS_OpHit_Y              );
+      t_Input->SetBranchAddress("PDS_OpHit_Z"              , &PDS_OpHit_Z              );
+      t_Input->SetBranchAddress("PDS_OpHit_PeakTimeAbs"    , &PDS_OpHit_PeakTimeAbs    );
+      t_Input->SetBranchAddress("PDS_OpHit_PeakTime"       , &PDS_OpHit_PeakTime       );
+      t_Input->SetBranchAddress("PDS_OpHit_Frame"          , &PDS_OpHit_Frame          );
+      t_Input->SetBranchAddress("PDS_OpHit_Width"          , &PDS_OpHit_Width          );
+      t_Input->SetBranchAddress("PDS_OpHit_Area"           , &PDS_OpHit_Area           );
+      t_Input->SetBranchAddress("PDS_OpHit_Amplitude"      , &PDS_OpHit_Amplitude      );
+      t_Input->SetBranchAddress("PDS_OpHit_PE"             , &PDS_OpHit_PE             );
+      t_Input->SetBranchAddress("PDS_OpHit_FastToTotal"    , &PDS_OpHit_FastToTotal    );
+      t_Input->SetBranchAddress("PDS_OpHit_True_GenType"   , &PDS_OpHit_True_GenType   );
+      t_Input->SetBranchAddress("PDS_OpHit_True_Energy"    , &PDS_OpHit_True_Energy    );
+      t_Input->SetBranchAddress("PDS_OpHit_True_TrackID"   , &PDS_OpHit_True_TrackID   );
+      t_Input->SetBranchAddress("PDS_OpHit_True_GenTypeAll", &PDS_OpHit_True_GenTypeAll);
+      t_Input->SetBranchAddress("PDS_OpHit_True_EnergyAll" , &PDS_OpHit_True_EnergyAll );
+      t_Input->SetBranchAddress("PDS_OpHit_True_TrackIDAll", &PDS_OpHit_True_TrackIDAll);
+      t_Input->SetBranchAddress("PDS_OpHit_True_IndexAll"  , &PDS_OpHit_True_IndexAll  );
+                                                                                     
+      t_Input->SetBranchAddress("True_Bck_Mode"            , &True_Bck_Mode            );
+      t_Input->SetBranchAddress("True_Bck_VertX"           , &True_Bck_VertX           );
+      t_Input->SetBranchAddress("True_Bck_VertY"           , &True_Bck_VertY           );
+      t_Input->SetBranchAddress("True_Bck_VertZ"           , &True_Bck_VertZ           );
+      t_Input->SetBranchAddress("True_Bck_Time"            , &True_Bck_Time            );
+      t_Input->SetBranchAddress("True_Bck_Energy"          , &True_Bck_Energy          );
+      t_Input->SetBranchAddress("True_Bck_PDG"             , &True_Bck_PDG             );
+
+      t_Input->SetBranchAddress("True_Bck_ModeAll"         , &True_Bck_ModeAll         );
+      t_Input->SetBranchAddress("True_Bck_VertXAll"        , &True_Bck_VertXAll        );
+      t_Input->SetBranchAddress("True_Bck_VertYAll"        , &True_Bck_VertYAll        );
+      t_Input->SetBranchAddress("True_Bck_VertZAll"        , &True_Bck_VertZAll        );
+      t_Input->SetBranchAddress("True_Bck_TimeAll"         , &True_Bck_TimeAll         );
+      // t_Input->SetBranchAddress("True_Bck_EndVertXAll"     , &True_Bck_EndVertXAll     );
+      // t_Input->SetBranchAddress("True_Bck_EndVertYAll"     , &True_Bck_EndVertYAll     );
+      // t_Input->SetBranchAddress("True_Bck_EndVertZAll"     , &True_Bck_EndVertZAll     );
+      // t_Input->SetBranchAddress("True_Bck_EndTimeAll"      , &True_Bck_EndTimeAll      );
+      t_Input->SetBranchAddress("True_Bck_EnergyAll"       , &True_Bck_EnergyAll       );
+      t_Input->SetBranchAddress("True_Bck_PDGAll"          , &True_Bck_PDGAll          );
+      t_Input->SetBranchAddress("True_Bck_IDAll"           , &True_Bck_IDAll           );
     } else {
       t_Input->SetBranchAddress("NTotHits"   , &NTotHit   );
       t_Input->SetBranchAddress("NColHits"   , &NColHit   );
       t_Input->SetBranchAddress("NIndHits"   , &NIndHit   );
       t_Input->SetBranchAddress("NHitNoBTs"  , &NHitNoBT  );
-      t_Input->SetBranchAddress("NFlash"    , &NFlash    );
-      t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
-      t_Input->SetBranchAddress("Hit_View"                 , &vec_Hit_View         );
-      t_Input->SetBranchAddress("Hit_Size"                 , &vec_Hit_Size         );
-      t_Input->SetBranchAddress("Hit_TPC"                  , &vec_Hit_TPC          );
-      t_Input->SetBranchAddress("Hit_Chan"                 , &vec_Hit_Chan         );
-      t_Input->SetBranchAddress("Hit_X_start"              , &vec_Hit_X_start      );
-      t_Input->SetBranchAddress("Hit_Y_start"              , &vec_Hit_Y_start      );
-      t_Input->SetBranchAddress("Hit_Z_start"              , &vec_Hit_Z_start      );
-      t_Input->SetBranchAddress("Hit_X_end"                , &vec_Hit_X_end        );
-      t_Input->SetBranchAddress("Hit_Y_end"                , &vec_Hit_Y_end        );
-      t_Input->SetBranchAddress("Hit_Z_end"                , &vec_Hit_Z_end        );
-      t_Input->SetBranchAddress("Hit_Time"                 , &vec_Hit_Time         );
-      t_Input->SetBranchAddress("Hit_RMS"                  , &vec_Hit_RMS          );
-      t_Input->SetBranchAddress("Hit_SADC"                 , &vec_Hit_SADC         );
-      t_Input->SetBranchAddress("Hit_Int"                  , &vec_Hit_Int          );
-      t_Input->SetBranchAddress("Hit_Peak"                 , &vec_Hit_Peak         );
-      t_Input->SetBranchAddress("Hit_True_GenType"         , &vec_Hit_True_GenType );
-      t_Input->SetBranchAddress("Hit_True_MainTrID"        , &vec_Hit_True_MainTrID);
-      t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &vec_Hit_True_EvEnergy);
-      t_Input->SetBranchAddress("Hit_True_X"               , &vec_Hit_True_X       );
-      t_Input->SetBranchAddress("Hit_True_Y"               , &vec_Hit_True_Y       );
-      t_Input->SetBranchAddress("Hit_True_Z"               , &vec_Hit_True_Z       );
-      t_Input->SetBranchAddress("Hit_True_Energy"          , &vec_Hit_True_Energy  );
-      t_Input->SetBranchAddress("Hit_True_nElec"           , &vec_Hit_True_nElec   );
-      t_Input->SetBranchAddress("Hit_True_nIDEs"           , &vec_Hit_True_nIDEs   );
+      // t_Input->SetBranchAddress("NFlash"    , &NFlash    );
+      // t_Input->SetBranchAddress("NFlashNoBT", &NFlashNoBT);
+      t_Input->SetBranchAddress("HitView"                 , &vec_Hit_View         );
+      t_Input->SetBranchAddress("HitSize"                 , &vec_Hit_Size         );
+      t_Input->SetBranchAddress("HitTPC"                  , &vec_Hit_TPC          );
+      t_Input->SetBranchAddress("HitChan"                 , &vec_Hit_Chan         );
+      // t_Input->SetBranchAddress("Hit_X_start"              , &vec_Hit_X_start      );
+      // t_Input->SetBranchAddress("Hit_Y_start"              , &vec_Hit_Y_start      );
+      // t_Input->SetBranchAddress("Hit_Z_start"              , &vec_Hit_Z_start      );
+      // t_Input->SetBranchAddress("Hit_X_end"                , &vec_Hit_X_end        );
+      // t_Input->SetBranchAddress("Hit_Y_end"                , &vec_Hit_Y_end        );
+      // t_Input->SetBranchAddress("Hit_Z_end"                , &vec_Hit_Z_end        );
+      t_Input->SetBranchAddress("HitTime"                 , &vec_Hit_Time         );
+      t_Input->SetBranchAddress("HitRMS"                  , &vec_Hit_RMS          );
+      t_Input->SetBranchAddress("HitSADC"                 , &vec_Hit_SADC         );
+      t_Input->SetBranchAddress("HitInt"                  , &vec_Hit_Int          );
+      t_Input->SetBranchAddress("HitPeak"                 , &vec_Hit_Peak         );
+      t_Input->SetBranchAddress("GenType"         , &vec_Hit_True_GenType );
+      // t_Input->SetBranchAddress("Hit_True_MainTrID"        , &vec_Hit_True_MainTrID);
+      // t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &vec_Hit_True_EvEnergy);
+      // t_Input->SetBranchAddress("Hit_True_X"               , &vec_Hit_True_X       );
+      // t_Input->SetBranchAddress("Hit_True_Y"               , &vec_Hit_True_Y       );
+      // t_Input->SetBranchAddress("Hit_True_Z"               , &vec_Hit_True_Z       );
+      // t_Input->SetBranchAddress("Hit_True_Energy"          , &vec_Hit_True_Energy  );
+      // t_Input->SetBranchAddress("Hit_True_nElec"           , &vec_Hit_True_nElec   );
+      // t_Input->SetBranchAddress("Hit_True_nIDEs"           , &vec_Hit_True_nIDEs   );
+
+      t_Input->SetBranchAddress("VertexChan"          , &singles_True_VertexChan          );
+      t_Input->SetBranchAddress("Nu_Type"             , &singles_True_Nu_Type             );
+      t_Input->SetBranchAddress("Nu_Lep_Type"         , &singles_True_Nu_Lep_Type         );
+      t_Input->SetBranchAddress("Mode"                , &singles_True_Mode                );
+      t_Input->SetBranchAddress("CCNC"                , &singles_True_CCNC                );
+      t_Input->SetBranchAddress("HitNucleon"          , &singles_True_HitNucleon          );
+      t_Input->SetBranchAddress("Target"              , &singles_True_Target              );
+      t_Input->SetBranchAddress("MarlSample"          , &singles_True_MarlSample          );
+      t_Input->SetBranchAddress("MarlTime"            , &singles_True_MarlTime            );
+      t_Input->SetBranchAddress("MarlWeight"          , &singles_True_MarlWeight          );
+      t_Input->SetBranchAddress("ENu"                 , &singles_True_ENu                 );
+      t_Input->SetBranchAddress("ENu_Lep"             , &singles_True_ENu_Lep             );
+      t_Input->SetBranchAddress("VertX"               , &singles_True_VertX               );
+      t_Input->SetBranchAddress("VertY"               , &singles_True_VertY               );
+      t_Input->SetBranchAddress("VertZ"               , &singles_True_VertZ               );
+      t_Input->SetBranchAddress("VertexT"             , &singles_True_VertexT             );
+      t_Input->SetBranchAddress("Px"                  , &singles_True_Px                  );
+      t_Input->SetBranchAddress("Py"                  , &singles_True_Py                  );
+      t_Input->SetBranchAddress("Pz"                  , &singles_True_Pz                  );
+      t_Input->SetBranchAddress("Dirx"                , &singles_True_Dirx                );
+      t_Input->SetBranchAddress("Diry"                , &singles_True_Diry                );
+      t_Input->SetBranchAddress("Dirz"                , &singles_True_Dirz                );
+      t_Input->SetBranchAddress("Time"                , &singles_True_Time                );
+
+      True_VertexChan           = new std::vector<int>();
+      True_Nu_Type              = new std::vector<int>();
+      True_Nu_Lep_Type          = new std::vector<int>();
+      True_Mode                 = new std::vector<int>();
+      True_CCNC                 = new std::vector<int>();
+      True_HitNucleon           = new std::vector<int>();
+      True_Target               = new std::vector<int>();
+      True_MarlSample           = new std::vector<int>();
+      True_MarlTime             = new std::vector<float>();
+      True_MarlWeight           = new std::vector<float>();
+      True_ENu                  = new std::vector<float>();
+      True_ENu_Lep              = new std::vector<float>();
+      True_VertX                = new std::vector<float>();
+      True_VertY                = new std::vector<float>();
+      True_VertZ                = new std::vector<float>();
+      True_VertexT              = new std::vector<float>();
+      True_Px                   = new std::vector<float>();
+      True_Py                   = new std::vector<float>();
+      True_Pz                   = new std::vector<float>();
+      True_Dirx                 = new std::vector<float>();
+      True_Diry                 = new std::vector<float>();
+      True_Dirz                 = new std::vector<float>();
+      True_Time                 = new std::vector<float>();
+
+      
     }
     
     if(t_Input->GetListOfBranches()->FindObject("Hit_True_MarleyIndex")) {
@@ -681,94 +944,7 @@ public:
     // if(MyTree->GetBranch("SomeBranchName")) {
     //   MyTree->SetBranchAddress("SomeBranchName", &SomeVabiable);
     // }
-    t_Input->SetBranchAddress("Hit_AdjM5SADC"            , &Hit_AdjM5SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM2SADC"            , &Hit_AdjM2SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM1SADC"            , &Hit_AdjM1SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP1SADC"            , &Hit_AdjP1SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP2SADC"            , &Hit_AdjP2SADC            );
-    t_Input->SetBranchAddress("Hit_AdjP5SADC"            , &Hit_AdjP5SADC            );
-    t_Input->SetBranchAddress("Hit_AdjM5Chan"            , &Hit_AdjM5Chan            );
-    t_Input->SetBranchAddress("Hit_AdjM2Chan"            , &Hit_AdjM2Chan            );
-    t_Input->SetBranchAddress("Hit_AdjM1Chan"            , &Hit_AdjM1Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP1Chan"            , &Hit_AdjP1Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP2Chan"            , &Hit_AdjP2Chan            );
-    t_Input->SetBranchAddress("Hit_AdjP5Chan"            , &Hit_AdjP5Chan            );
-                                                                                     
-    t_Input->SetBranchAddress("PDS_Flash_FlashID"        , &PDS_Flash_FlashID        );
-    t_Input->SetBranchAddress("PDS_Flash_YCenter"        , &PDS_Flash_YCenter        );
-    t_Input->SetBranchAddress("PDS_Flash_ZCenter"        , &PDS_Flash_ZCenter        );
-    t_Input->SetBranchAddress("PDS_Flash_YWidth"         , &PDS_Flash_YWidth         );
-    t_Input->SetBranchAddress("PDS_Flash_ZWidth"         , &PDS_Flash_ZWidth         );
-    t_Input->SetBranchAddress("PDS_Flash_Time"           , &PDS_Flash_Time           );
-    t_Input->SetBranchAddress("PDS_Flash_TimeWidth"      , &PDS_Flash_TimeWidth      );
-    t_Input->SetBranchAddress("PDS_Flash_TotalPE"        , &PDS_Flash_TotalPE        );
-    t_Input->SetBranchAddress("PDS_Flash_True_Distance"  , &PDS_Flash_True_Distance  );
-    t_Input->SetBranchAddress("PDS_Flash_True_GenType"   , &PDS_Flash_True_GenType   );
-                                                                                     
-    t_Input->SetBranchAddress("PDS_OpHit_OpChannel"      , &PDS_OpHit_OpChannel      );
-    t_Input->SetBranchAddress("PDS_OpHit_X"              , &PDS_OpHit_X              );
-    t_Input->SetBranchAddress("PDS_OpHit_Y"              , &PDS_OpHit_Y              );
-    t_Input->SetBranchAddress("PDS_OpHit_Z"              , &PDS_OpHit_Z              );
-    t_Input->SetBranchAddress("PDS_OpHit_PeakTimeAbs"    , &PDS_OpHit_PeakTimeAbs    );
-    t_Input->SetBranchAddress("PDS_OpHit_PeakTime"       , &PDS_OpHit_PeakTime       );
-    t_Input->SetBranchAddress("PDS_OpHit_Frame"          , &PDS_OpHit_Frame          );
-    t_Input->SetBranchAddress("PDS_OpHit_Width"          , &PDS_OpHit_Width          );
-    t_Input->SetBranchAddress("PDS_OpHit_Area"           , &PDS_OpHit_Area           );
-    t_Input->SetBranchAddress("PDS_OpHit_Amplitude"      , &PDS_OpHit_Amplitude      );
-    t_Input->SetBranchAddress("PDS_OpHit_PE"             , &PDS_OpHit_PE             );
-    t_Input->SetBranchAddress("PDS_OpHit_FastToTotal"    , &PDS_OpHit_FastToTotal    );
-    t_Input->SetBranchAddress("PDS_OpHit_True_GenType"   , &PDS_OpHit_True_GenType   );
-    t_Input->SetBranchAddress("PDS_OpHit_True_Energy"    , &PDS_OpHit_True_Energy    );
-    t_Input->SetBranchAddress("PDS_OpHit_True_TrackID"   , &PDS_OpHit_True_TrackID   );
-    t_Input->SetBranchAddress("PDS_OpHit_True_GenTypeAll", &PDS_OpHit_True_GenTypeAll);
-    t_Input->SetBranchAddress("PDS_OpHit_True_EnergyAll" , &PDS_OpHit_True_EnergyAll );
-    t_Input->SetBranchAddress("PDS_OpHit_True_TrackIDAll", &PDS_OpHit_True_TrackIDAll);
-    t_Input->SetBranchAddress("PDS_OpHit_True_IndexAll"  , &PDS_OpHit_True_IndexAll  );
-                                                                                     
-    t_Input->SetBranchAddress("True_VertexChan"          , &True_VertexChan          );
-    t_Input->SetBranchAddress("True_Nu_Type"             , &True_Nu_Type             );
-    t_Input->SetBranchAddress("True_Nu_Lep_Type"         , &True_Nu_Lep_Type         );
-    t_Input->SetBranchAddress("True_Mode"                , &True_Mode                );
-    t_Input->SetBranchAddress("True_CCNC"                , &True_CCNC                );
-    t_Input->SetBranchAddress("True_HitNucleon"          , &True_HitNucleon          );
-    t_Input->SetBranchAddress("True_Target"              , &True_Target              );
-    t_Input->SetBranchAddress("True_MarlSample"          , &True_MarlSample          );
-    t_Input->SetBranchAddress("True_MarlTime"            , &True_MarlTime            );
-    t_Input->SetBranchAddress("True_MarlWeight"          , &True_MarlWeight          );
-    t_Input->SetBranchAddress("True_ENu"                 , &True_ENu                 );
-    t_Input->SetBranchAddress("True_ENu_Lep"             , &True_ENu_Lep             );
-    t_Input->SetBranchAddress("True_VertX"               , &True_VertX               );
-    t_Input->SetBranchAddress("True_VertY"               , &True_VertY               );
-    t_Input->SetBranchAddress("True_VertZ"               , &True_VertZ               );
-    t_Input->SetBranchAddress("True_VertexT"             , &True_VertexT             );
-    t_Input->SetBranchAddress("True_Px"                  , &True_Px                  );
-    t_Input->SetBranchAddress("True_Py"                  , &True_Py                  );
-    t_Input->SetBranchAddress("True_Pz"                  , &True_Pz                  );
-    t_Input->SetBranchAddress("True_Dirx"                , &True_Dirx                );
-    t_Input->SetBranchAddress("True_Diry"                , &True_Diry                );
-    t_Input->SetBranchAddress("True_Dirz"                , &True_Dirz                );
-    t_Input->SetBranchAddress("True_Time"                , &True_Time                );
-    
-    // t_Input->SetBranchAddress("True_Bck_Mode"            , &True_Bck_Mode            );
-    // t_Input->SetBranchAddress("True_Bck_VertX"           , &True_Bck_VertX           );
-    // t_Input->SetBranchAddress("True_Bck_VertY"           , &True_Bck_VertY           );
-    // t_Input->SetBranchAddress("True_Bck_VertZ"           , &True_Bck_VertZ           );
-    // t_Input->SetBranchAddress("True_Bck_Time"            , &True_Bck_Time            );
-    // t_Input->SetBranchAddress("True_Bck_Energy"          , &True_Bck_Energy          );
-    // t_Input->SetBranchAddress("True_Bck_PDG"             , &True_Bck_PDG             );
-
-    // t_Input->SetBranchAddress("True_Bck_ModeAll"         , &True_Bck_ModeAll         );
-    // t_Input->SetBranchAddress("True_Bck_VertXAll"        , &True_Bck_VertXAll        );
-    // t_Input->SetBranchAddress("True_Bck_VertYAll"        , &True_Bck_VertYAll        );
-    // t_Input->SetBranchAddress("True_Bck_VertZAll"        , &True_Bck_VertZAll        );
-    // t_Input->SetBranchAddress("True_Bck_TimeAll"         , &True_Bck_TimeAll         );
-    // t_Input->SetBranchAddress("True_Bck_EndVertXAll"     , &True_Bck_EndVertXAll     );
-    // t_Input->SetBranchAddress("True_Bck_EndVertYAll"     , &True_Bck_EndVertYAll     );
-    // t_Input->SetBranchAddress("True_Bck_EndVertZAll"     , &True_Bck_EndVertZAll     );
-    // t_Input->SetBranchAddress("True_Bck_EndTimeAll"      , &True_Bck_EndTimeAll      );
-    // t_Input->SetBranchAddress("True_Bck_EnergyAll"       , &True_Bck_EnergyAll       );
-    // t_Input->SetBranchAddress("True_Bck_PDGAll"          , &True_Bck_PDGAll          );
-    // t_Input->SetBranchAddress("True_Bck_IDAll"           , &True_Bck_IDAll           );
+  
     
     t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
     t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
@@ -790,6 +966,7 @@ public:
 private:
   int fNAPA;
 };
-  
+
+
 #endif
 

@@ -30,15 +30,22 @@ void Clustering::RunClustering(){
     fSOM->SetCurrentEvent(fCurrentEvent);
     
     bool goodEvent = true;
-
-    if (fSNIM->True_MarlSample->size() > nMaxMarleyPerEvent)
-      nMaxMarleyPerEvent = fSNIM->True_MarlSample->size();
-
-    for(size_t MarleyEvent=0; MarleyEvent<fSNIM->True_MarlSample->size(); ++MarleyEvent) {
-      goodEvent = (((*fSNIM->True_VertZ)[MarleyEvent] >  695) &&
-                   ((*fSNIM->True_VertZ)[MarleyEvent] < 1160));
-    }
-    if(!goodEvent) continue;
+    // if (fSNIM->True_MarlSample) {
+    //   if (fSNIM->True_MarlSample->size() > nMaxMarleyPerEvent) {
+    //     nMaxMarleyPerEvent = fSNIM->True_MarlSample->size();
+    //     for(size_t MarleyEvent=0; MarleyEvent<fSNIM->True_MarlSample->size(); ++MarleyEvent) {
+    //       goodEvent = (((*fSNIM->True_VertZ)[MarleyEvent] >  695) &&
+    //                    ((*fSNIM->True_VertZ)[MarleyEvent] < 1160));
+    //     }
+    //   }
+    // } else {
+    //   nMaxMarleyPerEvent = 1;
+    //   goodEvent = (((*fSNIM->True_VertZ)[0] >  695) &&
+    //                ((*fSNIM->True_VertZ)[0] < 1160));
+    // }
+    
+    // if(!goodEvent) continue;
+    (void)goodEvent;
     fSOM->FillTruthInfo(*fSNIM);
 
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
@@ -65,6 +72,7 @@ void Clustering::RunClustering(){
       fClustEng->SetTimeWindowOpt(fcut_TimeWindowOpt   [fCurrentConfig]);
       fClustEng->SetPositionOpt  (fcut_PositionOpt     [fCurrentConfig]);
       fClustEng->SetBucketSize   (fcut_BucketSize      [fCurrentConfig]);
+      fClustEng->SetPreCutPEOpt  (fcut_PreCutPE        [fCurrentConfig]);
       
       fSimpleTrigger->SetWireNHitsMin    (fcut_HitsInWindow[fCurrentConfig]);
       fSimpleTrigger->SetWireNChanMin    (fcut_MinChannels [fCurrentConfig]);
@@ -77,7 +85,6 @@ void Clustering::RunClustering(){
       
       fClustEng->ClusterOpticalHits(vec_OptiHit, vec_OptiCluster);
       fClustEng->ClusterHits2      (vec_WireHit, vec_WireCluster);
-      
       if (fEReco) fEReco->EstimateEnergy(vec_WireCluster);
       
       fTrigger->IsTriggering(vec_OptiCluster);
@@ -93,8 +100,17 @@ void Clustering::RunClustering(){
       }
 
       for(size_t i=0; i<vec_WireCluster.size(); ++i) {
-        if (vec_WireCluster[i]->GetIsTriggering())
+        if (vec_WireCluster[i]->GetIsTriggering()) {
+          if (vec_WireCluster[i]->GetType() == 0) {
+            std::cout << "Background event" << std::endl;
+            std::cout << "Run     " << fSNIM->Run    << std::endl;
+            std::cout << "Subrun  " << fSNIM->SubRun << std::endl;
+            std::cout << "Event   " << fSNIM->Event  << std::endl;
+            std::cout << "Channel " << vec_WireCluster[i]->GetStartChannel() << std::endl;
+            std::cout << "File    " << fInputFileName << std::endl;
+          }
           fSOM->FillClusterInfo(vec_WireCluster[i]);
+        }
         delete vec_WireCluster[i];
         vec_WireCluster[i]=NULL;
       }

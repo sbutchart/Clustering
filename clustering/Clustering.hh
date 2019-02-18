@@ -56,7 +56,8 @@ public:
     SetupConfig_PositionOpt     ();
     SetupConfig_BucketSize      ();
     SetupConfig_OptHitInCluster ();
-
+    SetupConfig_PreCutPEOpt     ();
+    
     std::vector<size_t> sizes ={fcut_AdjChanTolerance.size(),
                                 fcut_HitsInWindow    .size(),
                                 fcut_MinChannels     .size(),
@@ -66,7 +67,8 @@ public:
                                 fcut_TimeWindowOpt   .size(),
                                 fcut_PositionOpt     .size(),
                                 fcut_BucketSize      .size(),
-                                fcut_OptHitInCluster .size()};
+                                fcut_OptHitInCluster .size(),
+                                fcut_PreCutPE        .size()};
 
     fNConfig = (int)(*std::min_element(sizes.begin(), sizes.end()));
     fWireClusterCount    = std::vector<float>(fNConfig,0);
@@ -79,16 +81,27 @@ public:
   void SetERecoXMLFile(const std::string s="") { fERecoXMLFile   = s; };
   void SetConfig      (const int n=-1)         { fConfig         = n; };
 
-  virtual void SetupConfig_AdjChanTolerance(const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_AdjChanTolerance = cut; };
-  virtual void SetupConfig_HitsInWindow    (const std::vector<float> cut = {6,6,6,6,6,6}            ) { fcut_HitsInWindow     = cut; };
-  virtual void SetupConfig_MinChannels     (const std::vector<float> cut = {2,2,2,2,2,2}            ) { fcut_MinChannels      = cut; };
-  virtual void SetupConfig_MinChanWidth    (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_MinChanWidth     = cut; };
-  virtual void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,20,20,20,20,20}      ) { fcut_TimeWindowSize   = cut; };
-  virtual void SetupConfig_TotalADC        (const std::vector<float> cut = {0,0,0,0,0,0}            ) { fcut_TotalADC         = cut; };
-  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2,1}                  ) { fcut_TimeWindowOpt    = cut; };
-  virtual void SetupConfig_PositionOpt     (const std::vector<float> cut = {300,300,300,300,300,300}) { fcut_PositionOpt      = cut; };
-  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {1,20}                   ) { fcut_BucketSize       = cut; };
-  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = {20,20,20}               ) { fcut_OptHitInCluster  = cut; };
+  // virtual void SetupConfig_HitsInWindow    (const std::vector<float> cut = { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6}) { fcut_HitsInWindow     = cut; };
+  // virtual void SetupConfig_AdjChanTolerance(const std::vector<float> cut = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7}) { fcut_AdjChanTolerance = cut; };
+  // virtual void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,30,40,50,60,70,80,90,20,30,40,50,60,70,80,90,20,30,40,50,60,70,80,90,20,30,40,50,60,70,80,90,20,30,40,50,60,70,80,90,20,30,40,50,60,70,80,90}) { fcut_TimeWindowSize   = cut; };
+
+  //                                                                            0  1  2  3  4  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
+  // virtual void SetupConfig_HitsInWindow    (const std::vector<float> cut = { 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1}) { fcut_HitsInWindow     = cut; };
+  // virtual void SetupConfig_AdjChanTolerance(const std::vector<float> cut = { 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2}) { fcut_AdjChanTolerance = cut; };
+  // virtual void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5,20,15,10, 5}) { fcut_TimeWindowSize   = cut; };
+  virtual void SetupConfig_HitsInWindow    (const std::vector<float> cut = { 3, 6}) { fcut_HitsInWindow     = cut; };
+  virtual void SetupConfig_AdjChanTolerance(const std::vector<float> cut = { 1, 1}) { fcut_AdjChanTolerance = cut; };
+  virtual void SetupConfig_TimeWindowSize  (const std::vector<float> cut = {20,15}) { fcut_TimeWindowSize   = cut; };
+
+  virtual void SetupConfig_MinChannels     (const std::vector<float> cut = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}) { fcut_MinChannels      = cut; };
+  virtual void SetupConfig_MinChanWidth    (const std::vector<float> cut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) { fcut_MinChanWidth     = cut; };
+  virtual void SetupConfig_TotalADC        (const std::vector<float> cut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) { fcut_TotalADC         = cut; };
+  
+  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2}) { fcut_TimeWindowOpt    = cut; };
+  virtual void SetupConfig_PreCutPEOpt     (const std::vector<float> cut = {1.5}) { fcut_PreCutPE         = cut; };
+  virtual void SetupConfig_PositionOpt     (const std::vector<float> cut = {300}) { fcut_PositionOpt      = cut; };
+  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {  1}) { fcut_BucketSize       = cut; };
+  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = { 10}) { fcut_OptHitInCluster  = cut; };
 
 
   void RunClustering();
@@ -120,7 +133,8 @@ private:
   std::vector<float> fcut_PositionOpt     ;
   std::vector<float> fcut_BucketSize      ;
   std::vector<float> fcut_OptHitInCluster ;
-
+  std::vector<float> fcut_PreCutPE        ;
+  
   int fNConfig;
   int fCurrentConfig;
   int fNAPA   ;

@@ -419,6 +419,14 @@ int main(int argc, char** argv){
   leg->Draw();
   c.Print(OutputFile.c_str());
   c.Print((OutputFile+"]").c_str());
+
+  TFile f((OutputFile+".root").c_str(), "RECREATE");
+  f.cd();
+  leg->Write();
+  
+
+
+  
   return 1;
 
 }

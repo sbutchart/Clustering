@@ -16,6 +16,7 @@ int RadiologicalCheatGenerator::Run() {
     else if (fRequestedBackgroundType == kKr85   ) { GenerateKr85   (); }
     else if (fRequestedBackgroundType == kRn222  ) { GenerateRn222  (); }
     else if (fRequestedBackgroundType == kTh232  ) { GenerateTh232  (); }
+    else if (fRequestedBackgroundType == kBi214  ) { GenerateBi214  (); }
     else if (fRequestedBackgroundType == kU238   ) { GenerateU238   (); }
     else if (fRequestedBackgroundType == kNeutron) { GenerateNeutron(); }
     else {
@@ -42,6 +43,18 @@ std::string RadiologicalCheatGenerator::CreateFCLFile(std::string textfilename) 
   return text;
 }
 
+
+
+void RadiologicalCheatGenerator::GenerateBi214() {
+  Part p;
+  p.M = 0.000510999;
+  p.pdg = 11;
+  p.E = 3.2667097;
+  p.p = sqrt(p.E*p.E - p.M * p.M);
+  FillParticlePositionOnPDS(p);
+  FillParticleIsotropicDirection(p);
+  fParticles.push_back(p);
+}
 
 void RadiologicalCheatGenerator::GenerateNeutron() {
   double chan = rand.Uniform(1.);
@@ -294,10 +307,11 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   fConvertor["Ar42"   ] = kAr42;
   fConvertor["Co60"   ] = kCo60;
   fConvertor["Kr85"   ] = kKr85;
+  fConvertor["Bi214"  ] = kBi214;
   fConvertor["Rn222"  ] = kRn222;
   fConvertor["Neutron"] = kNeutron;
   rand.SetSeed(2106691);
-  //fConvertor["Po210"  ] = kPo210;
+  
   gRandom = &rand;
   Decay d;
   // ARGON 39

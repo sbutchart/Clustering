@@ -19,7 +19,7 @@ public:
     fPeak = cHitSADC;
     fSize[kT] = cHitRMS;
     fPosition[kT] = cHitTime;
-    fTrueMarleyIndex = cMarleyIndex;
+    if (cGenType == 1)fTrueMarleyIndex = cMarleyIndex;
     fTrDepositedE = cTrDepositedE;
     fNElectron = cNelec;
     fTrEPart = cTrEPart;

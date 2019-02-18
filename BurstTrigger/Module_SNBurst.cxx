@@ -57,10 +57,81 @@ int main(int argc, char** argv) {
   Configs.insert(Configs.end(), Configs2.begin(), Configs2.end());
 
   Configuration c;
+
   c.fBackgroundRate = 0.0623056;
   c.fBurstTimeWindow = 10;
   c.fClusterEfficiency = 0.35;
+  
+//   double c_background=0.475;
+//   c.fBackgroundRate = c_background;
+//   c.fBurstTimeWindow = 10;
+//   c.fClusterEfficiency = 0.3;
+//   c.fLegendEntry = "Default";
+
   Configs.push_back(c);
+
+  c.fBackgroundRate = c_background;
+  c.fBurstTimeWindow = 10;
+  c.fClusterEfficiency = 0.25;
+  c.fLegendEntry = "15cm^{2}";
+  Configs.push_back(c);
+
+  c.fBackgroundRate = c_background;
+  c.fBurstTimeWindow = 10;
+  c.fClusterEfficiency = 0.4;
+  c.fLegendEntry = "Pessimistic reflections";
+  Configs.push_back(c);
+
+  c.fBackgroundRate = c_background;
+  c.fBurstTimeWindow = 10;
+  c.fClusterEfficiency = 0.55;
+  c.fLegendEntry = "Optimistic reflections";
+  Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4237;
+  // c.fLegendEntry = "30 cm^{2}";
+  // Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4492;
+  // c.fLegendEntry = "45 cm^{2}";
+  // Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4324;
+  // c.fLegendEntry = "60 cm^{2}";
+  // Configs.push_back(c);
+
+  // double c_background=0.475;
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4428;
+  // c.fLegendEntry = "S/N = 7";
+  // Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4492;
+  // c.fLegendEntry = "S/N = 5";
+  // Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4520;
+  // c.fLegendEntry = "S/N = 4";
+  // Configs.push_back(c);
+
+  // c.fBackgroundRate = c_background;
+  // c.fBurstTimeWindow = 10;
+  // c.fClusterEfficiency = 0.4380;
+  // c.fLegendEntry = "S/N = 3";
+  // Configs.push_back(c);
+
+
   if (Configs.size() == 0) {
     std::cout << "No Config parsed." << std::endl;
   } else {
@@ -90,10 +161,11 @@ int main(int argc, char** argv) {
   fInverse->SetParameter(1, gradient);
   
   SNBurstTrigger snb;
+  std::map<std::string,double> efficiency_10_events;
   //LOOP AROUND THE CLUSTERING CONFIGURATIONS.    
   for(auto& it : Configs){
-    it.SetDistanceProbability    (hSNProbabilityVDistance);
-    it.SetDistanceParametrisation(fInverse);
+    it.SetDistanceProbability    ((TH1D*)hSNProbabilityVDistance->Clone());
+    it.SetDistanceParametrisation((TF1*)fInverse->Clone());
     it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
     std::cout << "In a time window of " << it.fBurstTimeWindow
               << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
@@ -108,20 +180,30 @@ int main(int argc, char** argv) {
     }
     snb.FillFakeRateNClusters(it);
     snb.FindOnePerMonthFakeRate(it);
-    snb.FillEfficiencyBurst(it);
-    it.FillHistograms();
-    it.DumpAndPlot();
+    if (it.fNClusterCut>=0) {
+      snb.FillEfficiencyBurst(it);
+      it.FillHistograms();
+      efficiency_10_events[it.fName] = it.fEfficiency_Burst.at(10);
+      it.DumpAndPlot();
+    }
   }
-
-
-  std::cout << "Now saving all the configuration in the output tree." << std::endl;
+  
+  std::cout << "----------------------------------------------------" << std::endl;
+  std::cout << "Configuration\tEfficiency for 10 events" << std::endl;
+  for (auto const& it: Configs) {
+    if (it.fNClusterCut>=0)
+      std::cout << it.fName << "\t" << efficiency_10_events.at(it.fName) << std::endl;
+  }
+  std::cout << "----------------------------------------------------" << std::endl;
+  std::cout << "Now saving all the configuration in the output tree in" << OutputRootFile << std::endl;
   Configuration *Con = NULL;
   TFile* fOutput = new TFile(OutputRootFile.c_str(), "RECREATE");
   TTree* tree = new TTree("Configurations","Configurations");
   tree->Branch("Configuration", &Con);
   for (auto& it: Configs) {
     Con = &it;
-    tree->Fill();
+    if (it.fNClusterCut>=0)
+      tree->Fill();
   }
   tree->Write();
   fOutput->Close();

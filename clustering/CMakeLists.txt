@@ -43,6 +43,15 @@ target_link_libraries(RunDAQClustering Clustering)
 add_executable(AnalyseOpticalCluster AnalyseOpticalCluster.cxx)
 target_link_libraries(AnalyseOpticalCluster Clustering)
 
+add_executable(AnalyseBackgroundOpticalCluster AnalyseBackgroundOpticalCluster.cxx)
+target_link_libraries(AnalyseBackgroundOpticalCluster Clustering)
+
+add_executable(OptimiseNHitCut OptimiseNHitCut.cxx)
+target_link_libraries(OptimiseNHitCut Clustering)
+
+add_executable(OptimiseNPECut OptimiseNPECut.cxx)
+target_link_libraries(OptimiseNPECut Clustering)
+
 add_executable(GetEffBackRate GetEffBackRate.cxx)
 target_link_libraries(GetEffBackRate Clustering)
 
@@ -83,10 +92,16 @@ add_executable(EfficiencyCalculator EfficiencyCalculator.cxx)
 target_link_libraries(EfficiencyCalculator Clustering)
 
 add_executable(DumpSNRate DumpRate.cxx)
-target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
+target_link_libraries(DumpSNRate ${ROOT_LIBRARIES}) 
 
 add_executable(MakePEPlotForJose MakePEPlotForJose.C)
 target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})
+
+add_executable(AnalyseInputFile AnalyseInputFile.cxx)
+target_link_libraries(AnalyseInputFile Clustering)
+
+add_executable(AnalyseInputFile_Arb AnalyseInputFile_Arb.cxx)
+target_link_libraries(AnalyseInputFile_Arb Clustering)
 
 add_executable(TotalNEvents TotalNEvents.C)
 target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
@@ -94,5 +109,21 @@ target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
 add_executable(Optimiser Optimiser.cxx)
 target_link_libraries(Optimiser ${ROOT_LIBRARIES})
 
-# add_executable(OpHitTrigger OpHitTrigger.C)
-# target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
+add_executable(PlotEfficiencyAtNCut PlotEfficiencyAtNCut.cxx)
+target_link_libraries(PlotEfficiencyAtNCut ${ROOT_LIBRARIES})
+
+add_executable(GetBackgroundRateAt50PerCent GetBackgroundRateAt50PerCent.cxx)
+target_link_libraries(GetBackgroundRateAt50PerCent ${ROOT_LIBRARIES})
+
+add_executable(RunThreshold RunThreshold.cxx)
+target_link_libraries(RunThreshold Clustering)
+
+add_executable(DumpForAI DumpForAI.cxx)
+target_link_libraries(DumpForAI ${ROOT_LIBRARIES})
+
+add_executable(DumpForAI_Arbitrary DumpForAI_Arbitrary.cxx)
+target_link_libraries(DumpForAI_Arbitrary Clustering)
+
+add_executable(RunXDependancy RunXDependancy.cxx)
+target_link_libraries(RunXDependancy Clustering)
+

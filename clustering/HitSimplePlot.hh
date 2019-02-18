@@ -1,5 +1,5 @@
 #ifndef HITSIMPLEPLOT_HH
-#define HITSIMPLEPLOT_HH
+#define HITSIMPLEPLOT_HH 1
 #include "InputManager.hh"
 #include "Helper.h"
 

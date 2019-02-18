@@ -211,7 +211,7 @@ int main(int argc, char** argv){
   TH1D* rate_HEP_th1 = new TH1D("rate_HEP_th1", "", 100, 3, 20);
   gPad->SetLogy(false);
   
-  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
+  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) { 
     rate_tot_th1->SetBinContent(i, std::max(0.,rate_Tot->Eval(rate_tot_th1->GetBinCenter(i))));
     rate_B8_th1 ->SetBinContent(i, std::max(0.,rate_B8 ->Eval(rate_B8_th1 ->GetBinCenter(i))));
     rate_HEP_th1->SetBinContent(i, std::max(0.,rate_HEP->Eval(rate_HEP_th1->GetBinCenter(i))));
@@ -241,7 +241,14 @@ int main(int argc, char** argv){
   c->Print("SolarWeights.pdf");
   
   TFile* file_weights = new TFile("../clustering/data/SNRate.root", "READ");
+
   TH1D* rate_tot_sn_th1 = (TH1D*)file_weights->Get("SN_ENU_PDF");
+
+  TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
+  std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;
+  TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);
+  tree->Project("rate_tot_sn_th1", "True_ENu*1000.");
+
   rate_tot_sn_th1->SetStats(0);
   rate_tot_sn_th1->Scale(1. / rate_tot_sn_th1->Integral());
   rate_tot_sn_th1->Draw();

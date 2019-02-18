@@ -216,6 +216,9 @@ void HitSimplePlot::FillHistosWidth(std::vector<double>* vector, std::map<GenTyp
     im.GetEntry(iEntry);
     if(!(((*im.True_VertZ)[0] > 695) && ((*im.True_VertZ)[0] < 1160)))
       continue;
+    std::cout << "Vector x " << im.PDS_OpHit_X->size() << std::endl;
+    std::cout << "Vector y " << im.PDS_OpHit_Y->size() << std::endl;
+    std::cout << "Vector z " << im.PDS_OpHit_Z->size() << std::endl; 
     std::map<GenType,std::map<int, std::vector<double> > > map_pos = GetMap(vector,
                                                                             im.PDS_OpHit_True_GenType,
                                                                             im.PDS_OpHit_True_TrackID);
@@ -305,7 +308,7 @@ void HitSimplePlot::PlotWidth1D(const int dim) {
   std::map<GenType, TH1D*> Width = GetHistos(Form("Width_d%i",dim),
                                              Title,
                                              nbin_1D_Width[dim],xmin_1D_Width[dim],xmax_1D_Width[dim]);
-
+  
   if      (dim==1) { FillHistosWidth(im.PDS_OpHit_X,        Width); }
   else if (dim==2) { FillHistosWidth(im.PDS_OpHit_Y,        Width); }
   else if (dim==3) { FillHistosWidth(im.PDS_OpHit_Z,        Width); }

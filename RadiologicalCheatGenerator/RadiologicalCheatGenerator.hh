@@ -42,6 +42,7 @@ enum RadType{
   kRn222,
   kTh232,
   kU238 ,
+  kBi214,
   kNeutron
 };
 
@@ -107,6 +108,7 @@ public:
   void GenerateNi59   ();
   void GenerateCo60   ();
   void GenerateKr85   ();
+  void GenerateBi214  ();
   void GenerateRn222  ();
   void GenerateTh232  ();
   void GeneratePo210  ();

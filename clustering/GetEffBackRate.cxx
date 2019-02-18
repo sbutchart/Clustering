@@ -61,9 +61,10 @@ void FillEventCountMap(int nhit,
   } else {
     ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
   }
-  
+  CurrentProg = 0;
   for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
     ClusteredHit->GetEntry(i);
+    PrintProgress(i, ClusteredHit->GetEntries());
     if ((int)in_GenType->size() < nhit) continue;
 
     if (in_Type == 1) {
@@ -136,7 +137,7 @@ int main(int argc, char** argv) {
   extern int   optopt;
 
   std::string InputFile  = "";
-  std::string OutputFile = "";
+  std::string OutputFile = "BackEff.txt";
   int Config = -1;
   int nHit = -1;
   double DetectorScaling = 0.12;
@@ -167,20 +168,29 @@ int main(int argc, char** argv) {
     std::cout << "You have to set nhit cut (option -h)" << std::endl;
     std::cout << "For now, use all the cluster without any restriction on the number of hits." << std::endl;
   }
+
   
-  Clustering c;
-  if (Config >= c.GetNConfig()) {
-    std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << c.GetNConfig()-1 << std::endl;
-    exit(1);
-  }
-
-  int nConfig = (Config==-1? c.GetNConfig(): Config+1);
-  int iterConfig = (Config==-1? 0:Config);
-
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
   TTree *ClusteredWireHit    = (TTree*)f_Input->Get("ClusteredWireHit");
   TTree *ClusteredOpticalHit = (TTree*)f_Input->Get("ClusteredOpticalHit");
   TTree *TrueInfo            = (TTree*)f_Input->Get("TrueInfo");
+  TH1D* config_histo = new TH1D("config_histo",";Config;Clusters", 200, 0, 200);
+  
+  ClusteredWireHit->Project("config_histo", "Config");
+  ClusteredOpticalHit->Project("config_histo", "Config");
+  int nMaxConfig=0;
+  for (int i=1; i<200; ++i) {
+    if (config_histo->GetBinContent(i)>0)
+      ++nMaxConfig;
+  }
+  std::cout << "This file contains " << nMaxConfig << " configs." << std::endl;
+  int nConfig = (Config==-1? nMaxConfig: Config+1);
+  int iterConfig = (Config==-1? 0:Config);
+  
+  if (Config >= nMaxConfig) {
+    std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << nMaxConfig << std::endl;
+    exit(1);
+  }
   
   int nEventOriginally = (int)TrueInfo->GetEntries();
   std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS" << std::endl;
@@ -266,10 +276,10 @@ int main(int argc, char** argv) {
     std::cout  << "Config (Wire) " << c
                << ", SN efficiency: " << it.second.first << " +/- " << it.second.second
                << " Background rate in 10kt (Hz): " << map_Config_WireBackRate[c].first << " +/- " << map_Config_WireBackRate[c].second << std::endl;
-    txt_Result << c
-               << ", " << it.second.first << ", " << it.second.second
-               << ", " << map_Config_WireBackRate[c].first
-               << ", " << map_Config_WireBackRate[c].second << std::endl; 
+    txt_Result << c 
+               << " 10 " << it.second.first << " " << it.second.second
+               << " " << map_Config_WireBackRate[c].first
+               << " " << map_Config_WireBackRate[c].second << " Config_" << c << std::endl;
   }
   
   for(auto const& it : map_Config_WireEff) {

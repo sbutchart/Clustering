@@ -32,3 +32,6 @@ target_link_libraries(MakeSNTheoryDistributions ${ROOT_LIBRARIES})
 
 add_executable(TimingDistribMarley TimingDistribMarley.C)
 target_link_libraries(TimingDistribMarley ${ROOT_LIBRARIES})
+
+add_executable(PlotSNBurst Plotting_SNBurst.C)
+target_link_libraries(PlotSNBurst Configuration)

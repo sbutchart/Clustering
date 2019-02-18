@@ -116,6 +116,8 @@ int main(int argc, char** argv){
   std::vector<double> * TrPosZ   = NULL;
 
   int EventTrue;
+  int MarleyIndex;
+
   std::vector<double> * MarlTime = NULL;
   std::vector<double> * ENu      = NULL;
   std::vector<double> * ENu_Lep  = NULL;
@@ -130,6 +132,8 @@ int main(int argc, char** argv){
   
   TTree* t_Output_triggeredclusteredhits = (TTree*)f_Input->Get("ClusteredWireHit");
   t_Output_triggeredclusteredhits->SetBranchAddress("Cluster",        &Cluster      );
+  t_Output_triggeredclusteredhits->SetBranchAddress("MarleyIndex",    &MarleyIndex  );
+
   t_Output_triggeredclusteredhits->SetBranchAddress("Event",          &Event        );
   t_Output_triggeredclusteredhits->SetBranchAddress("Config",         &Config       );
   t_Output_triggeredclusteredhits->SetBranchAddress("StartChan",      &StartChan    );
@@ -193,18 +197,50 @@ int main(int argc, char** argv){
   std::cout << "Running over " << nEvent << " events." << std::endl;
  
   std::map<int,int> map_Event_TrueEntry;
-  std::map<int,double> map_Event_Weight;
+  std::map<std::pair<int,int>,double> map_Event_Weight;
   int nMarleyEvent=0;
   for (int i=0; i<nEvent; ++i) {
     t_TrueInfo->GetEntry(i);
     map_Event_TrueEntry[EventTrue] = i;
     ++nMarleyEvent;
-    map_Event_Weight[EventTrue] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(0)));
+    map_Event_Weight[std::make_pair(EventTrue,0)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(0)));
+    map_Event_Weight[std::make_pair(EventTrue,1)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(1)));
+    map_Event_Weight[std::make_pair(EventTrue,2)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(2)));
   }
   
   TCanvas c;
   c.Print((OutputFile+"[").c_str());
+  TH1D* signal = new TH1D("signal_visible", ";Deposited E[??];Events / 10 kT / day", 30, 0, 30);
+  TH1D* backgr = new TH1D("backgr_visible", ";Deposited E[??];Events / 10 kT / day", 30, 0, 30);
+  signal->SetLineColor(kRed);
+  backgr->SetLineColor(kBlue);
+  signal->SetLineWidth(2);
+  backgr->SetLineWidth(2);
+  
+  for (int ievent=0; ievent<nEvent; ievent++){
+    t_Output_triggeredclusteredhits->GetEntry(ievent);
+    if (Type == 1){
+      signal->Fill(E_deposited, map_Event_Weight.at(std::make_pair(Event,MarleyIndex)));
+    } else {
+      std::cout << SumADC << std::endl;
+      backgr->Fill(E_deposited);
+    }
+    
+  }
+  backgr->Scale(1.* 3600. * 24. / 2.246e-3 / nEvent / 0.12);
+  signal->Scale(1./nMarleyEvent);
+  signal->Draw();
+  backgr->Draw("SAME");
+  c.Print(OutputFile.c_str());
+  backgr->Draw();
+  c.Print(OutputFile.c_str());
+  c.Print((OutputFile+"]").c_str());
 
+
+  exit(1);
+
+
+  
   std::map<int,std::vector<int> > map_event_entry_wire;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
     t_Output_triggeredclusteredhits->GetEntry(i);
@@ -226,7 +262,7 @@ int main(int argc, char** argv){
     double nBackgroundEventWire=0;
     map_eff[ADC] = new TEfficiency(Form("EffAtADC>%.0f",ADC),Form("Efficiency at ADC > %.0f;E_{#nu};Efficiency to cluster",ADC),30,0,30);
     for (auto const& it: map_Event_TrueEntry) {
-      nEventWire += map_Event_Weight[it.first];
+      //nEventWire += map_Event_Weight[it.first];
       bool detected = false;
       for (auto const& it2 : map_event_entry_wire[it.first]) {
         std::map<int, int> map_gentype_nhit_sign;
@@ -238,7 +274,7 @@ int main(int argc, char** argv){
           ++nBackgroundEventWire;
         } else {
           detected = true;
-          nDetectedSignalEventWire += map_Event_Weight[it.first];
+          //nDetectedSignalEventWire += map_Event_Weight[it.first];
         }
       }
       t_TrueInfo->GetEntry(it.second);
