@@ -199,7 +199,8 @@ public:
     }
     Plot();
   }
-  virtual void Plot() const{
+  virtual void Plot(bool first=false) {
+    (void) first;
     TCanvas* c = new TCanvas();
     c->Print("TDRPlots.pdf[");
 

@@ -242,7 +242,7 @@ int main(int argc, char** argv){
   
   TFile* file_weights = new TFile("../clustering/data/SNRate.root", "READ");
 
-  TH1D* rate_tot_sn_th1 = (TH1D*)file_weights->Get("SN_ENU_PDF");
+//  TH1D* rate_tot_sn_th1 = (TH1D*)file_weights->Get("SN_ENU_PDF");
 
   TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
   std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;

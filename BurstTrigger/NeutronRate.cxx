@@ -164,24 +164,5 @@ int main(int argc, char** argv) {
   }
   tree->Write();
   fOutput->Close();
-  // fTheory->Close();
-
-
-  TCanvas can;
-  can.Print("BurstTrigger.pdf[");
-  int globalIt=0;
-  std::vector<int> vec_Colors = getColors(2);
-
-  TGraph* effLMC = new TGraph(40);
-  effLMC->SetLineWidth(2);
-
-  int globalIt=0;
-  for (auto& ThisConfig : Configs) {
-    double f=globalIt*0.02;
-    effLMC->SetPoint(globalIt, f, ThisConfig->fEfficiency_Burst.at(10));
-  }
-  effLMC->Draw();
-  can.Print("BurstTrigger.pdf]");
-
   return 0;
 }

@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
   c.fBurstTimeWindow = 10;
   c.fClusterEfficiency = 0.35;
   
-//   double c_background=0.475;
+  double c_background=0.475;
 //   c.fBackgroundRate = c_background;
 //   c.fBurstTimeWindow = 10;
 //   c.fClusterEfficiency = 0.3;
