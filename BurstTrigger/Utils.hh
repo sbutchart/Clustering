@@ -19,6 +19,7 @@ inline double PoissonIntegral(Double_t x, Double_t mean){
   value *=TMath::Exp(-mean);
   return value;
 }
+
 std::vector<Configuration> GetConfigurationTextFile(std::string InputFile) {
   std::vector<Configuration> conf;
   if (InputFile == "") return conf;

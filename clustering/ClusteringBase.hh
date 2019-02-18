@@ -17,7 +17,7 @@ class ClusteringBase {
 protected:
   ClusteringBase(){
   }
-  
+
   void InitialiseBase() {
     fInputFileName  = "";
     fInputTreeName  = "";

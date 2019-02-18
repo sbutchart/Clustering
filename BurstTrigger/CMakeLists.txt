@@ -21,6 +21,9 @@ target_link_libraries(SNBurst_Latency SNBurstTrigger)
 add_executable(SNBurst Module_SNBurst.cxx)
 target_link_libraries(SNBurst SNBurstTrigger)
 
+add_executable(NeutronRate NeutronRate.cxx)
+target_link_libraries(NeutronRate SNBurstTrigger)
+
 add_executable(RequirementEfficiency RequirementEfficiency.cxx)
 target_link_libraries(RequirementEfficiency SNBurstTrigger)
 

@@ -296,6 +296,7 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
   fConvertor["Kr85"   ] = kKr85;
   fConvertor["Rn222"  ] = kRn222;
   fConvertor["Neutron"] = kNeutron;
+  rand.SetSeed(2106691);
   //fConvertor["Po210"  ] = kPo210;
   gRandom = &rand;
   Decay d;
@@ -390,7 +391,7 @@ RadiologicalCheatGenerator::RadiologicalCheatGenerator():
 
   // Krypton
   d = Decay();
-  spectra = GetSpectrum("Krpyton_85.root");
+  spectra = GetSpectrum("Krypton_85.root");
   d.Spectrum = spectra[0];
   d.BranchingRatio = spectra[0]->Integral() / (spectra[0]->Integral() +
                                                spectra[1]->Integral());

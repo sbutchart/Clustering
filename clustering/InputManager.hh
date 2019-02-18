@@ -257,25 +257,27 @@ public:
   };
   
   void GetOpticalHits(std::vector<OpticalHit*>& opti) {
-    for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
-      int marley_index=0;
-      OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
-                                      (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
-                                      (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
-                                      (*PDS_OpHit_OpChannel)[j]);
-      oh->SetTrueEnergy((*True_ENu)[marley_index]);
-      oh->SetMarleyIndex(marley_index);
+    if (PDS_OpHit_OpChannel) {
+      for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
+        int marley_index=0;
+        OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
+                                        (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
+                                        (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
+                                        (*PDS_OpHit_OpChannel)[j]);
+        oh->SetTrueEnergy((*True_ENu)[marley_index]);
+        oh->SetMarleyIndex(marley_index);
 
-      if (oh->GetChannel() < 200000 ||
-          abs(oh->GetPosition(kX)) < 20000 ||
-          abs(oh->GetPosition(kY)) < 20000 ||
-          abs(oh->GetPosition(kZ)) < 20000 ||
-          abs(oh->GetPosition(kT)) < 20000) {
-        opti.push_back(oh);
-      } else {
-        std::cout << "Messed up optical hit" << std::endl;
-        delete oh;
-        oh = NULL;
+        if (oh->GetChannel() < 200000 ||
+            abs(oh->GetPosition(kX)) < 20000 ||
+            abs(oh->GetPosition(kY)) < 20000 ||
+            abs(oh->GetPosition(kZ)) < 20000 ||
+            abs(oh->GetPosition(kT)) < 20000) {
+          opti.push_back(oh);
+        } else {
+          std::cout << "Messed up optical hit" << std::endl;
+          delete oh;
+          oh = NULL;
+        }
       }
     }
   };

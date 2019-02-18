@@ -5,7 +5,6 @@
 #include "WireCluster.hh"
 #include "OpticalCluster.hh"
 
-
 class ClusterEngine{
 
 public:

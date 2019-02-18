@@ -86,7 +86,7 @@ void AdvancedClustering::RunClustering(){
   }
   
   fSOM->Write();
-  
+
   if (nMaxMarleyPerEvent>1) {
     std::cout << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
     std::cout << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;

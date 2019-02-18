@@ -1,6 +1,5 @@
 #ifndef DISPLAY_HH
-#define DISPLAY_HH
-
+#define DISPLAY_HH 1
 
 #include "TCanvas.h"
 #include "TH1D.h"

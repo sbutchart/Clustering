@@ -235,7 +235,7 @@ public:
     t_Input->SetBranchAddress("True_Prim_VertEndY"  , &True_Prim_VertEndY  );
     t_Input->SetBranchAddress("True_Prim_VertEndZ"  , &True_Prim_VertEndZ  );
     t_Input->SetBranchAddress("True_Prim_VertEndT"  , &True_Prim_VertEndT  );
-    t_Input->SetBranchAddress("True_Prim_Energy"    , &True_Prim_Energy    );
+    t_Input->SetBranchAddress("True_E"    , &True_Prim_Energy    );
     t_Input->SetBranchAddress("True_Prim_PDG"       , &True_Prim_PDG       );
     t_Input->SetBranchAddress("True_Prim_ID"        , &True_Prim_ID        );
     t_Input->SetBranchAddress("True_Sec_Index"      , &True_Sec_Index      );

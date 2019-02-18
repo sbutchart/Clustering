@@ -205,9 +205,11 @@ public:
 
     for (auto const& it: fPlotClusterEfficiency) {
       if (it.second.size() > 0) {
-        // it.second[0]->SetMinimum(0);
-        // it.second[0]->SetMaximum(1.2);
         it.second[0]->Draw();
+        gPad->Update(); 
+        auto graph = it.second[0]->GetPaintedGraph(); 
+        graph->SetMinimum(0);
+        graph->SetMaximum(1.2);
         for (auto const& it2: it.second) it2->Draw("SAME");
         fLegend.at(it.first)->SetX1NDC(0.6);
         fLegend.at(it.first)->SetX2NDC(0.9);
@@ -243,9 +245,11 @@ public:
 
     for (auto const& it: fPlotClusterEfficiencyENU) {
       if (it.second.size() > 0) {
-        // it.second[0]->SetMinimum(0);
-        // it.second[0]->SetMaximum(1.2);
         it.second[0]->Draw();
+        gPad->Update(); 
+        auto graph = it.second[0]->GetPaintedGraph(); 
+        graph->SetMinimum(0);
+        graph->SetMaximum(1.2);
         for (auto const& it2: it.second) it2->Draw("SAME");
         fLegend.at(it.first)->SetX1NDC(0.6);
         fLegend.at(it.first)->SetX2NDC(0.9);

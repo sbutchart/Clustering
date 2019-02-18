@@ -51,8 +51,6 @@ void Clustering::RunClustering(){
       if (it->GetGenType() == kNeutron)
         nneutron ++;
     }
-    if (nneutron>0)
-      std::cout << "N Neutron hits: " << nneutron << std::endl;
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());

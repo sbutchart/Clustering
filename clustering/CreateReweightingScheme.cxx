@@ -39,6 +39,7 @@ int main(int argc, char** argv){
   
   TGraph *flux_HEP = new TGraph("/Users/plasorak/Downloads/SNOFluxSpectrum_HEP.txt");
   TGraph *flux_B8  = new TGraph("/Users/plasorak/Downloads/SNOFluxSpectrum_B8.txt");
+  
   ifstream xsec_file;
   xsec_file.open("/Users/plasorak/Downloads/marley_ve_cc_total_xs.txt");
 
@@ -73,7 +74,7 @@ int main(int argc, char** argv){
     flux_HEP->GetPoint(i, E, flux);
     flux_HEP->SetPoint(i, E, flux*7.93e+03);
   }
-
+  
 
   flux_HEP->SetTitle("");
   flux_B8 ->SetTitle("");
@@ -82,8 +83,8 @@ int main(int argc, char** argv){
   
   TCanvas* c = new TCanvas();
   c->Print("SolarWeights.pdf[");
-  gPad->SetLogy();
-  gPad->SetLogx();
+  // gPad->SetLogy();
+  // gPad->SetLogx();
   flux_HEP->GetXaxis()->SetLimits(0.1,50.);
   flux_HEP->GetXaxis()->SetTitle("E_{#nu} [MeV]");
   flux_HEP->GetYaxis()->SetTitle("#Phi [s^{-1} cm^{-2}]");
@@ -98,9 +99,11 @@ int main(int argc, char** argv){
   leg_flux->Draw();
   c->Print("SolarWeights.pdf");
   c->Clear();
-
+  
   gPad->SetLogy();
-  gPad->SetLogx();
+  //gPad->SetLogx();
+  // gPad->SetLogy();
+  // gPad->SetLogx();
   xsec1->GetXaxis()->SetLimits(0.1,50.);
   xsec1->GetHistogram()->SetMaximum(1e-38);
   xsec1->GetHistogram()->SetMinimum(1e-45);
@@ -114,7 +117,9 @@ int main(int argc, char** argv){
   leg_xsec->Draw();
   c->Print("SolarWeights.pdf");
   c->Clear();
-  
+    
+  gPad->SetLogy(0);
+  gPad->SetLogx(0);
   TGraph *rate_HEP = new TGraph(flux_HEP->GetN());
   TGraph *rate_B8  = new TGraph(flux_B8 ->GetN());
   //                   10  k     T->kg in g     
@@ -180,12 +185,13 @@ int main(int argc, char** argv){
     }
   }
   
+  
   gPad->SetLogy();
-  gPad->SetLogx();
+  // gPad->SetLogx();
   rate_B8 ->SetLineColor(kRed); 
   rate_HEP->SetLineColor(kBlue);
   rate_Tot->SetLineColor(kBlack);
-  rate_B8 ->GetXaxis()->SetLimits(1.,50.);
+  rate_B8 ->GetXaxis()->SetLimits(1.,20.);
   rate_B8 ->SetTitle(""); 
   rate_HEP->SetTitle("");
   rate_Tot->SetTitle("");
@@ -200,13 +206,28 @@ int main(int argc, char** argv){
   leg_rate->AddEntry(rate_Tot, "total rate", "L");
   leg_rate->Draw();
   c->Print("SolarWeights.pdf");
-  TH1D* rate_tot_th1 = new TH1D("rate_tot_th1","",100,3,20);
+  TH1D* rate_tot_th1 = new TH1D("rate_tot_th1", "", 100, 3, 20);
+  TH1D* rate_B8_th1  = new TH1D("rate_B8_th1",  "", 100, 3, 20);
+  TH1D* rate_HEP_th1 = new TH1D("rate_HEP_th1", "", 100, 3, 20);
+  gPad->SetLogy(false);
+  
   for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
     rate_tot_th1->SetBinContent(i, std::max(0.,rate_Tot->Eval(rate_tot_th1->GetBinCenter(i))));
+    rate_B8_th1 ->SetBinContent(i, std::max(0.,rate_B8 ->Eval(rate_B8_th1 ->GetBinCenter(i))));
+    rate_HEP_th1->SetBinContent(i, std::max(0.,rate_HEP->Eval(rate_HEP_th1->GetBinCenter(i))));
     rate_tot_th1->SetBinError(i, 0);
+    rate_B8_th1 ->SetBinError(i, 0);  
+    rate_HEP_th1->SetBinError(i, 0);
   }
 
-  rate_tot_th1->Scale(rate_Tot->Integral() / rate_tot_th1->Integral());
+  // rate_tot_th1->Scale(rate_Tot->Integral() / rate_tot_th1->Integral());
+  // rate_B8_th1 ->Scale(rate_B8 ->Integral() / rate_B8_th1 ->Integral());
+  // rate_HEP_th1->Scale(rate_HEP->Integral() / rate_HEP_th1->Integral());
+
+  std::cout << rate_tot_th1->Integral() << std::endl;
+  std::cout << rate_B8_th1 ->Integral() << std::endl;
+  std::cout << rate_HEP_th1->Integral() << std::endl;
+  
   TH1D* integrated_rate_tot_th1 = new TH1D("integrated_rate_tot_th1",
                                            ";E_{threshold} [MeV];Events / 10 kT / day",
                                            100,3,20);
@@ -219,13 +240,10 @@ int main(int argc, char** argv){
   integrated_rate_tot_th1->Draw();
   c->Print("SolarWeights.pdf");
   
-  TFile* file_weights = new TFile("../clustering/data/RateMarley.root", "READ");
-  TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
-  std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;
-  TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);
-  tree->Project("rate_tot_sn_th1", "True_ENu*1000.");
+  TFile* file_weights = new TFile("../clustering/data/SNRate.root", "READ");
+  TH1D* rate_tot_sn_th1 = (TH1D*)file_weights->Get("SN_ENU_PDF");
   rate_tot_sn_th1->SetStats(0);
-  rate_tot_sn_th1->Scale(1. / rate_tot_sn_th1->Integral(0,99));
+  rate_tot_sn_th1->Scale(1. / rate_tot_sn_th1->Integral());
   rate_tot_sn_th1->Draw();
   c->Print("SolarWeights.pdf");
 
@@ -235,10 +253,35 @@ int main(int argc, char** argv){
   weight_tot_th1->SetTitle(";E_{#nu} [MeV];Weight [Solar events / 10 kT / day] / [SN event]");
   weight_tot_th1->Draw();
   c->Print("SolarWeights.pdf");
+
+  
+  TH1D* weight_B8_th1 = (TH1D*)rate_B8_th1->Clone();
+  weight_B8_th1->Divide(rate_tot_sn_th1);
+  weight_B8_th1->SetStats(0);
+  weight_B8_th1->SetTitle(";E_{#nu} [MeV];Weight [Solar B8 events / 10 kT / day] / [SN event]");
+  weight_B8_th1->Draw();
+  c->Print("SolarWeights.pdf");
+  
+  TH1D* weight_HEP_th1 = (TH1D*)rate_HEP_th1->Clone();
+  weight_HEP_th1->Divide(rate_tot_sn_th1);
+  weight_HEP_th1->SetStats(0);
+  weight_HEP_th1->SetTitle(";E_{#nu} [MeV];Weight [Solar HEP events / 10 kT / day] / [SN event]");
+  weight_HEP_th1->Draw();
+  c->Print("SolarWeights.pdf");
+  
+  TH1D* weight_flat_th1 = (TH1D*)rate_tot_sn_th1->Clone();
+  weight_flat_th1->Divide(rate_tot_sn_th1);
+  weight_flat_th1->Divide(rate_tot_sn_th1);
+  weight_flat_th1->SetTitle(";E_{#nu} [MeV];Weight [flat spectrum] / [SN event]");
+  weight_flat_th1->Draw();
+  c->Print("SolarWeights.pdf");
   c->Print("SolarWeights.pdf]");
 
   TFile* output_weight_file = new TFile("WeightFile.root", "RECREATE");
   weight_tot_th1->Write("SolarNu_weight");
+  weight_B8_th1 ->Write("SolarB8Nu_weight");
+  weight_HEP_th1->Write("SolarHEPNu_weight");
+  weight_flat_th1->Write("Flat_weight");
   output_weight_file->Close();
 
   return 0;

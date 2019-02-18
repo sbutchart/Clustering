@@ -39,8 +39,8 @@ public:
   std::map<double,double> fLatency_NoBurstBurst95CL;
   std::map<double,double> fLatency_NoBurstDistance95CL;
 
-  TH1D* fTH1DFakeRate_Cut;
-  TH1D* fTH1DEfficiency_Burst;
+  TH1D* fTH1DFakeRate_Cut       ;
+  TH1D* fTH1DEfficiency_Burst   ;
   TH1D* fTH1DEfficiency_Distance;
   TH1D* fTH1DCoverage;
   TH1D* fTH1DLatency_Burst;
@@ -198,13 +198,23 @@ public:
     }
     bins.push_back(input.crbegin()->first);
 
+    if("Efficiency_Burst" == Title){
+      for(auto const& it:bins){
+        std::cout <<it << std::endl;
+        if (it>30)
+          break;
+      }
+    }
     histo = new TH1D(Title.c_str(),
                      (";"+XTitle+";"+YTitle).c_str(),
                      input.size(), bins.data());
     histo->SetStats(0);
     for (auto const& it:input) {
-      if (it.second>=0)
+      if (it.second>=0){
         histo->SetBinContent(histo->FindBin(it.first), it.second);
+        if (it.first < 30)std::cout <<it.first << " " << it.second << std::endl;
+
+      }
     }
     fTH1DList.push_back(histo);
   };

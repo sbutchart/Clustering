@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TH1D.h"
+#include "TLine.h"
 #include "TMath.h"
 #include "TString.h"
 #include "TTree.h"
@@ -17,6 +18,8 @@
 #include "Configuration.hh"
 #include "Utils.hh"
 #include "SNBurstTrigger.hh"
+
+#include "colors.h"
 
 const bool reproduceAlexResult = false;
 
@@ -54,9 +57,9 @@ int main(int argc, char** argv) {
   Configs.insert(Configs.end(), Configs2.begin(), Configs2.end());
 
   Configuration c;
-  c.fBackgroundRate = 0.0985341;
+  c.fBackgroundRate = 0.0623056;
   c.fBurstTimeWindow = 10;
-  c.fClusterEfficiency = 0.581915;
+  c.fClusterEfficiency = 0.35;
   Configs.push_back(c);
   if (Configs.size() == 0) {
     std::cout << "No Config parsed." << std::endl;
@@ -123,5 +126,52 @@ int main(int argc, char** argv) {
   tree->Write();
   fOutput->Close();
   // fTheory->Close();
+
+
+  TCanvas can;
+  can.Print("BurstTrigger.pdf[");
+  int globalIt=0;
+  std::vector<int> vec_Colors = getColors(2);
+  gPad->SetGridx();
+  gPad->SetGridy();
+  for (auto& ThisConfig : Configs) {
+    int color = vec_Colors.at(globalIt % vec_Colors.size());
+    int color2 = vec_Colors.at(globalIt% vec_Colors.size()+1);
+    ThisConfig.fTH1DFakeRate_Cut       ->SetLineColor(color);
+    ThisConfig.fTH1DEfficiency_Burst   ->SetLineColor(color);
+    ThisConfig.fTH1DEfficiency_Distance->SetLineColor(color);
+    ThisConfig.fTH1DCoverage           ->SetLineColor(color);
+    ThisConfig.fTH1DFakeRate_Cut       ->SetLineColor(2);
+    ThisConfig.fTH1DEfficiency_Burst   ->SetLineColor(2);
+    ThisConfig.fTH1DEfficiency_Distance->SetLineColor(2);
+    ThisConfig.fTH1DCoverage           ->SetLineColor(2);
+    ThisConfig.fTH1DFakeRate_Cut->SetMinimum(1e-10);
+    gPad->SetLogx(false);
+    gPad->SetLogy(true);
+    ThisConfig.fTH1DFakeRate_Cut       ->Draw();
+    TLine *l_perMonth_2 = new TLine(0, ThisConfig.fTargetFakeRate,
+                                    ThisConfig.fTH1DFakeRate_Cut->GetXaxis()->GetXmax(), ThisConfig.fTargetFakeRate);
+    l_perMonth_2->SetLineColor(1);
+    l_perMonth_2->SetLineWidth(3);
+    l_perMonth_2->Draw();
+    can.Print("BurstTrigger.pdf");
+    gPad->SetLogy(false);
+    gPad->SetLogx(false);
+    ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(0,50);
+    ThisConfig.fTH1DEfficiency_Burst->Draw();can.Print("BurstTrigger.pdf");
+    ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(10,1000);
+    ThisConfig.fTH1DEfficiency_Distance->Draw();can.Print("BurstTrigger.pdf");
+    ThisConfig.fDistanceProbability->SetLineColor(kBlue);
+    ThisConfig.fDistanceProbability->SetLineWidth(3);
+    gPad->SetLogy(false);
+    gPad->SetLogx(false);
+    ThisConfig.fDistanceProbability->GetXaxis()->SetRange(0,50);
+
+    ThisConfig.fDistanceProbability->SetTitle(";Distance [kpc];SN probability #times SN triggering efficiency");
+    ThisConfig.fDistanceProbability    ->Draw();
+    ThisConfig.fTH1DCoverage           ->Draw("SAME");can.Print("BurstTrigger.pdf");
+  }
+  
+  can.Print("BurstTrigger.pdf]");
   return 0;
 }

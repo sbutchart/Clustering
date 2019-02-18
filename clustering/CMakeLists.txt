@@ -1,5 +1,5 @@
 project(DAQWork)
-message("building clustering")
+message(${CMAKE_CXX_COMPILER})
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
 #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
@@ -70,6 +70,9 @@ target_link_libraries(ThrowToySmartTrigger Clustering)
 add_executable(RunBiTrigger RunBiTrigger.cxx)
 target_link_libraries(RunBiTrigger Clustering)
 
+add_executable(BackgroundRateCalculator BackgroundRateCalculator.cxx)
+target_link_libraries(BackgroundRateCalculator Clustering)
+
 add_executable(CreateReweightingScheme CreateReweightingScheme.cxx)
 target_link_libraries(CreateReweightingScheme ${ROOT_LIBRARIES})
 
@@ -87,6 +90,9 @@ target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})
 
 add_executable(TotalNEvents TotalNEvents.C)
 target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
+
+add_executable(Optimiser Optimiser.cxx)
+target_link_libraries(Optimiser ${ROOT_LIBRARIES})
 
 # add_executable(OpHitTrigger OpHitTrigger.C)
 # target_link_libraries(OpHitTrigger ${ROOT_LIBRARIES})
