@@ -13,6 +13,7 @@ double PoissonIntegral(const double x, const double mean, const bool verb=0){
     std::cout << "x " << x << std::endl;
     std::cout << "mean " << mean << std::endl;
   }
+  if (mean == 0) return 0;
   if (mean < 20) {
     double value = 0;
     for (int i=0; i<=x; ++i) {
@@ -46,27 +47,28 @@ public:
     fBackgroundRate  (0),
     fTimeWindow      (0),
     fProportion      (1),
+    fThreshold       (0),
     fTimeProfile     (NULL){}
 
-  double GetEfficiencyAtNBurst(const int nBurst=10) const{
+  double GetEfficiencyAtNBurst(const int nBurst=10) {
     double Eff=0;
     double AverageNumberOfCluster = fBackgroundRate*fTimeWindow;
     int MaxNumber = AverageNumberOfCluster + 10. * sqrt(AverageNumberOfCluster);
-    int Threshold=AverageNumberOfCluster;
-    for (; Threshold<MaxNumber; Threshold++) {
-      double Frac = PoissonIntegral(Threshold,AverageNumberOfCluster);
-      if (Frac<0) PoissonIntegral(Threshold,AverageNumberOfCluster, true);
+    fThreshold=(int)AverageNumberOfCluster;
+    for (; fThreshold<MaxNumber; fThreshold++) {
+      double Frac = PoissonIntegral(fThreshold,AverageNumberOfCluster);
+      if (Frac<0) PoissonIntegral(fThreshold,AverageNumberOfCluster, true);
       double Rate = fBackgroundRate * fTimeWindow * Frac;
       if (Rate<fMaxFake)
         break;
     }
-    std::cout << "Threshold " << Threshold << std::endl;
-    
+    std::cout << "Threshold " << fThreshold << std::endl;
+    if (fThreshold < 0) fThreshold = 0;
     double AverageNumberOfClusterInBurst = (fBackgroundRate*fTimeWindow +
                                             nBurst * fEfficiencyMarley * fProportion);
 
-    Eff = PoissonIntegral(Threshold, AverageNumberOfClusterInBurst);
-    if (Eff<0) PoissonIntegral(Threshold,AverageNumberOfCluster, true);
+    Eff = PoissonIntegral(fThreshold, AverageNumberOfClusterInBurst);
+    if (Eff<0) PoissonIntegral(fThreshold,AverageNumberOfCluster, true);
     
     return Eff;
   }
@@ -77,6 +79,7 @@ public:
   double GetBackgroundRate  () const { return fBackgroundRate  ; };
   double GetTimeWindow      () const { return fTimeWindow      ; };
   double GetProportion      () const { return fProportion      ; };
+  double GetThreshold       () const { return fThreshold       ; };
   TH1D*  GetTimeProfile     () const { return fTimeProfile     ; };
 
   void SetMaxFake         (const double f) { fMaxFake          = f; };
@@ -92,6 +95,7 @@ private:
   double fBackgroundRate  ;
   double fTimeWindow      ;
   double fProportion      ;
+  double fThreshold       ;
   TH1D*  fTimeProfile     ;
 };
 

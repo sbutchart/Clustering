@@ -46,11 +46,13 @@ int main(int argc, char** argv){
   int nEvent = 0;
   int Range = 800;
   int Start = 0;
+  int Ofset = 0;
   bool BadFile = 0;
   std::string InputFile="";
   std::string OutputFile="OpticalCluster.pdf";
+  int nPECutMin=0;
   int nHitCutMin=0;
-  while ( (opt = getopt(argc, argv, "c:h:o:i:n:s:r:b")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "c:p:o:h:i:n:s:r:b")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'c':
       RequestedConfig = atoi(optarg);
@@ -60,6 +62,9 @@ int main(int argc, char** argv){
       break;
     case 'h':
       nHitCutMin = atoi(optarg);
+      break;
+    case 'p':
+      nPECutMin = atoi(optarg);
       break;
     case 's':
       Start = atoi(optarg);
@@ -71,7 +76,7 @@ int main(int argc, char** argv){
       Range = atoi(optarg);
       break;
     case 'o':
-      OutputFile = optarg;
+      Ofset = atoi(optarg);
       break;
     case 'n':
       nEvent = atoi(optarg);
@@ -89,7 +94,7 @@ int main(int argc, char** argv){
   if (InputFile == "") {
     std::cout << "You need to provide an input file -i ClusteringOutput.root" << std::endl;
   }
-  if(Start == 0 ) Start =  nHitCutMin;
+  if(Start == 0 ) Start =  nPECutMin;
   std::cout << "Saving output in " << OutputFile << std::endl;
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
 
@@ -188,21 +193,15 @@ int main(int argc, char** argv){
   std::map<int,std::vector<int> > map_event_entry_opti;
 
   std::cout << t_ClusteredOptHit->GetEntries() << " optical clusters were saved." << std::endl;
+  TEfficiency* Efficiency = new TEfficiency("Efficiency_ENu", ";Efficiency;E_{#nu} [MeV]", 30, 0, 30);
+  
+  TH1D* h_nPE_back_opti = new TH1D("h_nPE_back_opti", ";n PEs;Clusters", Range, 0, Range);
+  h_nPE_back_opti->SetLineColor(kBlue);
+  h_nPE_back_opti->SetMinimum(0.1);
+  h_nPE_back_opti->SetLineStyle(1);
+  h_nPE_back_opti->SetLineWidth(2);
 
-  TH1D* h_nhit_sign_opti = new TH1D("h_nhit_sign_opti", ";n Hits;Clusters", Range, 0, Range);
-  TH1D* h_nhit_back_opti = new TH1D("h_nhit_back_opti", ";n Hits;Clusters", Range, 0, Range);
-  h_nhit_sign_opti->SetLineColor(kRed);
-  h_nhit_back_opti->SetLineColor(kBlue);
-  h_nhit_sign_opti->SetMinimum(0.1);
-  h_nhit_back_opti->SetMinimum(0.1);
-  h_nhit_sign_opti->SetLineStyle(1);
-  h_nhit_back_opti->SetLineStyle(1);
-  h_nhit_sign_opti->SetLineWidth(2);
-  h_nhit_back_opti->SetLineWidth(2);
-
-  t_ClusteredOptHit->Project("h_nhit_sign_opti", "NHits", Form("Type==1 && Config==%i", RequestedConfig));
-  t_ClusteredOptHit->Project("h_nhit_back_opti", "NHits", Form("Type==0 && Config==%i", RequestedConfig));
-  double threshold = GetStatThreshold(h_nhit_sign_opti,h_nhit_back_opti);
+  t_ClusteredOptHit->Project("h_nPE_back_opti", "SumPE", Form("Type==0 && Config==%i", RequestedConfig));
 
   TF1 *f1 = new TF1("double_exp","[0]*exp([1]*x)",0,Range);
   f1->SetLineWidth(2);
@@ -210,7 +209,7 @@ int main(int argc, char** argv){
   f1->SetParameter(0, 100);
   f1->SetParameter(1, -0.01);
     
-  TFitResultPtr r = h_nhit_back_opti->Fit("double_exp", "", "", nHitCutMin, Range);
+  TFitResultPtr r = h_nPE_back_opti->Fit("double_exp", "", "", nPECutMin, Range);
 
   TF1 *f2 = new TF1("double_exp","[0]*exp([1]*x)",0,Range);
   f2->SetLineWidth(2);
@@ -219,38 +218,37 @@ int main(int argc, char** argv){
   f2->SetParameter(1,    f1->GetParameter(1));
 
   std::cout << "Fitting from " << std::endl;
-  std::cout << " - Min " << nHitCutMin << std::endl;
-  std::cout << " - Max " << threshold  << std::endl;
+  std::cout << " - Min " << nPECutMin << std::endl;
+  std::cout << " - Max " << Range << std::endl;
   
   TCanvas c;
   c.Print((OutputFile+"[").c_str());
-  h_nhit_back_opti->Draw("");
+  h_nPE_back_opti->Draw("");
   f1->Draw("SAME");
   f2->Draw("SAME");
   
-  TLine line2(threshold,  h_nhit_back_opti->GetMinimum(), threshold,  h_nhit_back_opti->GetMaximum());
-  TLine line3(nHitCutMin, h_nhit_back_opti->GetMinimum(), nHitCutMin, h_nhit_back_opti->GetMaximum());
-  line2.SetLineWidth(2);
+  TLine line3(nPECutMin, h_nPE_back_opti->GetMinimum(), nPECutMin, h_nPE_back_opti->GetMaximum());
   line3.SetLineWidth(2);
-  line2.Draw();
   line3.Draw();
   gPad->SetLogy();
-  c.Print(OutputFile.c_str());
+  c.Print(OutputFile.c_str()); 
   c.Print("Fit.pdf");
   if (r) {
     std::cout << "Fit failed!" << std::endl;
     c.Print((OutputFile+"]").c_str());
     exit(1);
   }
-
-  std::vector <double> max;
+  
+  std::vector<double> max;
   int EventIterator = 0;
-  std::map<int,bool> totalDetectedEvent;
-  std::map<int,int>  totalBackCluster;
-  std::map<int,int>  totalSignCluster;
-  std::map<int,bool> detectedEvent;
-  std::map<int,int>  backCluster;
-  std::map<int,int>  signCluster;
+  std::map<int,bool>   totalDetectedEvent;
+  std::map<int,int>    totalBackCluster;
+  std::map<int,int>    totalSignCluster;
+  std::map<int,double> totalEventEnergy;
+  std::map<int,bool>   detectedEvent;
+  std::map<int,double> eventEnergy;
+  std::map<int,int>    backCluster;
+  std::map<int,int>    signCluster;
 
   for (int i=0; i<100; i++) {
     detectedEvent[i] = false;
@@ -258,14 +256,13 @@ int main(int argc, char** argv){
     signCluster[i] = 0;
   }
   
-  std::map<int, TArrow*> ArrowMap;
-  TH1D* h_nhit_LMCEff = new TH1D("h_nhit_LMCEff", ";n Hits cut;LMC efficiency", Range, 0, Range);
-  
-  for (int nHitCut=Start; nHitCut<Range; nHitCut=nHitCut+1) {
-    std::cout << "Trying nhit cut = " << nHitCut << std::endl;
+  for (int nPECut=Start+Ofset; nPECut>Start; nPECut=nPECut-1) {  
+    std::cout << "nPE cut = " << nPECut << std::endl;
+    std::cout << "nHit cut = " << nHitCutMin << std::endl;
     totalDetectedEvent.clear();
     totalBackCluster  .clear();
     totalSignCluster  .clear();
+    totalEventEnergy  .clear();
     detectedEvent     .clear();
     backCluster       .clear();
     signCluster       .clear();
@@ -273,7 +270,7 @@ int main(int argc, char** argv){
     int Divisor=1;
   
     //Divisor=100;
-    //if (nHitCut<10) Divisor=100;
+    //if (nPECut<10) Divisor=100;
     CurrentProg=0;
     for (int iEntry=0; iEntry<t_ClusteredOptHit->GetEntries()/Divisor; iEntry++) {
       t_ClusteredOptHit->GetEntry(iEntry);
@@ -290,15 +287,17 @@ int main(int argc, char** argv){
           totalDetectedEvent[EventIterator] = detectedEvent[i];
           totalBackCluster[EventIterator] = backCluster[i];
           totalSignCluster[EventIterator] = signCluster[i];
+          totalEventEnergy[EventIterator] = eventEnergy[i];
           detectedEvent[i] = false;
           backCluster[i] = 0;
           signCluster[i] = 0;
+          eventEnergy[i] = 0;
           EventIterator++;
         }
       }
     
-      if (NHits<nHitCut) continue;
-
+      if (SumPE<nPECut || NHits<nHitCutMin) continue;
+      eventEnergy[Event] = 0;
       if (Type==0) {
         backCluster[Event]++;
       } else {
@@ -306,10 +305,12 @@ int main(int argc, char** argv){
         signCluster[Event]++;
       }
     }
+  
     if (!BadFile) {
       totalDetectedEvent = detectedEvent;
       totalBackCluster = backCluster;
-      totalSignCluster = signCluster;        
+      totalSignCluster = signCluster;
+      totalEventEnergy = eventEnergy;
     }
   
     size_t nTotalEvent=0;
@@ -320,140 +321,33 @@ int main(int argc, char** argv){
       if (it.second) {
         nDetectedEvent++;
       }
+      Efficiency->Fill(it.second, totalEventEnergy.at(it.first));
     }
     if (!BadFile) nTotalEvent=nEvent;
     std::cout << "nTotalEvent " << nTotalEvent << std::endl;
     std::cout << "nDetectedEvent " << nDetectedEvent << std::endl;
-    if (nDetectedEvent<1) break;
     std::cout << "Overall efficiency " << (double)nDetectedEvent / (double)nTotalEvent << std::endl;
-  
+    double efficiency = (double)nDetectedEvent / (double)nTotalEvent;
+
     for (auto const& it:totalBackCluster)
       nBackgroundCluster += it.second;
+    Efficiency->Draw();
 
+    std::cout << "nBackgroundCluster " << nBackgroundCluster << std::endl;
     std::cout << "Background rate from counting " << (double)nBackgroundCluster / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
-    std::cout << "Background rate from histo " <<  h_nhit_back_opti->Integral(nHitCut+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
-    std::cout << "Background rate from f1 " <<  f1->Integral(nHitCut+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
-    std::cout << "Background rate from f2 " <<  f2->Integral(nHitCut+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
+    std::cout << "Background rate from histo " <<  h_nPE_back_opti->Integral(nPECutMin+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
+    std::cout << "Background rate from f1 " <<  f1->Integral(nPECutMin+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
+    std::cout << "Background rate from f2 " <<  f2->Integral(nPECutMin+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12 << std::endl;
 
-    BurstEfficiencyCalculator bec;
-    bec.SetMaxFake(1./3600./24./31);
-    bec.SetEfficiencyMarley((double)nDetectedEvent / (double)nTotalEvent);
-    if (nHitCut<threshold) {
-      bec.SetBackgroundRate  ((double)nBackgroundCluster / (double)nTotalEvent / 4.492e-3 / 0.12);
-    } else {
-      bec.SetBackgroundRate  (f2->Integral(nHitCut+1, Range) / (double)nTotalEvent / 4.492e-3 / 0.12);
-    }
-    bec.SetTimeWindow(10.);
-    double eff = bec.GetEfficiencyAtNBurst();
-    if (bec.GetThreshold()>25)
-      nHitCut=nHitCut+10;
-    
-    std::cout << "Eff at nhit cut = " << nHitCut << " is " << eff << std::endl;
-
-    if (!ArrowMap[bec.GetThreshold()] && bec.GetThreshold() < 10)
-      ArrowMap[bec.GetThreshold()] = new TArrow(nHitCut, 1, nHitCut, 10, 0.05, "|>");
-    
-    if (eff < 0.99) {
-      h_nhit_LMCEff->SetBinContent(nHitCut, eff);
-    } else {
+    if (efficiency > 0.5)
       break;
-    }
-    h_nhit_LMCEff->SetBinError(nHitCut, 0);
-    if (bec.GetThreshold() == 0) break;
   }
-  TH1D* son = DoIntegratedSignalOverNoise(h_nhit_sign_opti, h_nhit_back_opti);
-  max = {h_nhit_sign_opti->GetMaximum(),
-         h_nhit_back_opti->GetMaximum()};
-  h_nhit_sign_opti->SetMaximum((*std::max_element(max.begin(),max.end()))*2);
-  h_nhit_sign_opti->SetMinimum(0.1);
-  gPad->SetLogy();
-  son->SetLineWidth(2);
-  son->SetLineColor(kCyan);
-  son->SetMarkerColor(kCyan);
-  h_nhit_LMCEff->SetLineWidth(2);
-  h_nhit_LMCEff->SetLineColor(kViolet);  
-  h_nhit_LMCEff->SetMarkerColor(kViolet);
-  
-  std::cout << "Threshold for nhit cut: " << threshold << std::endl;
-  std::cout << "Corresponding to a S/N: " << son->GetBinContent(son->FindBin(threshold)) << std::endl;
-  c.Clear();
-  c.cd();
-  TPad *pad1 = new TPad("pad1", "The pad 80% of the height",0.0,0.5,1.0,1.0);
-  pad1->SetLogy();
-  pad1->Draw();
-  pad1->SetGridx();
-  pad1->SetGridy();
-  pad1->cd();
-  pad1->SetBottomMargin(0);
-  h_nhit_sign_opti->SetStats(0);
-  h_nhit_back_opti->SetStats(0);
-  h_nhit_sign_opti->GetXaxis()->SetTitleSize(h_nhit_sign_opti->GetXaxis()->GetTitleSize()/.5);
-  h_nhit_sign_opti->GetXaxis()->SetLabelSize(h_nhit_sign_opti->GetXaxis()->GetLabelSize()/.5);
-  h_nhit_sign_opti->GetYaxis()->SetTitleSize(h_nhit_sign_opti->GetYaxis()->GetTitleSize()/.5);
-  h_nhit_sign_opti->GetYaxis()->SetLabelSize(h_nhit_sign_opti->GetYaxis()->GetLabelSize()/.5);
-  h_nhit_sign_opti->GetYaxis()->SetTitleOffset(h_nhit_sign_opti->GetYaxis()->GetTitleOffset()*.3);
-  h_nhit_sign_opti->Draw("");
-  h_nhit_back_opti->Draw("SAME");
-  f1->Draw("SAME");
-  f2->Draw("SAME");
-  son->Draw("SAME E");
-  TLine* line = new TLine(threshold,h_nhit_sign_opti->GetMinimum(),
-                          threshold,h_nhit_sign_opti->GetMaximum());
-  line->SetLineColor(kBlack);
-  line->SetLineWidth(2);
-  line->Draw();
-  c.cd();
 
-  TPad *pad2 = new TPad("pad2", "The pad 20% of the height",0.0,0.0,1.0,0.5);
-  pad2->Draw();
-  pad2->SetGridx();
-  pad2->SetGridy();
-  pad2->SetLogy();
-  pad2->cd();
-  pad2->SetTopMargin(0);
-  pad2->SetBottomMargin(pad2->GetBottomMargin()/0.5);
-  h_nhit_LMCEff->SetStats(0);
-  h_nhit_LMCEff->SetMinimum(0.01);
-  h_nhit_LMCEff->SetMaximum(2);
-  h_nhit_LMCEff->GetXaxis()->SetTitleSize(h_nhit_LMCEff->GetXaxis()->GetTitleSize()/.5);
-  h_nhit_LMCEff->GetXaxis()->SetLabelSize(h_nhit_LMCEff->GetXaxis()->GetLabelSize()/.5);
-  h_nhit_LMCEff->GetYaxis()->SetTitleSize(h_nhit_LMCEff->GetYaxis()->GetTitleSize()/.5);
-  h_nhit_LMCEff->GetYaxis()->SetTitleOffset(h_nhit_LMCEff->GetYaxis()->GetTitleOffset()*.01);
-  h_nhit_LMCEff->GetYaxis()->SetNoExponent();
-  h_nhit_LMCEff->GetYaxis()->SetLabelSize(h_nhit_LMCEff->GetYaxis()->GetLabelSize()/.5);
-  h_nhit_LMCEff->Draw();
-  // for (auto& it: ArrowMap) {
-  //   if (it.second) {
-  //     it.second->SetY1(h_nhit_LMCEff->GetMinimum());
-  //     it.second->SetY2(h_nhit_LMCEff->GetMinimum()*2);
-  //     it.second->Draw();
-  //     TText* text = new TText(it.second->GetX1(), it.second->GetY1()*4,Form("%i",it.first));
-  //     text->SetTextAngle(90);
-  //     text->Draw();
-  //   }
-  // }
   c.Print(OutputFile.c_str());
-  c.Clear();
-  c.cd(1);
-  gPad->Clear();
-  TLegend* leg = new TLegend(0.1, 0.1, 0.9, 0.9);
-  leg->AddEntry(h_nhit_sign_opti, "Signal optical clusters");
-  leg->AddEntry(h_nhit_back_opti, "Background optical clusters");
-  leg->AddEntry(f1, "Background optical clusters fit");
-  leg->AddEntry(f2, "Background optical clusters fit * 2");
-  leg->AddEntry(son, "Signal over noise ratio (not extrapolated)");
-  leg->AddEntry(h_nhit_LMCEff, "Efficiency to detect a SN of 10 events (extrapolated)");
-  leg->Draw();
-  c.Print(OutputFile.c_str());
-  c.Print((OutputFile+"]").c_str());
 
   TFile f((OutputFile+".root").c_str(), "RECREATE");
   f.cd();
-  h_nhit_sign_opti->Write();
-  h_nhit_back_opti->Write();
-  f1->Write();
-  son->Write();
-  h_nhit_LMCEff->Write();
+  Efficiency->Write();
   f.Close();
   
   return 1;

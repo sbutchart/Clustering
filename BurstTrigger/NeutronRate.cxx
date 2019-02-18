@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TH1D.h"
+#include "TLine.h"
 #include "TMath.h"
 #include "TString.h"
 #include "TTree.h"
@@ -17,6 +18,8 @@
 #include "Configuration.hh"
 #include "Utils.hh"
 #include "SNBurstTrigger.hh"
+
+#include "colors.h"
 
 const bool reproduceAlexResult = false;
 
@@ -49,80 +52,16 @@ int main(int argc, char** argv) {
     }
   }
     
-  std::vector<Configuration> Configs  = GetConfigurationTextFile(InputTextFile);
-  std::vector<Configuration> Configs2 = GetConfigurationRootFile(InputRootFile);
-  Configs.insert(Configs.end(), Configs2.begin(), Configs2.end());
+  std::vector<Configuration> Configs;
 
-  Configuration c;
-  double c_background=0.475;
-  c.fBackgroundRate = c_background;
-  c.fBurstTimeWindow = 10;
-  c.fClusterEfficiency = 0.3;
-  c.fLegendEntry = "Default";
-  Configs.push_back(c);
-
-  c.fBackgroundRate = c_background;
-  c.fBurstTimeWindow = 10;
-  c.fClusterEfficiency = 0.25;
-  c.fLegendEntry = "15cm^{2}";
-  Configs.push_back(c);
-
-  c.fBackgroundRate = c_background;
-  c.fBurstTimeWindow = 10;
-  c.fClusterEfficiency = 0.4;
-  c.fLegendEntry = "Pessimistic reflections";
-  Configs.push_back(c);
-
-  c.fBackgroundRate = c_background;
-  c.fBurstTimeWindow = 10;
-  c.fClusterEfficiency = 0.55;
-  c.fLegendEntry = "Optimistic reflections";
-  Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4237;
-  // c.fLegendEntry = "30 cm^{2}";
-  // Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4492;
-  // c.fLegendEntry = "45 cm^{2}";
-  // Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4324;
-  // c.fLegendEntry = "60 cm^{2}";
-  // Configs.push_back(c);
-
-  // double c_background=0.475;
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4428;
-  // c.fLegendEntry = "S/N = 7";
-  // Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4492;
-  // c.fLegendEntry = "S/N = 5";
-  // Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4520;
-  // c.fLegendEntry = "S/N = 4";
-  // Configs.push_back(c);
-
-  // c.fBackgroundRate = c_background;
-  // c.fBurstTimeWindow = 10;
-  // c.fClusterEfficiency = 0.4380;
-  // c.fLegendEntry = "S/N = 3";
-  // Configs.push_back(c);
-
-
+  for (double f=0; f<=2; f=f+0.05) {
+    Configuration c;
+    c.fBackgroundRate = 0.0261105 + 0.052221 * f;
+    c.fBurstTimeWindow = 10;
+    c.fClusterEfficiency = 0.35;
+    Configs.push_back(c); 
+  }
+  
   if (Configs.size() == 0) {
     std::cout << "No Config parsed." << std::endl;
   } else {
@@ -152,11 +91,10 @@ int main(int argc, char** argv) {
   fInverse->SetParameter(1, gradient);
   
   SNBurstTrigger snb;
-  std::map<std::string,double> efficiency_10_events;
   //LOOP AROUND THE CLUSTERING CONFIGURATIONS.    
   for(auto& it : Configs){
-    it.SetDistanceProbability    ((TH1D*)hSNProbabilityVDistance->Clone());
-    it.SetDistanceParametrisation((TF1*)fInverse->Clone());
+    it.SetDistanceProbability    (hSNProbabilityVDistance);
+    it.SetDistanceParametrisation(fInverse);
     it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
     std::cout << "In a time window of " << it.fBurstTimeWindow
               << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
@@ -171,33 +109,40 @@ int main(int argc, char** argv) {
     }
     snb.FillFakeRateNClusters(it);
     snb.FindOnePerMonthFakeRate(it);
-    if (it.fNClusterCut>=0) {
-      snb.FillEfficiencyBurst(it);
-      it.FillHistograms();
-      efficiency_10_events[it.fName] = it.fEfficiency_Burst.at(10);
-      it.DumpAndPlot();
-    }
+    snb.FillEfficiencyBurst(it);
+    // it.FillHistograms();
+    // it.DumpAndPlot();
   }
-  
-  std::cout << "----------------------------------------------------" << std::endl;
-  std::cout << "Configuration\tEfficiency for 10 events" << std::endl;
-  for (auto const& it: Configs) {
-    if (it.fNClusterCut>=0)
-      std::cout << it.fName << "\t" << efficiency_10_events.at(it.fName) << std::endl;
-  }
-  std::cout << "----------------------------------------------------" << std::endl;
-  std::cout << "Now saving all the configuration in the output tree in" << OutputRootFile << std::endl;
+
+
+  std::cout << "Now saving all the configuration in the output tree." << std::endl;
   Configuration *Con = NULL;
   TFile* fOutput = new TFile(OutputRootFile.c_str(), "RECREATE");
   TTree* tree = new TTree("Configurations","Configurations");
   tree->Branch("Configuration", &Con);
   for (auto& it: Configs) {
     Con = &it;
-    if (it.fNClusterCut>=0)
-      tree->Fill();
+    tree->Fill();
   }
   tree->Write();
   fOutput->Close();
   // fTheory->Close();
+
+
+  TCanvas can;
+  can.Print("BurstTrigger.pdf[");
+  int globalIt=0;
+  std::vector<int> vec_Colors = getColors(2);
+
+  TGraph* effLMC = new TGraph(40);
+  effLMC->SetLineWidth(2);
+
+  int globalIt=0;
+  for (auto& ThisConfig : Configs) {
+    double f=globalIt*0.02;
+    effLMC->SetPoint(globalIt, f, ThisConfig->fEfficiency_Burst.at(10));
+  }
+  effLMC->Draw();
+  can.Print("BurstTrigger.pdf]");
   return 0;
 }

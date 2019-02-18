@@ -51,12 +51,12 @@ public:
   TH1D* fTH1DLatency_NoBurstDistance;
   TH1D* fTH1DLatency_NoBurstBurst95CL;
   TH1D* fTH1DLatency_NoBurstDistance95CL;
-
-  std::vector<TH1D*> fTH1DList;
-
+  
   TF1 * fDistanceParametrisation;
   TH1D* fDistanceProbability;
   
+  std::vector<TH1D*> fTH1DList;
+
 public:
   void SetDistanceProbability    (TH1D* h) { fDistanceProbability     = (TH1D*)h->Clone(); }
   void SetDistanceProbability    (TH1D& h) { fDistanceProbability     = (TH1D*)h.Clone(); }
@@ -77,6 +77,7 @@ public:
     fClusterEfficiency           = c.fClusterEfficiency;
     fClusterEfficiencyError      = c.fClusterEfficiencyError;
     fLegendEntry                 = c.fLegendEntry;
+    fName                        = c.fName;
     fTargetFakeRate              = c.fTargetFakeRate;
     fActualFakeRate              = c.fActualFakeRate;
     

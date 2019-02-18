@@ -1,13 +1,13 @@
 #include <algorithm>    // std::min_element, std::max_element
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <fstream>
+#include <string>
+#include <iostream>
 
 #include "Helper.h"
 
 #include "TFile.h"
-
-#include "TMath.h"
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -15,50 +15,27 @@
 #include "TPad.h"
 #include "TTree.h"
 #include "TLegend.h"
-#include "TGraphErrors.h"
-
-
-TProfile* SetUpTProfileGenType(std::string name, std::string title) {
-  Helper h;
-  TProfile* p_ = new TProfile(name.c_str(), title.c_str(), h.GenName.size(), -0.5, (double)h.GenName.size()-0.5);
-  for(auto const& it : h.ShortGenName)
-    p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
-  return p_;
-  
-}
-
-std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
-  std::map<int,int> map_;
-  for(std::vector<int>::const_iterator it=GenType->begin(); it!=GenType->end(); ++it)
-    map_[*it]++;
-  return map_;
-}
+#include "TEfficiency.h"
+#include "TStyle.h"
 
 int main(int argc, char** argv){
+
   int opt;
   // Shut GetOpt error messages down (return '?'): 
   extern char *optarg;
   extern int  optopt;
 
-  int RequestedConfig=0;
   std::string InputFile;
   std::string OutputFile;
-  std::string WeightFile;
   int nEvent = 0;
 
-  while ( (opt = getopt(argc, argv, "o:i:n:w:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "o:i:n:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile = optarg;
       break;
-    case 'c':
-      RequestedConfig = atoi(optarg);
-      break;
     case 'n':
       nEvent = atoi(optarg);
-      break;
-    case 'w':
-      WeightFile = optarg;
       break;
     case 'o':
       OutputFile = optarg;
@@ -68,8 +45,7 @@ int main(int argc, char** argv){
       break;
     }
   }
-  TFile *f_Weights = new TFile(WeightFile.c_str(), "READ");
-  TH1D* hWeight = (TH1D*)f_Weights->Get("SolarNu_weight");
+
   
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
 
@@ -106,7 +82,7 @@ int main(int argc, char** argv){
   double pur_Ar42      ;
   
   std::vector<int>    * HitView  = NULL;
-  std::vector<int>    * GenType  = NULL;
+  std::vector<int>    * HitGenType = NULL;
   std::vector<int>    * HitChan  = NULL;
   std::vector<double> * HitTime  = NULL;
   std::vector<double> * HitSADC  = NULL;
@@ -115,9 +91,8 @@ int main(int argc, char** argv){
   std::vector<double> * TrPosY   = NULL; 
   std::vector<double> * TrPosZ   = NULL;
 
-  int EventTrue;
   int MarleyIndex;
-
+  int EventTrue;
   std::vector<double> * MarlTime = NULL;
   std::vector<double> * ENu      = NULL;
   std::vector<double> * ENu_Lep  = NULL;
@@ -128,12 +103,10 @@ int main(int argc, char** argv){
   std::vector<double> * DirX     = NULL;
   std::vector<double> * DirY     = NULL;
   std::vector<double> * DirZ     = NULL;
-
   
   TTree* t_Output_triggeredclusteredhits = (TTree*)f_Input->Get("ClusteredWireHit");
   t_Output_triggeredclusteredhits->SetBranchAddress("Cluster",        &Cluster      );
   t_Output_triggeredclusteredhits->SetBranchAddress("MarleyIndex",    &MarleyIndex  );
-
   t_Output_triggeredclusteredhits->SetBranchAddress("Event",          &Event        );
   t_Output_triggeredclusteredhits->SetBranchAddress("Config",         &Config       );
   t_Output_triggeredclusteredhits->SetBranchAddress("StartChan",      &StartChan    );
@@ -165,7 +138,7 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Radon"   ,   &pur_Radon   );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar42"    ,   &pur_Ar42    );
   t_Output_triggeredclusteredhits->SetBranchAddress("HitView",        &HitView);
-  t_Output_triggeredclusteredhits->SetBranchAddress("GenType",        &GenType);
+  t_Output_triggeredclusteredhits->SetBranchAddress("GenType",        &HitGenType);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitChan",        &HitChan);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitTime",        &HitTime);
   t_Output_triggeredclusteredhits->SetBranchAddress("HitSADC",        &HitSADC);
@@ -197,126 +170,42 @@ int main(int argc, char** argv){
   std::cout << "Running over " << nEvent << " events." << std::endl;
  
   std::map<int,int> map_Event_TrueEntry;
-  std::map<std::pair<int,int>,double> map_Event_Weight;
   int nMarleyEvent=0;
   for (int i=0; i<nEvent; ++i) {
     t_TrueInfo->GetEntry(i);
     map_Event_TrueEntry[EventTrue] = i;
-    ++nMarleyEvent;
-    map_Event_Weight[std::make_pair(EventTrue,0)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(0)));
-    map_Event_Weight[std::make_pair(EventTrue,1)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(1)));
-    map_Event_Weight[std::make_pair(EventTrue,2)] = hWeight->GetBinContent(hWeight->FindBin(1000.*ENu->at(2)));
+    nMarleyEvent += (int)ENu->size();
   }
   
-  TCanvas c;
-  c.Print((OutputFile+"[").c_str());
-  TH1D* signal = new TH1D("signal_visible", ";Deposited E[??];Events / 10 kT / day", 30, 0, 30);
-  TH1D* backgr = new TH1D("backgr_visible", ";Deposited E[??];Events / 10 kT / day", 30, 0, 30);
-  signal->SetLineColor(kRed);
-  backgr->SetLineColor(kBlue);
-  signal->SetLineWidth(2);
-  backgr->SetLineWidth(2);
-  
-  for (int ievent=0; ievent<nEvent; ievent++){
-    t_Output_triggeredclusteredhits->GetEntry(ievent);
-    if (Type == 1){
-      signal->Fill(E_deposited, map_Event_Weight.at(std::make_pair(Event,MarleyIndex)));
-    } else {
-      std::cout << SumADC << std::endl;
-      backgr->Fill(E_deposited);
-    }
-    
-  }
-  backgr->Scale(1.* 3600. * 24. / 2.246e-3 / nEvent / 0.12);
-  signal->Scale(1./nMarleyEvent);
-  signal->Draw();
-  backgr->Draw("SAME");
-  c.Print(OutputFile.c_str());
-  backgr->Draw();
-  c.Print(OutputFile.c_str());
-  c.Print((OutputFile+"]").c_str());
+  std::cout << "nMarleyEvent " << nMarleyEvent << std::endl;
 
-
-  exit(1);
-
-
-  
+  std::ofstream out(OutputFile);
+  out << "Event,ENu,Type,ChanWidth,TimeWidth,NHits,SumADC"<<std::endl;
   std::map<int,std::vector<int> > map_event_entry_wire;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
+    PrintProgress(i,t_Output_triggeredclusteredhits->GetEntries());
     t_Output_triggeredclusteredhits->GetEntry(i);
-    if (Config==RequestedConfig) map_event_entry_wire[Event].push_back(i);
+    map_event_entry_wire[Event].push_back(i);
   }
 
-  std::vector<double> vec_SADC_Cut = {0,1000,2000,3000,4000,5000,6000};
-  std::map<double,TEfficiency*> map_eff;
-  TGraphErrors* BackgroundRate_SADC = new TGraphErrors(vec_SADC_Cut.size());
-  TGraphErrors* Efficiency_SADC     = new TGraphErrors(vec_SADC_Cut.size());
-  int pointcount=0;
-  double ADCerror=500;
-  for (auto const& ADC: vec_SADC_Cut) {
-    std::cout << "ADC " << ADC << std::endl;
-    double eff, efferror;
-    double back, backerror;
-    double nEventWire=0;
-    double nDetectedSignalEventWire=0;
-    double nBackgroundEventWire=0;
-    map_eff[ADC] = new TEfficiency(Form("EffAtADC>%.0f",ADC),Form("Efficiency at ADC > %.0f;E_{#nu};Efficiency to cluster",ADC),30,0,30);
-    for (auto const& it: map_Event_TrueEntry) {
-      //nEventWire += map_Event_Weight[it.first];
-      bool detected = false;
-      for (auto const& it2 : map_event_entry_wire[it.first]) {
-        std::map<int, int> map_gentype_nhit_sign;
-        std::map<int, int> map_gentype_nhit_back;
-        t_Output_triggeredclusteredhits->GetEntry(it2);
-        if (SumADC < ADC) continue;
-        if (Type!=1) {
-          std::cout << "nBackgroundEventWire " << nBackgroundEventWire <<std::endl;
-          ++nBackgroundEventWire;
-        } else {
-          detected = true;
-          //nDetectedSignalEventWire += map_Event_Weight[it.first];
-        }
-      }
-      t_TrueInfo->GetEntry(it.second);
-      map_eff[ADC]->Fill(detected, 1000.*ENu->at(0));
+  
+  for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
+    t_Output_triggeredclusteredhits->GetEntry(i);
+    t_TrueInfo->GetEntry(map_Event_TrueEntry[Event]);
+    
+    if (Type==1 && abs(PosX->at(0)) > 50 && abs(PosX->at(0)) < 100 && ENu_Lep->at(0)*1000. < 10) {
+      out << Event <<","
+          << ENu_Lep->at(0)*1000. << ","
+          << Type      << ","
+          << ChanWidth << ","
+          << TimeWidth << ","
+          << NHits     << ","
+          << SumADC    << std::endl;
     }
-    std::cout << nEventWire << std::endl;
-    std::cout << nBackgroundEventWire << std::endl;
-    eff = nDetectedSignalEventWire / nEventWire;
-    efferror = TMath::Sqrt(1./(nDetectedSignalEventWire) + 1./(nEventWire));
-    efferror = eff*efferror;
-    back = (double)nBackgroundEventWire / nEventWire / 2.246e-3 /0.12;
-    backerror = TMath::Sqrt(1./nBackgroundEventWire + 1./ nEventWire);
-    backerror = back*backerror;
-    std::cout << "eff " << eff << " +- " << efferror << std::endl;
-    std::cout << "back " << back << " +- " << backerror << std::endl;
-    std::cout << "pc " << pointcount << std::endl;
-    BackgroundRate_SADC->SetPoint(pointcount, ADC, back);
-    Efficiency_SADC    ->SetPoint(pointcount, ADC, eff );
-    BackgroundRate_SADC->SetPointError(pointcount, ADCerror, backerror);
-    Efficiency_SADC    ->SetPointError(pointcount, ADCerror, efferror );
-
-    ++pointcount;
     
   }
-  
-  BackgroundRate_SADC->Draw("AP");
-  BackgroundRate_SADC->SetTitle("");
-  c.Print(OutputFile.c_str());
-  gPad->SetLogy();
-  Efficiency_SADC->GetXaxis()->SetTitle("Sum ADC threshold");
-  Efficiency_SADC->GetYaxis()->SetTitle("Efficiency for Solar #nu");
-  Efficiency_SADC->SetTitle("");
-  Efficiency_SADC->Draw("AP");
-  c.Print(OutputFile.c_str());
+  out.close();
 
-  gPad->SetLogy(false);
-  for (auto const& it:map_eff) {
-    it.second->Draw();
-    c.Print(OutputFile.c_str());
-  }
-  c.Print((OutputFile+"]").c_str());
-
-  return 1;
+  return 0;
 
 }

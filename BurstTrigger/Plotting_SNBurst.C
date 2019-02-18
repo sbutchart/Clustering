@@ -21,7 +21,6 @@
 int main(int argc, char** argv) {
 
   int opt;
-  std::string TheoryFile = "";
   std::string InputRootFile = "";
   std::string OutputFile = "";
   extern char *optarg;
@@ -33,9 +32,6 @@ int main(int argc, char** argv) {
       break;
     case 'o':
       OutputFile = optarg;
-      break;
-    case 't':
-      TheoryFile = optarg;
       break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
@@ -51,7 +47,7 @@ int main(int argc, char** argv) {
 
   std::vector<Configuration> Configs = GetConfigurationRootFile(InputRootFile);
   TCanvas* c = new TCanvas();
-  c->Print((OutputFile+".pdf[").c_str());
+  c->Print((OutputFile+"[").c_str());
   std::vector<int> vec_Colors = getColors(2);
   TLegend* leg = new TLegend(0.1,0.1,0.9,0.9);
   
@@ -75,7 +71,7 @@ int main(int argc, char** argv) {
   TLine *l_perMonth  = new TLine(0, 1./3600./24./31, Configs[0].fTH1DFakeRate_Cut->GetXaxis()->GetXmax(), 1./3600./24./31);
   l_perMonth->Draw();
   gPad->RedrawAxis();
-  c->Print((OutputFile+".pdf").c_str());
+  c->Print(OutputFile.c_str());
   
   gPad->SetLogy(false);
   Configs[0].fTH1DEfficiency_Burst->Draw("");
@@ -85,7 +81,7 @@ int main(int argc, char** argv) {
     i++;
   }
   gPad->RedrawAxis();
-  c->Print((OutputFile+".pdf").c_str());
+  c->Print(OutputFile.c_str());
   
   Configs[0].fTH1DEfficiency_Distance->Draw();
   for (auto const& it: Configs) {
@@ -93,11 +89,10 @@ int main(int argc, char** argv) {
     i++;
   }
   gPad->RedrawAxis();
-  c->Print((OutputFile+".pdf").c_str());
+  c->Print(OutputFile.c_str());
   
   gPad->SetLogy(true);
-  TFile *fTheory = new TFile(TheoryFile.c_str(),"READ");
-  TH1D  *hSNProbabilityVDistance = (TH1D*)fTheory->Get("h_SNProbabilityVDistance_LMC");
+  TH1D  *hSNProbabilityVDistance = (TH1D*)Configs[0].fDistanceProbability->Clone();
   hSNProbabilityVDistance->GetXaxis()->SetRange(0,50);
   hSNProbabilityVDistance->SetLineWidth(4);
   hSNProbabilityVDistance->SetLineColor(46);
@@ -107,13 +102,13 @@ int main(int argc, char** argv) {
     i++;
   }
   gPad->RedrawAxis();
-  c->Print((OutputFile+".pdf").c_str());
+  c->Print(OutputFile.c_str());
 
   gPad->Clear();
   leg->Draw();
-  c->Print((OutputFile+".pdf").c_str());
+  c->Print(OutputFile.c_str());
 
-  c->Print((OutputFile+".pdf]").c_str());
+  c->Print((OutputFile+"]").c_str());
 
   return 1;
 }

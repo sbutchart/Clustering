@@ -138,9 +138,15 @@ void ClusterEngine::ClusterHits2_sort(std::vector<WireHit*>& vec_Hits,
 }
 
 
-void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHit,
+void ClusterEngine::ClusterOpticalHits(std::vector<OpticalHit*>& vec_OptHitIn,
                                        std::vector<OpticalCluster*>& vec_OptCluster) {
 
+  std::vector<OpticalHit*> vec_OptHit;
+  for (auto const& it: vec_OptHitIn) {
+    if (it->GetSPE() > fPreCutPEOpt) {
+      vec_OptHit.push_back(it);
+    }
+  }
   ResetTime();
   fStopwatch0 = clock();
   std::sort(vec_OptHit.begin(), vec_OptHit.end(), HitOrderedInTime);

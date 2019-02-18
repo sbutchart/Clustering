@@ -70,7 +70,7 @@ protected:
     fAPA             (0),
     fTrueGenType     (kOther),
     fTrueEnergy      (0),
-    fTrueMarleyIndex (0),
+    fTrueMarleyIndex (-1),
     fTruePosition    (),
     fTrueDirection   (),
     fIsTriggering    (0){
@@ -94,7 +94,7 @@ protected:
     fAPA             (0),
     fTrueGenType     (kOther),
     fTrueEnergy      (0),
-    fTrueMarleyIndex (0),
+    fTrueMarleyIndex (-1),
     fTruePosition    (),
     fTrueDirection   (),
     fIsTriggering    (0){
@@ -105,17 +105,26 @@ protected:
     
     std::map<Direction,std::set<double>> all_pos;
     std::map<size_t,size_t> apa;
+    std::map<int,size_t> marleyIndices;
     std::set<int> channel;
     std::map<GenType,double> hittype_peak;
     for (auto const& it: fHit) {
+      marleyIndices[it->GetMarleyIndex()]++;
       channel.insert(it->GetChannel());
       fSumPeak += it->GetPeak();
       for (auto const& d : AllDirection) {
         fPosition[d] += it->GetPosition(d) * it->GetPeak();
+        fTruePosition[d] += it->GetTruePosition(d) * it->GetPeak();
         all_pos[d].insert(it->GetPosition(d));
       }
       apa[it->GetAPA()] += it->GetPeak();
       hittype_peak[it->GetGenType()] += it->GetPeak();
+    }
+    size_t max = 0;
+    for (auto const& it:marleyIndices){
+      if(it.second>max){
+        fTrueMarleyIndex = it.first;
+      }
     }
     fIsSelected = true;
     fAPA = GetMax(apa).first;
@@ -132,6 +141,7 @@ protected:
 
     for (auto const& d : AllDirection) {
       fPosition[d]   /= fSumPeak;
+      fTruePosition[d] /= fSumPeak;
       fExtent[d].first  = *(all_pos[d].begin());
       fExtent[d].second = *(all_pos[d].rbegin());
       fSize[d] = fExtent[d].second - fExtent[d].first;
@@ -193,7 +203,7 @@ public:
   bool   GetIsSelected   ()                  const { return fIsSelected;                   };
   bool   GetIsTriggering ()                  const { return fIsTriggering;                 };
   double GetRecoEnergy   ()                  const { return fRecoEnergy;                   };
-  size_t GetMarleyIndex  ()                  const { return fTrueMarleyIndex;              };
+  int    GetMarleyIndex  ()                  const { return fTrueMarleyIndex;              };
   double GetStartChannel ()                  const { return (double)fChannelExtent.first ; };
   double GetEndChannel   ()                  const { return (double)fChannelExtent.second; };
   double GetChannelWidth ()                  const { return (double)fChannelWidth        ; };
@@ -212,7 +222,7 @@ public:
   void SetIsSelected   (const bool b=true)                 { fIsSelected       = b; };
   void SetIsTriggering (const bool b=true)                 { fIsTriggering     = b; };
   void SetRecoEnergy   (const double d)                    { fRecoEnergy       = d; };
-  void SetMarleyIndex  (const size_t d)                    { fTrueMarleyIndex  = d; };
+  void SetMarleyIndex  (const int    d)                    { fTrueMarleyIndex  = d; };
   void SetHit          (const std::vector<Hit*>& h)        { fHit              = h; };
 
 protected:
@@ -232,7 +242,7 @@ protected:
   size_t  fAPA;
   GenType fTrueGenType;
   double  fTrueEnergy;
-  size_t  fTrueMarleyIndex;
+  int     fTrueMarleyIndex;
   std::map<Direction,double> fTruePosition;
   std::map<Direction,double> fTrueDirection;
   bool fIsTriggering;

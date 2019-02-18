@@ -29,6 +29,152 @@
 #include <unistd.h>
 #include <vector>
 
+class Helper;
+inline const std::vector<int>& getColors(int);
+
+
+inline double GetMinNonZeroBinContent(const TH1D* h_){
+  double min = std::numeric_limits<double>::max();
+  for (int i=0; i<h_->GetNbinsX(); ++i){
+    if (h_->GetBinContent(i) <= 0) continue;
+    if (h_->GetBinContent(i) < min) {
+      min=h_->GetBinContent(i);
+    }
+  }
+  return min;
+  
+}
+inline void PlotThese2Histos(TH1D* h1_, TH1D* h2_, TCanvas& c_, std::string filename,
+                             bool logx=false, bool logy=false, double maxv=10, double minv=0.1){
+  
+  std::vector<double> max = {h1_->GetBinContent(h1_->GetMaximumBin()),
+                             h2_->GetBinContent(h2_->GetMaximumBin()),
+                             maxv};
+  std::vector<double> min = {GetMinNonZeroBinContent(h1_),
+                             GetMinNonZeroBinContent(h2_),
+                             minv};
+  double ScaleMax=1.2, ScaleMin=0.;
+  if (logy) {
+    ScaleMax = 5;
+    ScaleMin = 0.1;
+    for (auto it = min.begin(); it!=min.end();)
+      if (*it == 0) {
+        it = min.erase(it);
+      } else {
+        it++;
+      }
+  }
+  h1_->SetStats(0);
+  h2_->SetStats(0);
+  h1_->SetMaximum((*std::max_element(max.begin(),max.end()))*ScaleMax);
+  h1_->SetMinimum((*std::min_element(min.begin(),min.end()))*ScaleMin);
+  gPad->SetLogx(logx);
+  gPad->SetLogy(logy);
+  h1_->SetTitle("");
+  h1_->Draw();
+  h2_->Draw("SAME");
+  c_.Print(filename.c_str());
+  gPad->SetLogx(false);
+  gPad->SetLogy(false);
+}
+
+
+
+inline void PlotThese2Histos(TH2D* h1_, TH2D* h2_, TCanvas& c_, std::string filename,
+                             bool logx=false, bool logy=false, bool logz=false){
+  h1_->SetStats(0);
+  h2_->SetStats(0);
+  gPad->SetLogx(logx);
+  gPad->SetLogy(logy);
+  gPad->SetLogz(logz);
+  h1_->Draw("COLZ");
+  h2_->Draw("SAME");
+  c_.Print(filename.c_str());
+  h1_->Draw("COLZ");
+  c_.Print(filename.c_str());
+  h2_->Draw("COLZ");
+  c_.Print(filename.c_str());
+  gPad->SetLogx(false);
+  gPad->SetLogy(false);
+  gPad->SetLogz(false);
+}
+
+template<typename T>
+inline void ScaleTheseHistos(std::map<T,TH1D*> h_, const double s_) {
+  for (auto& it: h_) {
+    it.second->Scale(s_);
+  }
+}
+
+template<typename T>
+inline void ScaleTheseHistos(std::map<T,TH2D*> h_, const double s_) {
+  for (auto& it: h_) {
+    it.second->Scale(s_);
+  }
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TH1D*>& m, std::string opt,
+             TCanvas& c, std::string filename,
+             bool logx=false, bool logy=false){
+  gPad->SetLogx(logx);
+  gPad->SetLogy(logy);
+  std::vector<double> min;
+  std::vector<double> max;
+  double ScaleMax=1.2, ScaleMin=0.;
+
+  if (logy) {
+    ScaleMax = 5;
+    ScaleMin = 0.1;
+    for (auto const& it: m) {
+      min.push_back(GetMinNonZeroBinContent(it.second));
+      max.push_back(it.second->GetBinContent(it.second->GetMaximumBin()));
+    }
+  }
+  
+  m.begin()->second->SetStats(0);
+  m.begin()->second->SetMaximum((*std::max_element(max.begin(),max.end()))*ScaleMax);
+  m.begin()->second->SetMinimum((*std::min_element(min.begin(),min.end()))*ScaleMin);
+  m.begin()->second->SetTitle("");
+  m.begin()->second->Draw(opt.c_str());
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw((opt+"SAME").c_str());
+  c.Print(filename.c_str());
+  gPad->SetLogx(false);
+  gPad->SetLogy(false);
+}
+
+template<typename T>
+void PlotAllIndividually(const std::map<T, TH2D*>& m, std::string opt,
+                         TCanvas& c, std::string filename,
+                         bool logx=false, bool logy=false){
+  gPad->SetLogx(logx);
+  gPad->SetLogy(logy);
+  for (auto const& it: m) {
+    it.second->Draw(opt.c_str());
+    c.Print(filename.c_str());
+  }
+  gPad->SetLogx(false);
+  gPad->SetLogy(false);
+}
+
+template<typename T>
+void PlotAll(const std::map<T, TH2D*>& m, std::string opt,
+             TCanvas& c, std::string filename,
+             bool logx=false, bool logy=false){
+  gPad->SetLogx(logx);
+  gPad->SetLogy(logy);
+  m.begin()->second->Draw(opt.c_str());
+  
+  for (auto const& it: m)
+    if (it != *m.begin())
+      it.second->Draw((opt+"SAME").c_str());
+  c.Print(filename.c_str());
+  gPad->SetLogx(false);
+  gPad->SetLogy(false);
+}
+
 template<typename T>
 void PlotAll(const std::map<T, TH1D*>& m, std::string opt=""){
   m.begin()->second->Draw(opt.c_str());
@@ -94,6 +240,62 @@ void PlotAll(const std::map<T, TGraph*>& m, std::string opt="LP"){
 }
 
 
+template<typename T>
+void SetMaxHisto(std::map<T,TH1D*>& map_, double fact=1.) {
+  double max=0;
+  for (auto const& it: map_)
+    if (max< it.second->GetMaximum())
+      max = it.second->GetMaximum();
+  for (auto const& it: map_) {
+    it.second->SetMaximum(max*fact);
+  }
+}
+
+
+template<typename T>
+inline void FormatTheseHistos(std::map<T,TH1D*> h_, double scale=1.2) {
+  SetMaxHisto(h_, scale);
+  std::vector<int>vec_colors = getColors(0);
+  int i=0;
+  for (auto& it: h_) {
+    TH1D* histo = it.second;
+    histo->SetLineWidth(2.);
+    histo->SetLineColor(vec_colors[i++]);
+    histo->SetStats(0);
+  }
+}
+
+
+template<typename T>
+inline void FormatTheseHistos(std::map<T,TH2D*> h_) {
+  for (auto& it: h_) {
+    TH2D* histo = it.second;
+    histo->SetStats(0);
+  }
+}
+
+template<typename T>
+inline void FormatTheseHistos(std::map<T,TEfficiency*> h_) {
+  std::vector<int>vec_colors = getColors(0);
+  int i=0;
+  for (auto& it: h_) {
+    TEfficiency* histo = it.second;
+    histo->SetLineWidth(2.);
+    histo->SetLineColor(vec_colors[i++]);
+  }
+}
+
+template<typename T>
+inline void FormatTheseHistos(std::map<T,TProfile*> h_) {
+  std::vector<int>vec_colors = getColors(0);
+  int i=0;
+  for (auto& it: h_) {
+    TProfile* histo = it.second;
+    histo->SetLineWidth(2.);
+    histo->SetLineColor(vec_colors[i++]);
+    histo->SetStats(0);
+  }
+}
 
 template<typename T, typename U>
 std::pair<T,U> GetMax(const std::map<T,U>& x) {

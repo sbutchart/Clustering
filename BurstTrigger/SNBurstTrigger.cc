@@ -45,9 +45,40 @@ void SNBurstTrigger::FindOnePerMonthFakeRate(Configuration& c, const double Targ
 void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, const int burstMax) const {
 
   bool IsOne=false;
+  std::vector<int> vec_Burst;
 
+  for (int Burst=0; Burst<1000; Burst++){
+    vec_Burst.push_back(Burst);    
+  }
+  for (int Burst=1100; Burst<30e4; Burst=Burst+100) {
+    vec_Burst.push_back(Burst);
+  }
+
+  if (vec_Burst.front() < burstMin) {
+    size_t index=0;
+    for (size_t it=0; it<vec_Burst.size(); ++it) {
+      if (vec_Burst[it]>= burstMin) {
+        index = it;
+        break;
+      }
+    }
+    vec_Burst.erase(vec_Burst.begin(), vec_Burst.begin()+index);
+  }
+
+  if (vec_Burst.back() > burstMax) {
+    size_t index=0;
+    for (size_t it=0; it<vec_Burst.size(); ++it) {
+      if (vec_Burst[it]>= burstMax) {
+        index = it;
+        break;
+      }
+    }
+    vec_Burst.erase(vec_Burst.begin()+index, vec_Burst.begin()+vec_Burst.size());
+  }
+
+  
   for(int Burst=burstMin; Burst<burstMax; Burst++){
-
+    if (Burst%10000==0) std::cout << "Burst " << Burst << " / " << burstMax << std::endl;
     if (IsOne) {
       c.fEfficiency_Burst[Burst] = 1;
       continue;
@@ -58,7 +89,12 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
     double RMS           = sqrt(TotalClusters);
     int    NMaxClusters  = (int)std::ceil(TotalClusters + 20*RMS);
     TH1D *Poisson = new TH1D("f_Poisson", "", NMaxClusters, -0.5, NMaxClusters-0.5);
-    for (int i=1; i<NMaxClusters+1; ++i) {
+    if (c.fNClusterCut>10.*TotalClusters) {
+      c.fEfficiency_Burst[Burst] = 0;
+      continue;
+    }
+
+      for (int i=1; i<NMaxClusters+1; ++i) {
       double BinCenter = Poisson->GetBinCenter(i);
       Poisson->SetBinContent(i, TMath::PoissonI(BinCenter,TotalClusters));
     }
@@ -74,13 +110,15 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
     } else if(Integral<0) {
       c.fEfficiency_Burst[Burst] = 0;
       std::cout << "Module_SNBurst::FillEfficiencyBurst(): Integral of the Poisson is fischy (= "
-        << Integral << ")" << std::endl;
+                << Integral << ")" << std::endl;
+      std::cout << "TotalClusters " << TotalClusters << std::endl;
+      std::cout << "ClusterCut    " << c.fNClusterCut << std::endl;      
     } else {
-        std::cout << "Module_SNBurst::FillEfficiencyBurst(): Integral of the Poisson is fischy (= "
-                  << Integral << ")" << std::endl;
-      }
+      std::cout << "Module_SNBurst::FillEfficiencyBurst(): Integral of the Poisson is fischy (= "
+                << Integral << ")" << std::endl;
+    }
     
-      if(Poisson){
+    if(Poisson){
       delete Poisson;
       Poisson = NULL;
     }

@@ -11,7 +11,7 @@ public:
   std::map<int, std::vector<TEfficiency*>> fPlotClusterEfficiencyENU;
   std::map<int, std::vector<TProfile*>>    fPlotNHitProfileENU;
   std::map<int, std::vector<TH2D*>>        fPlotNHitTH2DENU;
-  std::map<int, TH1D*>                     f5MeVEfficiencyENU;
+  std::map<int, TH1D*>                     f10MeVEfficiencyENU;
 
   virtual void SetUpTreeName() {
     std::cout << "Setting up the correct tree" << std::endl;
@@ -59,23 +59,25 @@ public:
     std::vector<int> color = getColors(0);
 
     for (auto const&treegroup: fTreeName) {
+      if (treegroup.first != 2) continue;
       int group=treegroup.first;
       int iter=0;
       fLegend[group] = new TLegend(0.1,0.6,0.4,0.9);
-      f5MeVEfficiency[group] = new TH1D(Form("f5MeVEfficiency_%i",group), ";ADC Threshold;Efficiency @E_{e}=5MeV", 7, 7.5, 42.5);
-      f5MeVEfficiency[group]->SetLineColor(color[group]);
-      f5MeVEfficiency[group]->SetLineWidth(2);
-      f5MeVEfficiency[group]->SetStats(0);
-      f5MeVEfficiencyENU[group] = new TH1D(Form("f5MeVEfficiencyENU_%i",group), ";ADC Threshold;Efficiency @E_{#nu}=5MeV", 7, 7.5, 42.5);
-      f5MeVEfficiencyENU[group]->SetLineColor(color[group]);
-      f5MeVEfficiencyENU[group]->SetLineWidth(2);
-      f5MeVEfficiencyENU[group]->SetStats(0);
+      f10MeVEfficiency[group] = new TH1D(Form("f10MeVEfficiency_%i",group), ";ADC Threshold;Efficiency @E_{e}=10MeV", 7, 7.5, 42.5);
+      f10MeVEfficiency[group]->SetLineColor(color[group]);
+      f10MeVEfficiency[group]->SetLineWidth(2);
+      f10MeVEfficiency[group]->SetStats(0);
+      f10MeVEfficiencyENU[group] = new TH1D(Form("f10MeVEfficiencyENU_%i",group), ";ADC Threshold;Efficiency @E_{#nu}=10MeV", 7, 7.5, 42.5);
+      f10MeVEfficiencyENU[group]->SetLineColor(color[group]);
+      f10MeVEfficiencyENU[group]->SetLineWidth(2);
+      f10MeVEfficiencyENU[group]->SetStats(0);
       std::string algorithm = treegroup.second[0];
       algorithm = std::regex_replace(algorithm, std::regex(R"([0-9])"), "");
       algorithm = std::regex_replace(algorithm, std::regex("snana"), "");
-      fLegendGroup->AddEntry(f5MeVEfficiency[group], algorithm.c_str());
+      fLegendGroup->AddEntry(f10MeVEfficiency[group], algorithm.c_str());
       
       for (auto const&tree: treegroup.second) {
+        if (tree != "snanatrigprim2000") continue;
         fTree[group].push_back((TTree*) fInputFile->Get((tree+"/SNSimTree").c_str()));
         if (fTree[group].back() == NULL) {
           throw WrongFileException();
@@ -85,17 +87,18 @@ public:
         fPlotNHitProfile[group]      .push_back(new TProfile((tree+"Prof").c_str(),
                                                              ";Electron energy [MeV];NHit", 30, 0, 30));
         fPlotNHitTH2D[group]         .push_back(new TH2D((tree+"TH2D").c_str(),
-                                                         ";Electron energy [MeV];NHit", 30, 0, 30, 10, 0, 10));
+                                                         ";Electron energy [MeV];NHit", 30, 0, 30, 20, 0, 20));
 
         fPlotClusterEfficiencyENU[group].push_back(new TEfficiency((tree+"EffENU").c_str(),
-                                                                ";Neutrino energy [MeV];Clustering efficiency", 30, 0, 30));
+                                                                   ";Neutrino energy [MeV];Clustering efficiency", 30, 0, 30));
         fPlotNHitProfileENU[group]      .push_back(new TProfile((tree+"ProfENU").c_str(),
-                                                             ";Neutrino energy [MeV];NHit", 30, 0, 30));
+                                                                ";Neutrino energy [MeV];NHit", 30, 0, 30));
         fPlotNHitTH2DENU[group]         .push_back(new TH2D((tree+"TH2DENU").c_str(),
-                                                         ";Neutrino energy [MeV];NHit", 30, 0, 30, 10, 0, 10));
+                                                            ";Neutrino energy [MeV];NHit", 30, 0, 30, 20, 0, 20));
       
         TTree* t = fTree[group].back();
         TEfficiency*& ef = fPlotClusterEfficiency[group].back();
+        std::cout << "Filling " << ef->GetName() << std::endl;
         TProfile*& pr = fPlotNHitProfile[group].back();
         TH2D*& th = fPlotNHitTH2D[group].back();
         TEfficiency*& efENU = fPlotClusterEfficiencyENU[group].back();
@@ -111,9 +114,7 @@ public:
         t->SetBranchAddress("Hit_RMS",  &Hit_RMS );
         t->SetBranchAddress("Hit_True_GenType", &Hit_True_GenType);
         pr->SetStats(0);
-        th->SetStats(0);
         prENU->SetStats(0);
-        thENU->SetStats(0);
         pr->SetLineColor(color[iter]);
         ef->SetLineColor(color[iter]);
         prENU->SetLineColor(color[iter]);
@@ -173,16 +174,26 @@ public:
 
           if (correctly_backtracked!=NColHit) std::cout << title << " " << entry << ": " << correctly_backtracked << " / " << NColHit << std::endl;
           std::vector<WireCluster*> cluster_collection;
+          cluster_collection.clear();
           c.ClusterHits2(hit_collection,cluster_collection);
-          ef->Fill(cluster_collection.size()>0, LepE->at(0)*1000.);
-          efENU->Fill(cluster_collection.size()>0, ENu->at(0)*1000.);
+          trigger.IsTriggering(cluster_collection);
+
+          bool eff=0;
+          for (auto const& it: cluster_collection) {
+            if (it->GetIsTriggering()) {
+              eff=1;
+              break;
+            }
+          }
+          ef   ->Fill(eff, LepE->at(0)*1000.);
+          efENU->Fill(eff, ENu ->at(0)*1000.);
           
         }
-        f5MeVEfficiency[group]->SetBinContent(f5MeVEfficiency[group]->FindBin(threshold), ef->GetEfficiency(ef->FindFixBin(5)));
-        f5MeVEfficiency[group]->SetBinError  (f5MeVEfficiency[group]->FindBin(threshold), 0.5*(ef->GetEfficiencyErrorLow(ef->FindFixBin(5))+ef->GetEfficiencyErrorLow(ef->FindFixBin(5))));
+        f10MeVEfficiency[group]->SetBinContent(f10MeVEfficiency[group]->FindBin(threshold), ef->GetEfficiency(ef->FindFixBin(10)));
+        f10MeVEfficiency[group]->SetBinError  (f10MeVEfficiency[group]->FindBin(threshold), 0.5*(ef->GetEfficiencyErrorLow(ef->FindFixBin(10))+ef->GetEfficiencyErrorLow(ef->FindFixBin(10))));
 
-        f5MeVEfficiencyENU[group]->SetBinContent(f5MeVEfficiencyENU[group]->FindBin(threshold), efENU->GetEfficiency(efENU->FindFixBin(5)));
-        f5MeVEfficiencyENU[group]->SetBinError  (f5MeVEfficiencyENU[group]->FindBin(threshold), 0.5*(efENU->GetEfficiencyErrorLow(efENU->FindFixBin(5))+efENU->GetEfficiencyErrorLow(efENU->FindFixBin(5))));
+        f10MeVEfficiencyENU[group]->SetBinContent(f10MeVEfficiencyENU[group]->FindBin(threshold), efENU->GetEfficiency(efENU->FindFixBin(10)));
+        f10MeVEfficiencyENU[group]->SetBinError  (f10MeVEfficiencyENU[group]->FindBin(threshold), 0.5*(efENU->GetEfficiencyErrorLow(efENU->FindFixBin(10))+efENU->GetEfficiencyErrorLow(efENU->FindFixBin(10))));
 
       }
     }
@@ -202,7 +213,13 @@ public:
         c->Print("TDRPlots.pdf");
       }
     }
-
+    for (auto const& it: fPlotNHitTH2D) {
+      for (size_t it2=0; it2<it.second.size(); ++it2) {
+        it.second[it2]->Draw("COLZ");
+        fPlotNHitProfile.at(it.first).at(it2)->Draw("SAME");
+        c->Print("TDRPlots.pdf");
+      }
+    }
     for (auto const& it: fPlotClusterEfficiency) {
       if (it.second.size() > 0) {
         // it.second[0]->SetMinimum(0);
@@ -217,18 +234,18 @@ public:
         c->Print("TDRPlots.pdf");
       }
     }
-    std::cout << f5MeVEfficiency.size() << std::endl;
-    if (f5MeVEfficiency.size() > 0) {
-      f5MeVEfficiency.at(0)->SetMaximum(1.2);
-      f5MeVEfficiency.at(0)->SetMinimum(0.0);
-      gPad->SetGridx();
-      f5MeVEfficiency.at(0)->Draw();
-      for (auto const& it: f5MeVEfficiency)
-        it.second->Draw("SAME");
-      gPad->RedrawAxis();
-      fLegendGroup->Draw();
-      c->Print("TDRPlots.pdf");
-    }
+    // std::cout << f10MeVEfficiency.size() << std::endl;
+    // if (f10MeVEfficiency.size() > 0) {
+    //   f10MeVEfficiency.at(0)->SetMaximum(1.2);
+    //   f10MeVEfficiency.at(0)->SetMinimum(0.0);
+    //   gPad->SetGridx();
+    //   f10MeVEfficiency.at(0)->Draw();
+    //   for (auto const& it: f10MeVEfficiency)
+    //     it.second->Draw("SAME");
+    //   gPad->RedrawAxis();
+    //   fLegendGroup->Draw();
+    //   c->Print("TDRPlots.pdf");
+    // }
     gPad->SetGridx(false);
 
     for (auto const& it: fPlotNHitProfileENU) {
@@ -240,7 +257,13 @@ public:
         c->Print("TDRPlots.pdf");
       }
     }
-
+    for (auto const& it: fPlotNHitTH2DENU) {
+      for (auto const& it2: it.second) {
+        it2->Draw("COLZ");
+        c->Print("TDRPlots.pdf");
+      }
+    }
+    
     for (auto const& it: fPlotClusterEfficiencyENU) {
       if (it.second.size() > 0) {
         // it.second[0]->SetMinimum(0);
@@ -256,17 +279,17 @@ public:
       }
     }
     
-    if (f5MeVEfficiencyENU.size() > 0) {
-      f5MeVEfficiencyENU.at(0)->SetMaximum(1.2);
-      f5MeVEfficiencyENU.at(0)->SetMinimum(0.0);
-      gPad->SetGridx();
-      f5MeVEfficiencyENU.at(0)->Draw();
-      for (auto const& it: f5MeVEfficiencyENU)
-        it.second->Draw("SAME");
-      gPad->RedrawAxis();
-      fLegendGroup->Draw();
-      c->Print("TDRPlots.pdf");
-    }
+    // if (f10MeVEfficiencyENU.size() > 0) {
+    //   f10MeVEfficiencyENU.at(0)->SetMaximum(1.2);
+    //   f10MeVEfficiencyENU.at(0)->SetMinimum(0.0);
+    //   gPad->SetGridx();
+    //   f10MeVEfficiencyENU.at(0)->Draw();
+    //   for (auto const& it: f10MeVfficiencyENU)
+    //     it.second->Draw("SAME");
+    //   gPad->RedrawAxis();
+    //   fLegendGroup->Draw();
+    //   c->Print("TDRPlots.pdf");
+    // }
     c->Print("TDRPlots.pdf]");
     delete c;
     c = NULL;

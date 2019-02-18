@@ -5,6 +5,7 @@
 
 #include "TH2D.h"
 #include "TPad.h"
+#include "TStyle.h"
 
 template <class T>
 class Boundary {

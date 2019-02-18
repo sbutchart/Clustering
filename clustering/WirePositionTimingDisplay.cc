@@ -23,17 +23,16 @@ void WirePositionTimingDisplay::LookForAPA(const GenType gen) {
       type_count.push_back(it);
     }
   }
-  if (1000.*(*im.True_ENu)[0] < 10 ||
-      1000.*(*im.True_ENu)[0] > 11) {
-    fAPA = -1;
-    return;
-  }
+  // if (1000.*(*im.True_ENu)[0] < 10 ||
+  //     1000.*(*im.True_ENu)[0] > 11) {
+  //   fAPA = -1;
+  //   return;
+  // }
   
-  if (type_count.size() == 0 ||
-      (gen == kSNnu && type_count.size() < 10)) {
+  if (type_count.size() == 0) {
     std::cout << "Didn't find this event in the whole detector trying next event." << std::endl;
-    fAPA = -1;
-    return;
+    // fAPA = -1;
+    // return;
   } else if (type_count.size() == 1) {
     fChan = (*im.Hit_Chan)[type_count[0]];
     fTime = (*im.Hit_Time)[type_count[0]];
@@ -76,14 +75,19 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
                                 2*spread,fChan-spread,fChan+spread,
                                 2*spread,fTime-spread,fTime+spread);
 
+  std::map<GenType, size_t> nHit_type;
   for (size_t i=0; i<im.Hit_True_GenType->size(); ++i) {
     int chan = (*im.Hit_Chan)[i];
     if (fAPA_Bounds[fAPA].IsInOrOnBorder(chan)) {
       GenType g = ConvertIntToGenType((*im.Hit_True_GenType)[i]);
+      nHit_type[g]++;
       float initial_time = (*im.Hit_Time)[i];
       float adc = (*im.Hit_SADC)[i];
+      f_map_wire_time[g]->Fill(chan,initial_time,adc*2);
+      std::cout << g << " -> " << chan << " : " << (*im.Hit_RMS)[i] << std::endl;
+      
       for(size_t time=0; time<(*im.Hit_RMS)[i];++time) {
-        f_map_wire_time[g]->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
+        f_map_wire_time[g]   ->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
         f_map_wire_time[kAll]->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
       }
     }
@@ -91,8 +95,13 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
   }
   c->Print("WireTimingDisplay.pdf[");
   gPad->SetRightMargin(1.5*gPad->GetRightMargin());
+  gPad->SetGridx();
+  gPad->SetGridy();
+  gStyle->SetOptStat("orme");
   for (auto const& it: f_map_wire_time) {
-    it.second->SetMaximum(500);
+    it.second->SetEntries(nHit_type[it.first]);
+    it.second->SetStats(1);
+    //it.second->SetMaximum(500);
     it.second->SetMinimum(0);
     it.second->Draw("COLZ");
     c->Print("WireTimingDisplay.pdf");

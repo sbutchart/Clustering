@@ -201,7 +201,7 @@ int main(int argc, char** argv){
   leg_rate->Draw();
   c->Print("SolarWeights.pdf");
   TH1D* rate_tot_th1 = new TH1D("rate_tot_th1","",100,3,20);
-  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) {
+  for (int i=0; i<=rate_tot_th1->GetXaxis()->GetNbins(); ++i) { 
     rate_tot_th1->SetBinContent(i, std::max(0.,rate_Tot->Eval(rate_tot_th1->GetBinCenter(i))));
     rate_tot_th1->SetBinError(i, 0);
   }
@@ -219,7 +219,7 @@ int main(int argc, char** argv){
   integrated_rate_tot_th1->Draw();
   c->Print("SolarWeights.pdf");
   
-  TFile* file_weights = new TFile("../clustering/data/RateMarley.root", "READ");
+  TFile* file_weights = new TFile("../clustering/data/SNRate.root", "READ");
   TTree* tree = (TTree*)file_weights->Get("snanagaushit/SNSimTree");
   std::cout << "The original tree had " <<tree->GetEntries() << " entries. " << std::endl;
   TH1D* rate_tot_sn_th1 = new TH1D("rate_tot_sn_th1", ";E_{#nu} [MeV];SN#nu PDF", 100, 3, 20);

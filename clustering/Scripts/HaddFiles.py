@@ -18,8 +18,8 @@ TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
          "snanaSNR45cm0100Hz4snrNonRefl",
          "snanaSNR45cm0100Hz7snrNonRefl"]
 
-InputDirectory="/dune/data2/users/plasorak/PhotonProdCluster/"
-OutputDirectory="/dune/data2/users/plasorak/PhotonClusterHadd/"
+InputDirectory="/dune/data2/users/plasorak/PhotonProdCluster1PECut/"
+OutputDirectory="/dune/data2/users/plasorak/PhotonClusterHadd1PE/"
 Executable="hadd -f "
 
 for TreeName in TreeDir:

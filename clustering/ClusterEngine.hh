@@ -17,6 +17,7 @@ public:
     fTimeWindowOpt(TimeWindowOpt),
     fPositionOpt(PositionOpt),
     fBucketSize(BucketSize),
+    fPreCutPEOpt(0),
     fStopwatch0(0),
     fStopwatch1(0),
     fSorting(0),
@@ -53,6 +54,9 @@ public:
   double GetBucketSize() const { return fBucketSize; };
   void   SetBucketSize(double B)  { fBucketSize = B; };
 
+  double GetPreCutPEOpt() const { return fPreCutPEOpt; };
+  void   SetPreCutPEOpt(double B)  { fPreCutPEOpt = B; };
+  
   void SetSorting(const int i=0) { fSorting = i; };
   
   std::vector<double> GetElapsedTime_TimeOrdering () const { return TimeOrdering_Time;  } ;
@@ -71,6 +75,7 @@ private:
   double fTimeWindowOpt;
   double fPositionOpt  ;
   double fBucketSize   ;
+  double fPreCutPEOpt  ;
   clock_t fStopwatch0;
   clock_t fStopwatch1;
 
