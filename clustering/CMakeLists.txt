@@ -97,8 +97,8 @@ target_link_libraries(DumpSNRate ${ROOT_LIBRARIES})
 add_executable(SolarPlot SolarPlot.cxx)
 target_link_libraries(SolarPlot Clustering)
 
-add_executable(PrintSource PrintSource.cxx)
-target_link_libraries(PrintSource Clustering)
+add_executable(NeutronStudy NeutronStudy.cxx)
+target_link_libraries(NeutronStudy Clustering)
 
 add_executable(TriggerStudies TriggerStudies.cxx)
 target_link_libraries(TriggerStudies Clustering)

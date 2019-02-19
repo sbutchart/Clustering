@@ -88,6 +88,34 @@ void progress(float prog) {
 |  gives a visual representation of how the script is running.
 */
 
+bool StaysInside(double xend, double yend, double zend) {
+
+  bool status = false;
+  
+  double xlowlim = -360; double xhighlim = 360 ;
+  double ylowlim = -600; double yhighlim = 600 ;
+  double zlowlim = 0   ; double zhighlim = 1390;
+
+  if (xend < xhighlim && xend > xlowlim) {
+    if (yend < yhighlim && yend > ylowlim) {
+      if (zend < zhighlim && zend > zlowlim) {
+ 	status = true;
+      }
+    }
+  }
+
+  return status;
+  
+}
+
+/*
+|  StaysInside is a boolean function that returns true is the condition is met
+|  and false otherwise. The condition here is that the particle's final position
+|  is within the volume of the detector.
+*/
+
+
+
 int main(int argc, char** argv) {
 
   int opt;
@@ -148,8 +176,9 @@ int main(int argc, char** argv) {
   std::map<int, TH2D*> SADCvsTime ;
 
   TH1D *capturevsenergy   = new TH1D("CaptureVsEnergy"  , "", 100, 0, 5);
-  TH1D *neutronstarttimes = new TH1D("NeutronStartTimes", "", 100, 0, 2e3);
- 
+  TH1D *neutronstarttimes = new TH1D("NeutronStartTimes", "", 40, -3e3, 3e3);
+  TH1D *neutronendtimes   = new TH1D("NeutronStartTimes", "", 40, -3e3, 3e3);
+  TH1D *neutrontraveltime = new TH1D("NeutronStartTimes", "", 40, 0, 2e3);
 
   int fNEvent = nEvent;
 
@@ -227,32 +256,28 @@ int main(int argc, char** argv) {
 
       NumberOfNeutrons += im->TotGen_Neut;
 
-      // for (size_t i=0; i<im->True_Bck_Time->size(); ++i) {
-      // 	if ((*im->True_Bck_PDG)[i] == 2112)
-      // 	std::cout << (*im->True_Bck_Time)[i] << "\t" << (*im->True_Bck_EndT)[i] << "\t" << (*im->True_Bck_EndT)[i] - (*im->True_Bck_Time)[i] << std::endl;
-      // }
-      
-      // double StartTime = std::numeric_limits<double>::max();
-      // double EndTime   = std::numeric_limits<double>::min();
-
       for (size_t it=0; it<(*im->True_Bck_Mode).size(); ++it) {
-	if ((*im->True_Bck_Mode)[it] == 5) {
-	  if ((*im->True_Bck_PDG)[it] == 2112) {	    
-	    if ((*im->True_Bck_EndProcess)[it] == 10) {
-	      if (((*im->True_Bck_EndX)[it] > -360) && ((*im->True_Bck_EndX)[it] < 360)) {
-		if (((*im->True_Bck_EndY)[it] > -600) && ((*im->True_Bck_EndY)[it] < 600)) {
-		  if (((*im->True_Bck_EndZ)[it] > 0)    && ((*im->True_Bck_EndZ)[it] < 1390)) {
-		    NumberOfCaptures++;
-		    capturevsenergy->Fill(((*im->True_Bck_Energy)[it]*1000) - 938);
-		    neutronstarttimes->Fill(((*im->True_Bck_EndT)[it] - (*im->True_Bck_Time)[it])/1000);
-		    NeutronCaptureLocationX.push_back((*im->True_Bck_EndX)[it]);
-		    NeutronCaptureLocationY.push_back((*im->True_Bck_EndY)[it]);
-		    NeutronCaptureLocationZ.push_back((*im->True_Bck_EndZ)[it]);
-		  } 
-		}
-	      }
-	    }
-	  }
+	if ((*im->True_Bck_Mode      )[it] == 5    &&
+	    (*im->True_Bck_PDG       )[it] == 2112 &&
+	    (*im->True_Bck_EndProcess)[it] == 10) {
+
+	  double xend = (*im->True_Bck_EndX)[it];
+	  double yend = (*im->True_Bck_EndY)[it];
+	  double zend = (*im->True_Bck_EndZ)[it]; 
+
+	  if (StaysInside(xend, yend, zend)) {
+	  
+	    NumberOfCaptures++;
+	    capturevsenergy->Fill(((*im->True_Bck_Energy)[it]*1000) - 938);
+
+	    neutrontraveltime->Fill(((*im->True_Bck_EndT)[it] - (*im->True_Bck_Time)[it])/1000);
+	    neutronstarttimes->Fill((*im->True_Bck_Time)[it] / 1000);
+	    neutronendtimes  ->Fill((*im->True_Bck_EndT)[it] / 1000);
+		    
+	    NeutronCaptureLocationX.push_back((*im->True_Bck_EndX)[it]);
+	    NeutronCaptureLocationY.push_back((*im->True_Bck_EndY)[it]);
+	    NeutronCaptureLocationZ.push_back((*im->True_Bck_EndZ)[it]);
+	  } 
 	}
       }
 
@@ -473,7 +498,7 @@ int main(int argc, char** argv) {
   SADCvsTime[1]->GetXaxis()->SetTitle("hit SADC");
   SADCvsTime[1]->GetYaxis()->SetTitle("hit RMS" );
   c.Print("HitSADC.pdf");
-
+  
 /*  
 |  Canvas 2:
 |
@@ -484,5 +509,50 @@ int main(int argc, char** argv) {
 |  There is also some information on the time of flight for the neutron
 |  before it captures. 
 */
+
+  TCanvas c1;
+  c1.Print("CaptureLocation.pdf[");
+  neutronstarttimes->Draw();
+  neutronstarttimes->SetStats(0);
+  neutronstarttimes->GetXaxis()->SetTitle("Generation time [#mus]");
+  c1.Print("CaptureLocation.pdf");
   
+  neutronendtimes->Draw();
+  neutronendtimes->SetStats(0);
+  neutronendtimes->GetXaxis()->SetTitle("Capture time [#mus]");
+  c1.Print("CaptureLocation.pdf");
+
+  neutrontraveltime->Draw();
+  neutrontraveltime->SetStats(0);
+  neutrontraveltime->GetXaxis()->SetTitle("Time of flight [#mus]");
+  c1.Print("CaptureLocation.pdf");
+
+
+  TH2D *xyview = new TH2D("xyview", "", 720, -360, 360, 1200, -600, 600 );
+  TH2D *xzview = new TH2D("xzview", "", 720, -360, 360, 1390, 0   , 1390);
+  for (size_t i=0; i<NeutronCaptureLocationX.size(); ++i) {
+    xyview->Fill(NeutronCaptureLocationX[i], NeutronCaptureLocationY[i]);
+    xzview->Fill(NeutronCaptureLocationX[i], NeutronCaptureLocationZ[i]);
+  }
+
+  xyview->Draw();
+  xyview->SetMarkerStyle(4);
+  xyview->GetXaxis()->SetTitle("x");
+  xyview->GetYaxis()->SetTitle("y");
+  xyview->SetStats(0);
+  c1.Print("CaptureLocation.pdf");
+  
+  xzview->Draw();
+  xzview->SetMarkerStyle(4);
+  xzview->GetXaxis()->SetTitle("x");
+  xzview->GetYaxis()->SetTitle("z");  
+  xzview->SetStats(0);
+  c1.Print("CaptureLocation.pdf");
+  c1.Print("CaptureLocation.pdf]");
+
+  std::cout << "NUMBER OF NEUTRONS : " << NumberOfNeutrons << std::endl;
+  std::cout << "NUMBER OF CAPTURES : " << NumberOfCaptures << std::endl;
+  std::cout << "CAPTURE PROBABILITY: " << 100 * (double)NumberOfCaptures/(double)NumberOfNeutrons << " %" <<  std::endl;
+  std::cout << "CAPTURE RATE       : " << (double)NumberOfCaptures / 0.12 / 2 / fNEvent / 2.246e-3 << " [Hz]" << std::endl;
+
 }
