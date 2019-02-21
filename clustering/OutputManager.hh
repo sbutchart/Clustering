@@ -428,7 +428,6 @@ public:
 
 
   void FillTruthInfo(SNAnaInputManager& im) {
-
     MarlTime.clear();
     ENu     .clear();
     ENu_Lep .clear();
@@ -440,9 +439,8 @@ public:
     DirY    .clear();
     DirZ    .clear();
     
-    for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlSample->size(); ++MarleyEvent) {
+    for(size_t MarleyEvent=0; MarleyEvent<im.True_VertZ->size(); ++MarleyEvent) {
       Event = fCurrentEvent+fOutputOffset;
-      MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
       ENu     .push_back((*im.True_ENu)     [MarleyEvent]);
       ENu_Lep .push_back((*im.True_ENu_Lep) [MarleyEvent]);
       PosX    .push_back((*im.True_VertX)   [MarleyEvent]);
@@ -453,7 +451,9 @@ public:
       DirY    .push_back((*im.True_Diry)    [MarleyEvent]);
       DirZ    .push_back((*im.True_Dirz)    [MarleyEvent]);
     }
-    
+    for(size_t MarleyEvent=0; MarleyEvent<im.True_MarlTime->size(); ++MarleyEvent) {
+      MarlTime.push_back((*im.True_MarlTime)[MarleyEvent]);
+    }    
     fTrees["TrueInfo"]->Fill();
   }
 };

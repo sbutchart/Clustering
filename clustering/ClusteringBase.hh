@@ -7,6 +7,8 @@
 
 #include "Helper.h"
 
+#include "Exceptions.hh"
+
 #include "InputManager.hh"
 #include "OutputManager.hh"
 
@@ -44,7 +46,13 @@ protected:
     fmap_APA_Channel[10] = 26000;
     fmap_APA_Channel[11] = 29000;
     fmap_APA_Channel[12] = 31000;
+    fUsePDS = 1;
+    fUseTPC = 1;
     SetupCuts();
+    
+    if (fNConfig == 0)
+      throw NoConfig();
+    
   };
 
   virtual void SetupCuts() = 0;
@@ -55,6 +63,8 @@ public:
   std::string GetInputFile   () const { return fInputFileName;  };
   std::string GetInputTree   () const { return fInputTreeName;  };
   std::string GetOutputFile  () const { return fOutputFileName; };
+  bool        GetUsePDS      () const { return fUsePDS; };
+  bool        GetUseTPC      () const { return fUseTPC; };
 
   void SetPrintLevel  (const int p=-1) { fPrintLevel     = p; };
   void SetInputFile   (const std::string s="") { fInputFileName  = s; };
@@ -63,7 +73,9 @@ public:
   void SetOffset      (const size_t n= 0)      { fOffset         = n; };
   void SetOutputOffset(const size_t n= 0)      { fOutputOffset   = n; };
   void SetNAPA        (const int n=-1)         { fNAPA           = n; };
-
+  void SetUsePDS      (const bool usepds=1)    { fUsePDS = usepds;    };
+  void SetUseTPC      (const bool usetpc=1)    { fUseTPC = usetpc;    };
+  
   virtual void ClusterAll(int inNEvent) {
 
     if (inNEvent>0) {
@@ -111,6 +123,11 @@ protected:
   size_t fCurrentEvent;
 
   std::map<int, int> fmap_APA_Channel;
+  size_t fNConfig;
+
+  bool fUseTPC;
+  bool fUsePDS;
+
 };
 #endif
 

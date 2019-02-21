@@ -97,11 +97,11 @@ public:
   virtual void SetupConfig_MinChanWidth    (const std::vector<float> cut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) { fcut_MinChanWidth     = cut; };
   virtual void SetupConfig_TotalADC        (const std::vector<float> cut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) { fcut_TotalADC         = cut; };
   
-  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.2}) { fcut_TimeWindowOpt    = cut; };
-  virtual void SetupConfig_PreCutPEOpt     (const std::vector<float> cut = {1.5}) { fcut_PreCutPE         = cut; };
-  virtual void SetupConfig_PositionOpt     (const std::vector<float> cut = {300}) { fcut_PositionOpt      = cut; };
-  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {  1}) { fcut_BucketSize       = cut; };
-  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = { 10}) { fcut_OptHitInCluster  = cut; };
+  virtual void SetupConfig_TimeWindowOpt   (const std::vector<float> cut = {0.1, 0.1, 0.1}) { fcut_TimeWindowOpt    = cut; };
+  virtual void SetupConfig_PreCutPEOpt     (const std::vector<float> cut = { 0.,  0.,  0.}) { fcut_PreCutPE         = cut; };
+  virtual void SetupConfig_PositionOpt     (const std::vector<float> cut = {300, 300, 300}) { fcut_PositionOpt      = cut; };
+  virtual void SetupConfig_BucketSize      (const std::vector<float> cut = {0.3, 0.5,  1.}) { fcut_BucketSize       = cut; };
+  virtual void SetupConfig_OptHitInCluster (const std::vector<float> cut = { 10,  10,  10}) { fcut_OptHitInCluster  = cut; };
 
 
   void RunClustering();
@@ -135,7 +135,6 @@ private:
   std::vector<float> fcut_OptHitInCluster ;
   std::vector<float> fcut_PreCutPE        ;
   
-  int fNConfig;
   int fCurrentConfig;
   int fNAPA   ;
   int fConfig ;

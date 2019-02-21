@@ -30,29 +30,34 @@ void Clustering::RunClustering(){
     fSOM->SetCurrentEvent(fCurrentEvent);
     
     bool goodEvent = true;
-    // if (fSNIM->True_MarlSample) {
-    //   if (fSNIM->True_MarlSample->size() > nMaxMarleyPerEvent) {
-    //     nMaxMarleyPerEvent = fSNIM->True_MarlSample->size();
-    //     for(size_t MarleyEvent=0; MarleyEvent<fSNIM->True_MarlSample->size(); ++MarleyEvent) {
-    //       goodEvent = (((*fSNIM->True_VertZ)[MarleyEvent] >  695) &&
-    //                    ((*fSNIM->True_VertZ)[MarleyEvent] < 1160));
-    //     }
-    //   }
-    // } else {
-    //   nMaxMarleyPerEvent = 1;
-    //   goodEvent = (((*fSNIM->True_VertZ)[0] >  695) &&
-    //                ((*fSNIM->True_VertZ)[0] < 1160));
-    // }
-    
-    // if(!goodEvent) continue;
-    (void)goodEvent;
-    fSOM->FillTruthInfo(*fSNIM);
+    if (fSNIM->True_MarlSample) {
+      if (fSNIM->True_MarlSample->size() > nMaxMarleyPerEvent) {
+        nMaxMarleyPerEvent = fSNIM->True_MarlSample->size();
+        for(size_t MarleyEvent=0; MarleyEvent<fSNIM->True_MarlSample->size(); ++MarleyEvent) {
+          goodEvent = (((*fSNIM->True_VertZ)[MarleyEvent] >  695) &&
+                       ((*fSNIM->True_VertZ)[MarleyEvent] < 1160));
+        }
+      }
+    } else {
+      nMaxMarleyPerEvent = 1;
+      goodEvent = (((*fSNIM->True_VertZ)[0] >  695) &&
+                   ((*fSNIM->True_VertZ)[0] < 1160));
+    }
+      
+    if (nMaxMarleyPerEvent>1 && fUsePDS) {
+      std::cerr << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
+      std::cerr << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;
+      throw PDSInfoJunk();
+    }
 
+    if(!goodEvent && fUsePDS) continue;
+    fSOM->FillTruthInfo(*fSNIM);
+    
     //MAKE RECOHIT OBJECTS EVENTWISE FROM THE TREE.
     std::vector<WireHit*>    vec_WireHit;
     std::vector<OpticalHit*> vec_OptiHit;
-    fSNIM->GetWireHits   (vec_WireHit);
-    fSNIM->GetOpticalHits(vec_OptiHit);
+    if (fUseTPC) fSNIM->GetWireHits   (vec_WireHit);
+    if (fUsePDS) fSNIM->GetOpticalHits(vec_OptiHit);
     int nneutron = 0;
     for (auto const& it:vec_WireHit) {
       if (it->GetGenType() == kNeutron)
@@ -136,9 +141,5 @@ void Clustering::RunClustering(){
   }
   
   fSOM->Write();
-  
-  if (nMaxMarleyPerEvent>1) {
-    std::cout << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
-    std::cout << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;
-  }
+
 }

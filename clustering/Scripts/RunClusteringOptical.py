@@ -18,17 +18,18 @@ TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
          "snanaSNR45cm0100Hz3snrNonRefl",
          "snanaSNR45cm0100Hz4snrNonRefl",
          "snanaSNR45cm0100Hz7snrNonRefl"]
-TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
-         "snanaEFF15cm0100Hz5snrNonRefl",
-         "snanaEFF30cm0100Hz5snrNonRefl",
-         "snanaEFF60cm0100Hz5snrNonRefl",
-         "snanaREF45cm0100Hz5snrOptRefl",
-         "snanaREF45cm0100Hz5snrPesRefl"]
+# TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
+#          "snanaEFF15cm0100Hz5snrNonRefl",
+#          "snanaEFF30cm0100Hz5snrNonRefl",
+#          "snanaEFF60cm0100Hz5snrNonRefl",
+#          "snanaREF45cm0100Hz5snrOptRefl",
+#          "snanaREF45cm0100Hz5snrPesRefl"]
 
 Config=" -c 0"
-filename="optical.list"
+Config=""
+filename="optical.list2"
 f = open(filename, "r")
-OutputDirectory="/dune/data2/users/plasorak/PhotonProdCluster1PECut/"
+OutputDirectory="/dune/data2/users/plasorak/PhotonProdClusterMultipleConfig/"
 
 def file_len(fname):
     with open(fname) as f:
@@ -48,7 +49,7 @@ if len(sys.argv)>1:
         print "EXAMPLE: ./RunFromFileList.py 2 10"
         print "EXAMPLE: will divide the list in 10 and run the third portion of it"
 
-Executable="/dune/app/users/plasorak/Clustering/build/clustering/RunDAQClustering"
+Executable="/dune/app/users/plasorak/Clustering/build/clustering/RunDAQClustering_PhotonOnly"
 NCompletedFile=0
 Offset=0
 
