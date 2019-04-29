@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 
   std::vector<KS> KSs;
   std::vector<std::thread> threads;
-  TFile* f = new TFile("~/Desktop/RealTest.pdf.root", "READ");
+  TFile* f = new TFile("RealTest.pdf.root", "READ");
   TH1D* back_pdf = (TH1D*)f->Get((std::string("h_")+argv[1]+"_back_wire").c_str());
   TH1D* sign_pdf = (TH1D*)f->Get((std::string("h_")+argv[1]+"_sign_wire").c_str());
   

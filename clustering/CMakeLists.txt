@@ -17,6 +17,9 @@ execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
   OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
+# set(Gperftools_ROOT_DIR "/Users/plasorak/Documents/Sussex-Postdoc/Physics/gperftools/")
+# string(CONCAT CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/Users/plasorak/Documents/Sussex-Postdoc/Physics/Clustering/clustering/")
+
 # if the distribution is scientific linux, then setup boost in a different way (not using the cmake file from boost)
 string(FIND "${LSB_RELEASE_ID_SHORT}" "Scientific" _cmp)
 if (_cmp GREATER -1)
@@ -24,6 +27,7 @@ if (_cmp GREATER -1)
 endif()
 
 find_package(Boost REQUIRED)
+#find_package(Gperftools REQUIRED) 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
@@ -70,8 +74,13 @@ target_link_libraries(PDSTiming ${ROOT_LIBRARIES})
 add_executable(NeutronInfo NeutronInfo.cxx)
 target_link_libraries(NeutronInfo ${ROOT_LIBRARIES})
 
-add_executable(RunSmartTrigger RunSmartTrigger.cxx)
-target_link_libraries(RunSmartTrigger Clustering)
+# add_executable(RunSmartTrigger RunSmartTrigger.cxx)
+# target_link_libraries(RunSmartTrigger Clustering)
+# target_link_libraries(RunSmartTrigger ${Gperftools_LIBRARIES})
+
+add_executable(RunSmartTriggerStatisticalTests RunSmartTriggerStatisticalTests.cxx)
+target_link_libraries(RunSmartTriggerStatisticalTests Clustering)
+# target_link_libraries(RunSmartTrigger ${Gperftools_LIBRARIES})
 
 add_executable(ThrowToySmartTrigger ThrowToySmartTrigger.cxx)
 target_link_libraries(ThrowToySmartTrigger Clustering)
