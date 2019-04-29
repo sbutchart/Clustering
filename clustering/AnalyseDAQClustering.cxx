@@ -15,6 +15,7 @@
 #include "TLegend.h"
 #include "TEfficiency.h"
 #include "TStyle.h"
+#include "TVector3.h"
 
 
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
@@ -193,12 +194,21 @@ int main(int argc, char** argv){
  
   std::map<int,int> map_Event_TrueEntry;
   int nMarleyEvent=0;
+  int nMarleyPerEvent=-1;
   for (int i=0; i<nEvent; ++i) {
     t_TrueInfo->GetEntry(i);
     map_Event_TrueEntry[EventTrue] = i;
     nMarleyEvent += (int)ENu->size();
+    if (i==0) {
+      nMarleyPerEvent = (int)ENu->size();
+    } else {
+      if (nMarleyPerEvent != (int)ENu->size()) {
+        std::cerr << "You are running with a mix of file containing different number of marley event, which this cannot process." << std::endl;
+        std::cerr << "Exiting" << std::endl;
+        exit(1);
+      }
+    }
   }
-  
   std::cout << "nMarleyEvent " << nMarleyEvent << std::endl;
   TCanvas c;
   c.Print((OutputFile+"[").c_str());
@@ -374,7 +384,17 @@ int main(int argc, char** argv){
   std::map<GenType,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
   std::map<GenType,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
 
-  std::map<std::pair<int,int>,bool> nDetectedEvent;
+  TEfficiency* eff_enu  = new TEfficiency("eff_enu",  ";E_{#nu} [MeV]"  ,  50, 0, 50);
+  TEfficiency* eff_elep = new TEfficiency("eff_elep", ";E_{e} [MeV]"    ,  50, 0, 50);
+  TEfficiency* eff_dirx = new TEfficiency("eff_dirx", ";Direction x"    ,  50, -1, 1);
+  TEfficiency* eff_diry = new TEfficiency("eff_diry", ";Direction y"    ,  50, -1, 1);
+  TEfficiency* eff_dirz = new TEfficiency("eff_dirz", ";Direction z"    ,  50, -1, 1);
+  TEfficiency* eff_posx = new TEfficiency("eff_posx", ";Position x [cm]",  50, -380, 380);
+  TEfficiency* eff_posy = new TEfficiency("eff_posy", ";Position y [cm]",  50, -650, 650);
+  TEfficiency* eff_posz = new TEfficiency("eff_posz", ";Position z [cm]",  50, -100, 1300);
+
+  
+  std::map<int, std::map<int,bool> > nDetectedEvent;
   for(int i=0; i<t_Output_triggeredclusteredhits->GetEntries();++i) {
     t_Output_triggeredclusteredhits->GetEntry(i);
     PrintProgress(i, t_Output_triggeredclusteredhits->GetEntries());
@@ -382,6 +402,8 @@ int main(int argc, char** argv){
     std::map<int, int> map_gentype_nhit_back;
     if (Config != RequestedConfig) continue;
     //t_Output_triggeredclusteredhits->GetEntry(it2);
+    nDetectedEvent[Event][-1] = false;
+    
     if (Type==0) {
       // std::cout << "----------" << std::endl;
       // std::cout << "Entry " << i << std::endl;
@@ -414,9 +436,9 @@ int main(int argc, char** argv){
       h_singled_nchan_sadc_wire[gen]->Fill(NChan    , SumADC   );
       h_singled_nchan_time_wire[gen]->Fill(NChan    , TimeWidth);
       h_singled_nchan_nhit_wire[gen]->Fill(NChan    , NHits    );
-      
+
     } else {
-      nDetectedEvent[std::make_pair(Event,MarleyIndex)] = true;
+      nDetectedEvent[Event][MarleyIndex] = true;
       //map_gentype_nhit_sign = GetMapOfHit(HitGenType);
       double MaxADC=0;
       for (auto const& adc:(*HitSADC))
@@ -456,15 +478,29 @@ int main(int argc, char** argv){
     if(h_singled_sadc_wire.at(it.first)->GetEntries()>0)
       it.second->Scale(1./ h_singled_sadc_wire.at(it.first)->GetEntries());
   }
-  
+
+  std::cout << "now calculating efficiencies " << std::endl;
   int ntotaldetected=0;
   for (auto const& it: nDetectedEvent) {
-    (void)it;
-    ntotaldetected++;
+    int ThisEvent = it.first;
+    std::map<int, bool> map_index_detected = it.second;
+    for (int i=0; i<nMarleyPerEvent; ++i) {
+      t_TrueInfo->GetEntry(map_Event_TrueEntry[ThisEvent]);
+      eff_enu ->Fill(map_index_detected[i], ENu->at(i) * 1000.);
+      eff_elep->Fill(map_index_detected[i], ENu_Lep->at(i) * 1000.);
+      std::cout << DirX->at(i) << std::endl;
+      eff_dirx->Fill(map_index_detected[i], DirX->at(i));
+      eff_diry->Fill(map_index_detected[i], DirY->at(i));
+      eff_dirz->Fill(map_index_detected[i], DirZ->at(i));
+      eff_posx->Fill(map_index_detected[i], PosX->at(i));
+      eff_posy->Fill(map_index_detected[i], PosY->at(i));
+      eff_posz->Fill(map_index_detected[i], PosZ->at(i));
+      ntotaldetected += (map_index_detected[i]);
+    }
   }
   std::cout <<"totaldetected " << ntotaldetected << std::endl;
   std::cout <<"Efficiency " << (double)ntotaldetected / nMarleyEvent << std::endl;
-  
+  TVector3 Efficiency((double)ntotaldetected / nMarleyEvent, -1, -1);
   
   gPad->SetLogy(true);
   
@@ -496,6 +532,7 @@ int main(int argc, char** argv){
   // gStyle->SetStatH(0.1);
   // gStyle->SetStatW(0.2);
   h_rate_back->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
+
   int nentries = h_rate_back->GetEntries();
   double errorint;
   double integral = h_rate_back->IntegralAndError(1,10,errorint);
@@ -504,6 +541,8 @@ int main(int argc, char** argv){
   h_rate_back->SetEntries(nentries);
   h_rate_back->Draw();
   std::cout << "TOTAL Background rate " << integral << std::endl;
+  TVector3 BackgroundRate(integral, -1, -1);
+
   for (int i=3; i<=10; i++){
     std::cout <<h_rate_back->GetXaxis()->GetBinLabel(i) << " : " << h_rate_back->GetBinContent(i) << std::endl;
   }
@@ -558,6 +597,24 @@ int main(int argc, char** argv){
   PlotAllIndividually(h_singled_nchan_time_wire, "COLZ", c, OutputFile);
   PlotAllIndividually(h_singled_nchan_nhit_wire, "COLZ", c, OutputFile);
 
+  eff_enu ->SetLineWidth(2.);
+  eff_elep->SetLineWidth(2.);
+  eff_dirx->SetLineWidth(2.);
+  eff_diry->SetLineWidth(2.);
+  eff_dirz->SetLineWidth(2.);
+  eff_posx->SetLineWidth(2.);
+  eff_posy->SetLineWidth(2.);
+  eff_posz->SetLineWidth(2.);
+  
+  eff_enu ->Draw(); c.Print(OutputFile.c_str());
+  eff_elep->Draw(); c.Print(OutputFile.c_str());
+  eff_dirx->Draw(); c.Print(OutputFile.c_str());
+  eff_diry->Draw(); c.Print(OutputFile.c_str());
+  eff_dirz->Draw(); c.Print(OutputFile.c_str());
+  eff_posx->Draw(); c.Print(OutputFile.c_str());
+  eff_posy->Draw(); c.Print(OutputFile.c_str());
+  eff_posz->Draw(); c.Print(OutputFile.c_str());
+
   gPad->Clear();
   TLegend* leg2 = GetNewLegend(0.1,0.1,0.9,0.9,h_singled_nhit_wire);
   leg2->Draw();
@@ -608,6 +665,17 @@ int main(int argc, char** argv){
   for (auto const& it: h_singled_nchan_time_wire) {it.second->Write();}
   for (auto const& it: h_singled_nchan_nhit_wire) {it.second->Write();}
   leg2->Write();
+  Efficiency.Write("Efficiency");
+  BackgroundRate.Write("BackgroundRate");
+  eff_enu ->Write();
+  eff_elep->Write();
+  eff_dirx->Write();
+  eff_diry->Write();
+  eff_dirz->Write();
+  eff_posx->Write();
+  eff_posy->Write();
+  eff_posz->Write();
+
   f.Close();
 
   return 1;
