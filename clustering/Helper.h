@@ -690,7 +690,7 @@ public:
     ShortGenName[kPolonium] =      "Polonium"      ;
     ShortGenName[kRadon] =         "Radon"         ;
     ShortGenName[kAr42] =          "Ar42"          ;
-    ShortGenName[kOther] =         "Other"         ;
+    ShortGenName[kOther] =         "Other/Noise"   ;
     ShortGenName[kAllBackground] = "AllBackground" ;
     ShortGenName[kAll] =           "All"           ;
   };
