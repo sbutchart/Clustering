@@ -60,9 +60,9 @@ const int nbin = 20;
 // double ylowlim = -788; double yhighlim = 830 ;
 // double zlowlim = -483; double zhighlim = 6039;
 
-const double xlen = xhighlim - xlowlim;
-const double ylen = yhighlim - ylowlim;
-const double zlen = zhighlim - zlowlim;
+// const double xlen = xhighlim - xlowlim;
+// const double ylen = yhighlim - ylowlim;
+// const double zlen = zhighlim - zlowlim;
 
 void progress(float prog) {
 
