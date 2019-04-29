@@ -230,6 +230,9 @@ public:
   double              singles_True_Time                ;
                                                               
   std::vector<int>                 * True_Bck_Mode            ;
+  std::vector<int>                 * True_Bck_EndProcess      ;
+  std::vector<int>                 * True_Bck_Mother          ;
+  std::vector<int>                 * True_Bck_ID              ;
   std::vector<double>              * True_Bck_VertX           ;
   std::vector<double>              * True_Bck_VertY           ;
   std::vector<double>              * True_Bck_VertZ           ;
@@ -249,6 +252,12 @@ public:
   std::vector<double>              * True_Bck_EnergyAll       ;
   std::vector<int>                 * True_Bck_PDGAll          ;
   std::vector<int>                 * True_Bck_IDAll           ;
+
+  std::vector<double>              * True_Bck_EndX            ;
+  std::vector<double>              * True_Bck_EndY            ;
+  std::vector<double>              * True_Bck_EndZ            ;  
+  std::vector<double>              * True_Bck_EndT            ;
+  
 
   void GetWireHits(std::vector<WireHit*>& wire) {
     for(int j = 0; j < NColHit; j++) {
@@ -281,27 +290,25 @@ public:
   };
   
   void GetOpticalHits(std::vector<OpticalHit*>& opti) {
-    if (PDS_OpHit_OpChannel) {
-      for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
-        int marley_index=0;
-        OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
-                                        (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
-                                        (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
-                                        (*PDS_OpHit_OpChannel)[j]);
-        oh->SetTrueEnergy((*True_ENu)[marley_index]);
-        oh->SetMarleyIndex(marley_index);
+    for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
+      int marley_index=0;
+      OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
+                                      (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
+                                      (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
+                                      (*PDS_OpHit_OpChannel)[j]);
+      oh->SetTrueEnergy((*True_ENu)[marley_index]);
+      oh->SetMarleyIndex(marley_index);
 
-        if (oh->GetChannel() < 200000 ||
-            abs(oh->GetPosition(kX)) < 20000 ||
-            abs(oh->GetPosition(kY)) < 20000 ||
-            abs(oh->GetPosition(kZ)) < 20000 ||
-            abs(oh->GetPosition(kT)) < 20000) {
-          opti.push_back(oh);
-        } else {
-          std::cout << "Messed up optical hit" << std::endl;
-          delete oh;
-          oh = NULL;
-        }
+      if (oh->GetChannel() < 200000 ||
+          abs(oh->GetPosition(kX)) < 20000 ||
+          abs(oh->GetPosition(kY)) < 20000 ||
+          abs(oh->GetPosition(kZ)) < 20000 ||
+          abs(oh->GetPosition(kT)) < 20000) {
+        opti.push_back(oh);
+      } else {
+        std::cout << "Messed up optical hit" << std::endl;
+        delete oh;
+        oh = NULL;
       }
     }
   };
@@ -402,6 +409,9 @@ public:
     delete True_Time                ; True_Time                 = NULL;
                                                                
     delete True_Bck_Mode            ; True_Bck_Mode             = NULL;
+    delete True_Bck_EndProcess      ; True_Bck_EndProcess       = NULL;
+    delete True_Bck_Mother          ; True_Bck_Mother           = NULL;
+    delete True_Bck_ID              ; True_Bck_ID               = NULL;
     delete True_Bck_VertX           ; True_Bck_VertX            = NULL;
     delete True_Bck_VertY           ; True_Bck_VertY            = NULL;
     delete True_Bck_VertZ           ; True_Bck_VertZ            = NULL;
@@ -421,6 +431,11 @@ public:
     delete True_Bck_EnergyAll       ; True_Bck_EnergyAll        = NULL;
     delete True_Bck_PDGAll          ; True_Bck_PDGAll           = NULL;
     delete True_Bck_IDAll           ; True_Bck_IDAll            = NULL;
+
+    delete True_Bck_EndX            ; True_Bck_EndX             = NULL;   
+    delete True_Bck_EndY            ; True_Bck_EndY             = NULL;
+    delete True_Bck_EndZ            ; True_Bck_EndZ             = NULL;
+    delete True_Bck_EndT            ; True_Bck_EndT             = NULL;
     
     if (f_Input) f_Input->Close();
 
@@ -590,6 +605,9 @@ public:
     singles_True_Time             (-1),
     
     True_Bck_Mode            (NULL),
+    True_Bck_EndProcess      (NULL),
+    True_Bck_Mother          (NULL),
+    True_Bck_ID              (NULL),
     True_Bck_VertX           (NULL),
     True_Bck_VertY           (NULL),
     True_Bck_VertZ           (NULL),
@@ -608,7 +626,11 @@ public:
     // True_Bck_EndTimeAll      (NULL),
     True_Bck_EnergyAll       (NULL),
     True_Bck_PDGAll          (NULL),
-    True_Bck_IDAll           (NULL){
+    True_Bck_IDAll           (NULL),
+    True_Bck_EndX            (NULL),
+    True_Bck_EndY            (NULL),
+    True_Bck_EndZ            (NULL),
+    True_Bck_EndT            (NULL){
 
     f_Input = NULL;
     t_Input = NULL;
@@ -832,6 +854,9 @@ public:
       t_Input->SetBranchAddress("PDS_OpHit_True_IndexAll"  , &PDS_OpHit_True_IndexAll  );
                                                                                      
       t_Input->SetBranchAddress("True_Bck_Mode"            , &True_Bck_Mode            );
+      t_Input->SetBranchAddress("True_Bck_EndProcess"      , &True_Bck_EndProcess      );
+      t_Input->SetBranchAddress("True_Bck_Mother"          , &True_Bck_Mother          );
+      t_Input->SetBranchAddress("True_Bck_ID"              , &True_Bck_ID              );
       t_Input->SetBranchAddress("True_Bck_VertX"           , &True_Bck_VertX           );
       t_Input->SetBranchAddress("True_Bck_VertY"           , &True_Bck_VertY           );
       t_Input->SetBranchAddress("True_Bck_VertZ"           , &True_Bck_VertZ           );
@@ -851,6 +876,11 @@ public:
       t_Input->SetBranchAddress("True_Bck_EnergyAll"       , &True_Bck_EnergyAll       );
       t_Input->SetBranchAddress("True_Bck_PDGAll"          , &True_Bck_PDGAll          );
       t_Input->SetBranchAddress("True_Bck_IDAll"           , &True_Bck_IDAll           );
+      t_Input->SetBranchAddress("True_Bck_EndX"            , &True_Bck_EndX            );
+      t_Input->SetBranchAddress("True_Bck_EndY"            , &True_Bck_EndY            );      
+      t_Input->SetBranchAddress("True_Bck_EndZ"            , &True_Bck_EndZ            );
+      t_Input->SetBranchAddress("True_Bck_EndT"            , &True_Bck_EndT            );
+      
     } else {
       t_Input->SetBranchAddress("NTotHits"   , &NTotHit   );
       t_Input->SetBranchAddress("NColHits"   , &NColHit   );
