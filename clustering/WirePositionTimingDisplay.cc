@@ -47,8 +47,8 @@ void WirePositionTimingDisplay::LookForAPA(const GenType gen) {
       break;
     }
   }
-  std::cout << "Energy " << 1000.*(*im.True_ENu)[0] << " MeV"<< std::endl;
-  std::cout << "X " << (*im.True_VertX)[0] << " cm"<< std::endl;
+  // std::cout << "Energy " << 1000.*(*im.True_ENu)[0] << " MeV"<< std::endl;
+  // std::cout << "X " << (*im.True_VertX)[0] << " cm"<< std::endl;
 }
 
 void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gentype=-1) {
