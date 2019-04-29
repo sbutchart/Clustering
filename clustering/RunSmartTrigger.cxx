@@ -1,102 +1,191 @@
-#include <unistd.h>
 #include <iostream>
+#include <map>
+#include <memory>
 
 #include "TH1D.h"
-#include "TCanvas.h"
+#include "TChain.h"
+#include "TFile.h"
+#include "TVectorT.h"
 
-#include "SmartTrigger.hh"
+#include "CLI11.hpp"
+#include "Helper.h"
 
+using namespace std;
 
+int GetGenType(vector<int> GenType) {
+  map<int,int> counts;
+  for (auto const& it: GenType) {
+    counts[it]++;
+  }
+  int max=-1;
+  int type=-1;
+  for (auto const& it: counts) {
+    if (it.second>max){
+      max = it.second;
+      type = it.first;
+    }
+  }
+  return type;
+}
+
+std::string slurp(std::ifstream& in) {
+  std::stringstream sstr;
+  sstr << in.rdbuf();
+  return sstr.str();
+}
 
 int main(int argc, char** argv) {
+  CLI::App app{"SmartTrigger"};
 
-  int opt;
-  int Config=-1;
-  std::string InputFile = "";
-  std::string OutputFile = "";
-  std::string Feature = "";
-// Shut GetOpt error messages down (return '?'): 
-  extern char *optarg;
-  extern int  optopt;
-  // Retrieve the options:
-  while ( (opt = getopt(argc, argv, "c:f:i:o:")) != -1 ) {  // for each option...
-    switch ( opt ) {
-    case 'c':
-      Config = atoi(optarg);
-      break;
-    case 'i':
-      InputFile = optarg;
-      break;
-    case 'o':
-      OutputFile = optarg;
-      break;
-    case 'f':
-      Feature = optarg;
-      break;
-    case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
-      break;
+  string InputChainName = "ClusteredWireHit";
+  string InputTrueChainName = "TrueInfo";
+  string Feature = "SumADC";
+  string InputListFile = "";
+  string OutputFileName = "LikelihoodTrigger.root";
+
+  int nConfig;
+  app.add_option("--feature", Feature, "Feature");
+  app.add_option("-l,--list",  InputListFile, "Input file list")->required();
+  app.add_option("-o,--output", OutputFileName, "Output file name");
+  app.add_option("-n,--nconfig", nConfig, "Number of configurations in the input file")->required();
+  CLI11_PARSE(app, argc, argv);
+
+  map<int,map<int,shared_ptr<TH1D>>> PDF_Background_config;// [config][type]
+  for (int iConfig=0; iConfig<nConfig; ++iConfig) {
+    for (int iBack=0; iBack<10; ++iBack) {
+      PDF_Background_config[iConfig][iBack] = make_shared<TH1D>(("PDF_Background_"+to_string(iBack)+"_config"+to_string(iConfig)).c_str(), "PDF;SADC;", 20, 0, 200); 
     }
   }
   
-  if (InputFile == "") {
-    std::cout << "No input file!!" << std::endl;
-    exit(1);
-  }
- 
-  if (OutputFile == "") {
-    std::cout << "No output file!!" << std::endl;
-    exit(1);
+  map<TFile*,map<int,map<int,shared_ptr<TH1D>>>> PDF_Background_config_perfile;// [file][config][type]
+  map<int,map<TFile*,map<int,set<int>>>> nMarleyEventDetected;// [config][file][event][marleyindex]
+  map<int,shared_ptr<TH1D>> PDF_Background_config_notype;
+  for (int iConfig=0; iConfig<nConfig; ++iConfig) {
+    PDF_Background_config_notype[iConfig] = make_shared<TH1D>(("PDF_Background_config"+to_string(iConfig)).c_str(), "PDF;SADC;", 20, 0, 200); 
   }
   
-  std::cout << "Using file " << InputFile << std::endl;
+  map<TFile*,map<int,shared_ptr<TH1D>>> PDF_Background_config_perfile_notype;
+  int Config=0;
+  int Event=0;
+  double SumADC=0;
+  int MarleyIndex=0;
+  vector<int> *GenType = NULL;
+  vector<double> *ENu = NULL;
   
-  if (Config<0 || Config>5) {
-    std::cout << "Invalid config " << Config << std::endl;
-    exit(1);
+  
+  unique_ptr<TChain> InputChain     = make_unique<TChain>(InputChainName    .c_str());
+  unique_ptr<TChain> InputTrueChain = make_unique<TChain>(InputTrueChainName.c_str());
+  
+  string line;
+  ifstream myfile (InputListFile);
+  if (myfile.is_open()){
+    cout << "Parsing list of files...\n";
+    while ( getline (myfile,line) ){
+      cout << line << '\n';
+      InputChain->Add(line.c_str());
+      InputTrueChain->Add(line.c_str());
+    }
+  }
+  
+  InputChain->SetBranchAddress("Config",  &Config );
+  InputChain->SetBranchAddress("Event",   &Event  );
+  InputChain->SetBranchAddress(Feature.c_str(),  &SumADC );
+  InputChain->SetBranchAddress("GenType", &GenType);
+  InputChain->SetBranchAddress("MarleyIndex", &MarleyIndex);
+  
+  InputTrueChain->SetBranchAddress("ENu", &ENu);
+  size_t nMarleyEventGenerated=0;
+  size_t nBackgroundEventGenerated=0;
+  
+  for (int iEntry = 0; iEntry<InputTrueChain->GetEntries(); ++iEntry) {
+    InputTrueChain->GetEntry(iEntry);
+    nMarleyEventGenerated+=ENu->size();
+    size_t pos=string(InputTrueChain->GetFile()->GetName()).find("prodbackground_5x_radiological");
+    if (pos == string::npos) {
+      nBackgroundEventGenerated++;
+    } else {
+      nBackgroundEventGenerated+=5;
+    }
   }
 
-  SmartERecoWireClusterTrigger strig(Feature);
-  strig.SetConfig(Config);
-  std::map<std::string,std::vector<double>> bin;
-  bin["SumADC"] = {0,1000,2000,3000,4000,5000,10000};
-  bin["EReco"]  = {0,17,20,30,50};
-  bin["NElectron"]  = {0,5000,10000,15000,20000,25000,30000,35000,40000,45000,70000,100000};
-  if (bin.find(Feature) == bin.end()) {
-    std::cout << "The requested feature dpesn't have a binning set, go to RunSmartTrigger.cxx and add one to the bin map." << std::endl;
-    exit(1);
+  
+  int nEntries = InputChain->GetEntries();
+
+  for (int iEntry=0; iEntry<nEntries; ++iEntry) {
+    InputChain->GetEntry(iEntry);
+    PrintProgress(iEntry,nEntries);
+
+    int type = GetGenType(*GenType);
+    if (type == 1) {
+      nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
+      //cout << MarleyIndex << "\n";
+    } else {
+      PDF_Background_config_notype[Config]->Fill(SumADC/100.);
+      if (PDF_Background_config_perfile_notype[InputChain->GetFile()][Config]) {
+        PDF_Background_config_perfile_notype[InputChain->GetFile()][Config]->Fill(SumADC/100.);
+      } else {
+        for (int iConfig=0; iConfig<nConfig; ++iConfig) {
+          std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << "\n";
+          PDF_Background_config_perfile_notype[InputChain->GetFile()][iConfig] =  make_shared<TH1D>(("PDF_Background_perfile_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
+        }
+      }
+    }
+    PDF_Background_config[Config][type]->Fill(SumADC/100.);
+    
+    if (PDF_Background_config_perfile[InputChain->GetFile()].size()>0) {
+      PDF_Background_config_perfile[InputChain->GetFile()][Config][type]->Fill(SumADC/100.);
+    } else {
+      for (int iConfig=0; iConfig<nConfig; ++iConfig) {
+        for (int iBack=0; iBack<10; ++iBack) {
+          std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << " " << iBack << "\n";
+          PDF_Background_config_perfile[InputChain->GetFile()][iConfig][iBack] = make_shared<TH1D>(("PDF_Background_perfile"+to_string(iBack)+"_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
+        }
+      }
+    }
   }
-  strig.SetBinning(bin.at(Feature));
-  strig.ConstructLikelihood(InputFile, OutputFile);
 
-  TH1D* Likelihood_Sign = strig.GetLikelihood_Signal    ();
-  TH1D* Likelihood_Back = strig.GetLikelihood_Background();
-
-  TCanvas c;
-  AddOverflow(Likelihood_Sign);
-  AddOverflow(Likelihood_Back);
-  std::cout<< Likelihood_Back->GetBinContent(1)<< std::endl;
-  Likelihood_Sign->SetMinimum(0);
-  Likelihood_Back->SetMinimum(0);
-  std::vector<double> max = {Likelihood_Sign->GetBinContent(Likelihood_Sign->GetMaximumBin()),
-                             Likelihood_Back->GetBinContent(Likelihood_Back->GetMaximumBin())};
-  double max_d = *max_element(max.begin(), max.end())*1.2;
-  Likelihood_Sign->SetMaximum(max_d);
-  Likelihood_Back->SetMaximum(max_d);
-  Likelihood_Sign->SetLineColor(kRed);
-  Likelihood_Back->SetLineColor(kBlue);
-  Likelihood_Sign->Draw();
-  Likelihood_Back->Draw("SAME");
-  c.SaveAs("likelihoods.pdf");
-
-  TH1D* Lookup = strig.GetLookupDiscriminator();
-  Lookup->Draw();
-  gPad->SetLogy();
-  c.SaveAs("Lookup.pdf");
+  TVectorD efficiencies(nConfig);
+  for (auto const& it: nMarleyEventDetected) {
+    efficiencies[it.first] = 0;
+    for (auto const& it2: it.second) {
+      for (auto const& it3: it2.second) {
+        //cout << it.first << " " << it3.second.size() << "\n";
+        efficiencies[it.first] += it3.second.size();
+      }
+    }
+    efficiencies[it.first] /= nMarleyEventGenerated;
+  }
+    
+  unique_ptr<TFile> OutputFile = make_unique<TFile>(OutputFileName.c_str(), "RECREATE");
+  OutputFile->cd();
+  efficiencies.Print();
+  efficiencies.Write("Efficiencies");
 
 
+  double scaleBackground = 1. / 2.2e-3 / nBackgroundEventGenerated;
+  for (auto const& it: PDF_Background_config_notype) {
+    it.second->Scale(scaleBackground);
+    it.second->Write();
+  }
+  for (auto const& it: PDF_Background_config_perfile_notype) {
+    for (auto const& it2: it.second) {
+      it2.second->Write();
+    }
+  }
 
+  
+  for (auto& it: PDF_Background_config) {
+    for(auto& it2: it.second) {
+      it2.second->Scale(scaleBackground);
+      it2.second->Write();
+    }
+  }
+
+  for (auto& it: PDF_Background_config_perfile) {
+    for(auto& it2: it.second) {
+      for(auto& it3: it2.second) {
+        it3.second->Write();
+      }
+    }
+  }
 }
-
-
-

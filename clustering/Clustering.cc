@@ -43,7 +43,7 @@ void Clustering::RunClustering(){
       goodEvent = (((*fSNIM->True_VertZ)[0] >  695) &&
                    ((*fSNIM->True_VertZ)[0] < 1160));
     }
-      
+    //std::cout << nMaxMarleyPerEvent << std::endl;
     if (nMaxMarleyPerEvent>1 && fUsePDS) {
       std::cerr << "IMPORTANT WARNING: You have just ran over a file which has several SN interaction / LArSoft event." << std::endl;
       std::cerr << "IMPORTANT WARNING: This means the optical cluster information is essentially unusable!!" << std::endl;
@@ -58,10 +58,11 @@ void Clustering::RunClustering(){
     std::vector<OpticalHit*> vec_OptiHit;
     if (fUseTPC) fSNIM->GetWireHits   (vec_WireHit);
     if (fUsePDS) fSNIM->GetOpticalHits(vec_OptiHit);
+
     int nneutron = 0;
     for (auto const& it:vec_WireHit) {
       if (it->GetGenType() == kNeutron)
-        nneutron ++;
+        nneutron++;
     }
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
@@ -106,14 +107,14 @@ void Clustering::RunClustering(){
 
       for(size_t i=0; i<vec_WireCluster.size(); ++i) {
         if (vec_WireCluster[i]->GetIsTriggering()) {
-          if (vec_WireCluster[i]->GetType() == 0) {
-            std::cout << "Background event" << std::endl;
-            std::cout << "Run     " << fSNIM->Run    << std::endl;
-            std::cout << "Subrun  " << fSNIM->SubRun << std::endl;
-            std::cout << "Event   " << fSNIM->Event  << std::endl;
-            std::cout << "Channel " << vec_WireCluster[i]->GetStartChannel() << std::endl;
-            std::cout << "File    " << fInputFileName << std::endl;
-          }
+          // if (vec_WireCluster[i]->GetType() == 0) {
+          //   std::cout << "Background event" << std::endl;
+          //   std::cout << "Run     " << fSNIM->Run    << std::endl;
+          //   std::cout << "Subrun  " << fSNIM->SubRun << std::endl;
+          //   std::cout << "Event   " << fSNIM->Event  << std::endl;
+          //   std::cout << "Channel " << vec_WireCluster[i]->GetStartChannel() << std::endl;
+          //   std::cout << "File    " << fInputFileName << std::endl;
+          // }
           fSOM->FillClusterInfo(vec_WireCluster[i]);
         }
         delete vec_WireCluster[i];

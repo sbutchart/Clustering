@@ -83,26 +83,35 @@ int main (int argc, char** argv) {
   SimpleGeom sg;
   std::vector<std::pair<int,double>> Threshold = {std::make_pair(3,    0.),
                                                   //std::make_pair(3,  100.),
-                                                  std::make_pair(3,  200.),
-                                                  //std::make_pair(3,  300.),
-                                                  std::make_pair(3,  400.),
-                                                  std::make_pair(3,  500.),
-                                                  std::make_pair(3,  550.),
-                                                  std::make_pair(3,  600.),
-                                                  std::make_pair(3,  650.),
-                                                  std::make_pair(3,  700.),
-                                                  std::make_pair(3,  750.),
-                                                  std::make_pair(3,  800.),
-                                                  std::make_pair(3,  850.),
-                                                  std::make_pair(3,  900.),
-                                                  std::make_pair(3, 1000.),
-                                                  //std::make_pair(3, 1100.),
-                                                  std::make_pair(3, 1200.),
-                                                  //std::make_pair(3, 1300.),
-                                                  std::make_pair(3, 1400.)
+                                                  // std::make_pair(3,  200.),
+                                                  // //std::make_pair(3,  300.),
+                                                  // std::make_pair(3,  400.),
+                                                  // std::make_pair(3,  500.),
+                                                  // std::make_pair(3,  550.),
+                                                  // std::make_pair(3,  600.),
+                                                  // std::make_pair(3,  650.),
+                                                  // std::make_pair(3,  700.),
+                                                  // std::make_pair(3,  750.),
+                                                  // std::make_pair(3,  800.),
+                                                  // std::make_pair(3,  850.),
+                                                  // std::make_pair(3,  900.),
+                                                  // std::make_pair(3, 1000.),
+                                                  // //std::make_pair(3, 1100.),
+                                                  // std::make_pair(3, 1200.),
+                                                  // //std::make_pair(3, 1300.),
+                                                  // std::make_pair(3, 1400.)
                                                   //std::make_pair(3, 1500.)
   };
 
+  TH2D*     ADC_Calib_10MeV_th2d = new TH2D    ("ADC_Calib_10MeV_th2d",  "10 MeV electrons;X position [cm];ADC", 100, 0, 400, 50, 0, 5000);
+  TProfile* ADC_Calib_10MeV_prof = new TProfile("ADC_Calib_10MeV_prof",  "10 MeV electrons;X position [cm];ADC", 100, 0, 400);
+  TH2D*     PE_Calib_10MeV_th2d = new TH2D    ("PE_Calib_10MeV_th2d",  "10 MeV electrons;X position [cm];PE", 100, 0, 400, 50, 0, 50);
+  TProfile* PE_Calib_10MeV_prof = new TProfile("PE_Calib_10MeV_prof",  "10 MeV electrons;X position [cm];PE", 100, 0, 400);
+  ADC_Calib_10MeV_th2d->SetStats(0);
+  ADC_Calib_10MeV_prof->SetStats(0);
+  PE_Calib_10MeV_th2d ->SetStats(0);
+  PE_Calib_10MeV_prof ->SetStats(0);
+    
   TH1D* TotalSpectrum = new TH1D    ("TotalSpectrum", ";Electron KE;Total Solar Spectrum [a.u.]", 20,0,20);
   TH1D* B8Spectrum    = new TH1D    ("B8Spectrum",    ";Electron KE;B8 Spectrum [a.u.]",          20,0,20);
   TH1D* HEPSpectrum   = new TH1D    ("HEPSpectrum",   ";Electron KE;HEP Spectrum [a.u.]",         20,0,20);
@@ -125,6 +134,14 @@ int main (int argc, char** argv) {
   TProfile* ADCEnergy_region_prof  = new TProfile("ADCDistance_region_prof_%i",  ";ADC Cluster;Lepton energy [MeV]", 50, 0, 5000);
   TH2D*     ADCEnergy_cheat_th2d   = new TH2D    ("ADCDistance_cheat_th2d_%i",   "Perfect correction;ADC Cluster;Lepton energy [MeV]", 50, 0, 5000, 20, 0, 20);
   TProfile* ADCEnergy_cheat_prof   = new TProfile("ADCDistance_cheat_prof_%i",   ";ADC Cluster;Lepton energy [MeV]", 50, 0, 5000);
+  TH2D*     PEEnergy_total_th2d   = new TH2D    ("PEDistance_total_th2d_%i",   "No correction;PE Cluster;Lepton energy [MeV]", 50, 0, 5000, 20, 0, 20);
+  TProfile* PEEnergy_total_prof   = new TProfile("PEDistance_total_prof_%i",   ";PE Cluster;Lepton energy [MeV]", 50, 0, 5000);
+  TH2D*     PEEnergy_recalib_th2d = new TH2D    ("PEDistance_recalib_th2d_%i", "PDS correction;PE Cluster;Lepton energy [MeV]", 50, 0, 5000, 20, 0, 20);
+  TProfile* PEEnergy_recalib_prof = new TProfile("PEDistance_recalib_prof_%i", ";PE Cluster;Lepton energy [MeV]", 50, 0, 5000);
+  TH2D*     PEEnergy_region_th2d  = new TH2D    ("PEDistance_region_th2d_%i",  "x slice;PE Cluster;Lepton energy [MeV]", 50, 0, 5000, 20, 0, 20);
+  TProfile* PEEnergy_region_prof  = new TProfile("PEDistance_region_prof_%i",  ";PE Cluster;Lepton energy [MeV]", 50, 0, 5000);
+  TH2D*     PEEnergy_cheat_th2d   = new TH2D    ("PEDistance_cheat_th2d_%i",   "Perfect correction;PE Cluster;Lepton energy [MeV]", 50, 0, 5000, 20, 0, 20);
+  TProfile* PEEnergy_cheat_prof   = new TProfile("PEDistance_cheat_prof_%i",   ";PE Cluster;Lepton energy [MeV]", 50, 0, 5000);
   ADCEnergy_total_th2d  ->SetStats(0);
   ADCEnergy_total_prof  ->SetStats(0);
   ADCEnergy_recalib_th2d->SetStats(0);
@@ -133,6 +150,14 @@ int main (int argc, char** argv) {
   ADCEnergy_region_prof ->SetStats(0);
   ADCEnergy_cheat_th2d  ->SetStats(0);
   ADCEnergy_cheat_prof  ->SetStats(0);
+  PEEnergy_total_th2d  ->SetStats(0);
+  PEEnergy_total_prof  ->SetStats(0);
+  PEEnergy_recalib_th2d->SetStats(0);
+  PEEnergy_recalib_prof->SetStats(0);
+  PEEnergy_region_th2d ->SetStats(0);
+  PEEnergy_region_prof ->SetStats(0);
+  PEEnergy_cheat_th2d  ->SetStats(0);
+  PEEnergy_cheat_prof  ->SetStats(0);
 
   std::map<std::pair<int,double>,TEfficiency*> Efficiency;
   std::map<std::pair<int,double>,TEfficiency*> Efficiency_PDS;
@@ -159,11 +184,8 @@ int main (int argc, char** argv) {
 
   int fNEvent = nEvent;
 
-  TF1 Parametrisation ("Parametrisation", "[0]+[1]*x+[2]*sin(x/[3])", 0, 6000);
-  Parametrisation.SetParameters(6.24901e+00,
-                                6.55628e-02,
-                                4.37581e+01,
-                                1.43180e+03);
+  TF1 Parametrisation ("Parametrisation", "[0]*x", 0, 6000);
+  Parametrisation.SetParameter(0,6.55628e-02);
 
   for (auto const& it: aaim) {
     SNAnaInputManager* im = it.second;
@@ -235,8 +257,10 @@ int main (int argc, char** argv) {
         clusteng.ClusterHits2      (vec_WireHit, vec_WireCluster);
         clusteng.ClusterOpticalHits(vec_OptiHit, vec_OptiCluster);
         wiretrigger.IsTriggering   (vec_WireCluster);
-
-        bool trigger=false;
+	double maxPE=0;
+	double maxADC = 0;
+	
+	bool trigger=false;
         bool triggerPDS=false;
         bool triggerCheat=false;
 
@@ -248,9 +272,12 @@ int main (int argc, char** argv) {
 
         for (size_t c=0; c<vec_WireCluster.size(); ++c) {
           WireCluster* wire_clust = vec_WireCluster[c];
+          if (wire_clust->GetIsTriggering() && wire_clust->GetSumPeak() > maxADC) {
+	    maxADC = wire_clust->GetSumPeak();
+	  }
 
           if (wire_clust->GetIsTriggering() && wire_clust->GetSumPeak() > ADC) {
-            if (wire_clust->GetType()) {
+	    if (wire_clust->GetType()) {
 
               trigger=true;
               nTrigTotalSolar += weight_Total_Sun;
@@ -289,6 +316,7 @@ int main (int argc, char** argv) {
                 interesting_optiClust = opti_clust;
               }
             }
+	    maxPE = interesting_optiClust->GetSumPeak();
             double reco_x = Parametrisation.Eval(wire_clust->GetPosition(kT) - interesting_optiClust->GetPosition(kT));
             
             if (first && wire_clust->GetType()) {
@@ -340,7 +368,16 @@ int main (int argc, char** argv) {
           }
         }
 
-        double KE = im->True_ENu_Lep->at(0) * 1000. - 0.511;
+	double KE = im->True_ENu_Lep->at(0) * 1000. - 0.511;
+	if (KE > 9.5 && KE < 10.5) {
+	  std::cout << "MAXADC " << maxADC << std::endl;
+	  std::cout << "MAXPE  " << maxPE  << std::endl;
+	  ADC_Calib_10MeV_th2d->Fill((*im->True_VertX)[0],maxADC);
+	  ADC_Calib_10MeV_prof->Fill((*im->True_VertX)[0],maxADC);
+	  PE_Calib_10MeV_th2d ->Fill((*im->True_VertX)[0],maxPE );
+	  PE_Calib_10MeV_prof ->Fill((*im->True_VertX)[0],maxPE );
+	}
+
         Efficiency      [Threshold[iThreshold]]->Fill(trigger     , KE);
         Efficiency_PDS  [Threshold[iThreshold]]->Fill(triggerPDS  , KE);
         Efficiency_Cheat[Threshold[iThreshold]]->Fill(triggerCheat, KE);
@@ -420,6 +457,19 @@ int main (int argc, char** argv) {
   Resolution_prof->Draw("SAME");
   c.Print("XResolution.pdf");
   c.Print("XResolution.pdf]");
+
+  TCanvas c0;
+  c0.Print("ADCPE_XDep.pdf[");
+  ADC_Calib_10MeV_th2d->Draw("COLZ");
+  ADC_Calib_10MeV_prof->Draw("SAME");
+  c0.Print("ADCPE_XDep.pdf");
+  
+  PE_Calib_10MeV_th2d ->Draw("COLZ");
+  PE_Calib_10MeV_prof ->Draw("SAME");
+  c0.Print("ADCPE_XDep.pdf");
+  c0.Print("ADCPE_XDep.pdf]");
+
+
 
   TCanvas c1;
   c1.Print("ADCCalib.pdf[");

@@ -8,6 +8,7 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 find_package(ROOT REQUIRED COMPONENTS RIO Net XMLIO)
 find_program(LSB_RELEASE_EXEC lsb_release)
+find_package(TBB REQUIRED)
 
 include(${ROOT_USE_FILE})
 string(CONCAT CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -Wall -Wextra -Wpedantic -Werror")
@@ -32,7 +33,8 @@ find_package(Boost REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 
-add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc SmartTrigger.cc SmartTriggerToyThrower.cc BiTrigger.cc)
+#add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc SmartTrigger.cc SmartTriggerToyThrower.cc BiTrigger.cc)
+add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc)
 target_link_libraries(Clustering ${ROOT_LIBRARIES})
 
 add_library(Display SHARED PhotonTimingDisplay.cc PhotonWirePositionDisplay.cc WirePositionTimingDisplay.cc)
@@ -88,11 +90,14 @@ add_executable(RunSmartTriggerStatisticalTests RunSmartTriggerStatisticalTests.c
 target_link_libraries(RunSmartTriggerStatisticalTests Clustering)
 # target_link_libraries(RunSmartTrigger ${Gperftools_LIBRARIES})
 
-add_executable(ThrowToySmartTrigger ThrowToySmartTrigger.cxx)
-target_link_libraries(ThrowToySmartTrigger Clustering)
+add_executable(RunSmartTrigger RunSmartTrigger.cxx)
+target_link_libraries(RunSmartTrigger ${ROOT_LIBRARIES})
 
-add_executable(RunBiTrigger RunBiTrigger.cxx)
-target_link_libraries(RunBiTrigger Clustering)
+# add_executable(ThrowToySmartTrigger ThrowToySmartTrigger.cxx)
+# target_link_libraries(ThrowToySmartTrigger Clustering)
+
+# add_executable(RunBiTrigger RunBiTrigger.cxx)
+# target_link_libraries(RunBiTrigger Clustering)
 
 add_executable(BackgroundRateCalculator BackgroundRateCalculator.cxx)
 target_link_libraries(BackgroundRateCalculator Clustering)
@@ -124,6 +129,12 @@ target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
 add_executable(Optimiser Optimiser.cxx)
 target_link_libraries(Optimiser ${ROOT_LIBRARIES})
 
+add_executable(Optimiser2D Optimiser2D.cxx)
+target_link_libraries(Optimiser2D ${ROOT_LIBRARIES})
+
+# add_executable(Outlier Outlier.cxx)
+# target_link_libraries(Outlier ${ROOT_LIBRARIES})
+
 add_executable(PlotEfficiencyAtNCut PlotEfficiencyAtNCut.cxx)
 target_link_libraries(PlotEfficiencyAtNCut ${ROOT_LIBRARIES})
 
@@ -142,6 +153,5 @@ target_link_libraries(DumpForAI_Arbitrary Clustering)
 add_executable(RunXDependancy RunXDependancy.cxx)
 target_link_libraries(RunXDependancy Clustering)
 
-add_executable(Test test.cxx)
-#target_link_libraries(RunXDependancy Clustering)
-
+add_executable(RunNeutronStudyInd NeutronStudyInd.cxx)
+target_link_libraries(RunNeutronStudyInd Clustering)

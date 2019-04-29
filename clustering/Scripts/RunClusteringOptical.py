@@ -6,18 +6,26 @@ import ntpath
 import sys
 RunOver=10000
 TreeName="SNSimTree"
-TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
-         "snanaEFF15cm0100Hz5snrNonRefl",
-         "snanaEFF30cm0100Hz5snrNonRefl",
-         "snanaEFF60cm0100Hz5snrNonRefl",
-         "snanaNSE45cm0010Hz5snrNonRefl",
-         "snanaNSE45cm0300Hz5snrNonRefl",
-         "snanaNSE45cm1000Hz5snrNonRefl",
-         "snanaREF45cm0100Hz5snrOptRefl",
-         "snanaREF45cm0100Hz5snrPesRefl",
-         "snanaSNR45cm0100Hz3snrNonRefl",
-         "snanaSNR45cm0100Hz4snrNonRefl",
-         "snanaSNR45cm0100Hz7snrNonRefl"]
+TreeDir=["snanaDEF35QENonRefl1PE",
+         "snanaEFF15QENonRefl1PE",
+         "snanaEFF25QENonRefl1PE",
+         "snanaEFF45QENonRefl1PE",
+         "snanaREF35QEOptRefl1PE",
+         "snanaREF35QEPesRefl1PE",
+         "snanaTHR35QENonRefl2PE",
+         "snanaTHR35QENonRefl3PE"]
+# TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
+#          "snanaEFF15cm0100Hz5snrNonRefl",
+#          "snanaEFF30cm0100Hz5snrNonRefl",
+#          "snanaEFF60cm0100Hz5snrNonRefl",
+#          "snanaNSE45cm0010Hz5snrNonRefl",
+#          "snanaNSE45cm0300Hz5snrNonRefl",
+#          "snanaNSE45cm1000Hz5snrNonRefl",
+#          "snanaREF45cm0100Hz5snrOptRefl",
+#          "snanaREF45cm0100Hz5snrPesRefl",
+#          "snanaSNR45cm0100Hz3snrNonRefl",
+#          "snanaSNR45cm0100Hz4snrNonRefl",
+#          "snanaSNR45cm0100Hz7snrNonRefl"]
 # TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
 #          "snanaEFF15cm0100Hz5snrNonRefl",
 #          "snanaEFF30cm0100Hz5snrNonRefl",
@@ -27,9 +35,9 @@ TreeDir=["snanaDEF45cm0100Hz5snrNonRefl",
 
 Config=" -c 0"
 Config=""
-filename="optical.list2"
+filename="optical.list3"
 f = open(filename, "r")
-OutputDirectory="/dune/data2/users/plasorak/PhotonProdClusterMultipleConfig/"
+OutputDirectory="/dune/data2/users/plasorak/PhotonProdClusterMultipleConfig_March19/"
 
 def file_len(fname):
     with open(fname) as f:

@@ -66,6 +66,16 @@ private:
 };
 
 
+class SmartSADC: public SmartTrigger {
+  using SmartTrigger::SmartTrigger;
+
+  double GetEstimator(const Cluster& c) const{
+    WireCluster& wc = (WireCluster&)c;
+    return wc.GetRecoEnergy();
+  };
+  
+};
+
 class SmartERecoWireClusterTrigger: public SmartTrigger {
   using SmartTrigger::SmartTrigger;
 

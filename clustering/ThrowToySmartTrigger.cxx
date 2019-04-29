@@ -12,43 +12,41 @@ int main(int argc, char** argv) {
   int opt;
   std::string InputFile = "";
   std::string OutputFile = "";
-  int nNeutrino=10, nToy=1000;
-  double backRate=1;
-  // Shut GetOpt error messages down (return '?'): 
-  extern char *optarg;
-  extern int  optopt;
-  // Retrieve the options:
-  while ( (opt = getopt(argc, argv, "t:c:f:i:o:b:n:")) != -1 ) {  // for each option...
-    switch ( opt ) {
-    case 'i':
-      InputFile = optarg;
-      break;
-    case 'o':
-      OutputFile = optarg;
-      break;
-    case 'n':
-      nNeutrino = atof(optarg);
-      break;
-    case 'b':
-      backRate = std::stod(optarg);
-      break;
-    case 't':
-      nToy = atof(optarg);
-      break;
-    case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
-      break;
-    }
-  }
-    
+  std::string Param="";
+  int nThread = 4;
+
+  CLI::App app{"ToyThrower"};
+
+  app.add_option("-f,--file", InputFile, "Input filename");
+  app.add_option("-t,--thread", nThread, "Number of thread this will run on");
+  app.add_option("-p,--param", Param, "Parameter name");
+  app.add_option("-o,--output", OutputFile, "Output file name");
+
+  CLI11_PARSE(app, argc, argv);
+
   if (InputFile == "") {
     std::cout << "No input file!!" << std::endl;
     exit(1);
   }
 
-  SmartTriggerToyThrower sttt(InputFile);
+  int nToys = (double)back_pdf->GetEntries() / 10. / (double) nThread;
+  if (nToys == 0) {
+    nToys = (double)back_pdf->GetEntries() / 10.;
+    nThread = 1;
+  }
+  if (nToys < 10) {
+    std::cout << "not enough stats to make toys!" << std::endl;
+    exit(0);
+  }
+  TFile* f = new TFile(InputFile.c_str(), "READ");
+  TH1D* back_pdf = (TH1D*)f->Get((std::string("h_")+param+"_back_wire").c_str());
+  TH1D* sign_pdf = (TH1D*)f->Get((std::string("h_")+param+"_sign_wire").c_str());
+  TVector3* Efficiency = (TVector3*)f->Get("Efficiency");
+  TVector3* BackgroundRate = (TVector3*)f->Get("BackgroundRate");
+  
+  SmartTriggerToyThrower sttt();
   sttt.SetNToys(nToy);
-  sttt.SetBackgroundRateAndNumberOfNeutrino(backRate,nNeutrino);
+  sttt.SetBackgroundRateAndNumberOfNeutrino(BackgroundRate,Efficiency*10.);
   sttt.ThrowToys();
 
   TH1D* disc_sign = sttt.GetDiscriminator_Sign();
