@@ -5,6 +5,7 @@
 #include "TRandom3.h"
 #include "TGraph.h"
 #include "Helper.h"
+#include "TVector3.h"
 #include "TMath.h"
 //#include <numeric>
 #include <iostream>
@@ -13,6 +14,8 @@
 #include <atomic>
 #include <random>
 #include <time.h>
+
+#include "CLI11.hpp"
 
 std::piecewise_constant_distribution<double> GetDistrib(TH1D* histo_) {
   std::vector<double> intervals;
@@ -33,12 +36,10 @@ double GetKolmogorovSmirnovTest(std::piecewise_constant_distribution<double>& pd
     std::cout << "trial has no element" << std::endl;
     return 1; 
   }
-  std::cout << "trial.size() : " << trial.size() << std::endl;
-  for (size_t it=0; it<trial.size(); ++it)
-    std::cout << "it " << it << " : " << trial[it] << std::endl;
+  // std::cout << "trial.size() : " << trial.size() << std::endl;
+  // for (size_t it=0; it<trial.size(); ++it)
+  //   std::cout << "it " << it << " : " << trial[it] << std::endl;
   
-
-
   std::vector<double> interval = pdf.intervals();
   std::vector<double> density  = pdf.densities();
   double sum = std::accumulate(density.begin(), density.end(), 0.);
@@ -113,7 +114,14 @@ private:
   std::default_random_engine     generator;
   std::poisson_distribution<int> distribution_signal;
   std::poisson_distribution<int> distribution_background;
+  TRandom3 rand;
+  TH1D* th1_sign;
+  TH1D* th1_back;
 public:
+  int UniqueID;
+  std::vector<double> SignalKS    ;
+  std::vector<double> BackgroundKS;
+  
   KS():
     sign_pdf_(),
     back_pdf_(),
@@ -121,15 +129,18 @@ public:
     LMCEvent_(0),
     BackgroundEvent_(0),
     generator(clock()),
+    rand(),
+    th1_sign(nullptr),
+    th1_back(nullptr),
     SignalKS(),
     BackgroundKS(){
   }
-  void SetBackground      (TH1D* back_pdf)         { back_pdf_ = GetDistrib(back_pdf);   }
-  void SetSignal          (TH1D* sign_pdf)         { sign_pdf_ = GetDistrib(sign_pdf);   }
+  void SetBackground      (TH1D* back_pdf)         { back_pdf_ = GetDistrib(back_pdf); th1_back = (TH1D*)back_pdf->Clone(); }
+  void SetSignal          (TH1D* sign_pdf)         { sign_pdf_ = GetDistrib(sign_pdf); th1_sign = (TH1D*)sign_pdf->Clone(); }
   void SetNBackgroundEvent(double BackgroundEvent) { BackgroundEvent_ = BackgroundEvent; }
   void SetNSignalEvent    (double SignalEvent)     { LMCEvent_ = SignalEvent;            }
   void SetNToys           (int nToys)              { nThrow_ = nToys;                    }
-  void SetSeed            (int Seed)               { generator.seed(Seed);               }
+  void SetSeed            (int Seed)               { generator.seed(Seed);rand.SetSeed(Seed); }
   
   KS(const KS& t) {
     this->sign_pdf_               = t.sign_pdf_;
@@ -142,14 +153,24 @@ public:
     this->generator               = t.generator;
     this->distribution_signal     = t.distribution_signal;
     this->distribution_background = t.distribution_background;
-    
+    this->rand                    = t.rand;
+    if (t.th1_sign) this->th1_sign = (TH1D*)t.th1_sign->Clone();
+    if (t.th1_back) this->th1_back = (TH1D*)t.th1_back->Clone();
   }
-  int UniqueID;
-
-
+  ~KS() {
+    if (th1_sign) {
+      delete th1_sign;
+      th1_sign = nullptr;
+    }
+    if (th1_back) {
+      delete th1_back;
+      th1_back = nullptr;
+    }
+  }
+  
 public:
-  std::vector<double> SignalKS    ;
-  std::vector<double> BackgroundKS;
+
+  
   void GetKSStat(){
     
     distribution_signal     = std::poisson_distribution<int>(LMCEvent_);
@@ -179,18 +200,86 @@ public:
       } else {
         SignalKS.push_back(1.);
       }
-      //BackgroundKS.push_back(GetKolmogorovSmirnovTest(back_pdf_,back_thrown));
+
+      if (back_thrown.size() != 0) {
+        BackgroundKS.push_back(GetKolmogorovSmirnovTest(back_pdf_,back_thrown));  
+      } else {
+        BackgroundKS.push_back(1.);  
+      }
     }
+
     std::cout << "in thread " << SignalKS    .size() << std::endl;
     std::cout << "in thread " << BackgroundKS.size() << std::endl;
-  }
+    
+  } // GetKSStat
+
+
+
+  void GetKSStatROOT(){
+    TH1D* th1_thrown_back = (TH1D*)th1_back->Clone();
+    TH1D* th1_thrown_sign = (TH1D*)th1_sign->Clone();
+    for (int i=0; i<nThrow_; ++i) {
+      if (i%1000==0) std::cout << i << "/" << nThrow_ << std::endl;
+      int nSignal      = rand.Poisson(LMCEvent_);
+      int nBackground  = rand.Poisson(BackgroundEvent_);
+      int nBackground2 = rand.Poisson(BackgroundEvent_);
+      th1_thrown_back->Reset();
+      th1_thrown_sign->Reset();
+
+      for (int nCluster=0; nCluster<nSignal; ++nCluster) {
+        th1_thrown_sign->Fill(th1_sign->GetRandom());
+      }
+      for (int nCluster=0; nCluster<nBackground; ++nCluster) {
+        th1_thrown_sign->Fill(th1_back->GetRandom());
+      }
+    
+      for (int nCluster=0; nCluster<nBackground2; ++nCluster) {
+        th1_thrown_back->Fill(th1_back->GetRandom());
+      }
+
+      if (th1_thrown_sign->GetEntries() != 0) {
+        SignalKS.push_back(th1_thrown_sign->Chi2Test(th1_back));
+        if (SignalKS.back() >= 1.) {
+          std::cout << "Weird sign " << SignalKS.back() << std::endl;
+        }
+      } else {
+        SignalKS.push_back(1.);
+      }
+
+      if (th1_thrown_back->GetEntries() != 0) {
+        BackgroundKS.push_back(th1_thrown_back->Chi2Test(th1_back));  
+        if (SignalKS.back() >= 1.) {
+          std::cout << "Weird back" << SignalKS.back()<< std::endl;
+        }
+      } else {
+        BackgroundKS.push_back(1.);  
+      }
+    }
+
+    std::cout << "in thread " << SignalKS    .size() << std::endl;
+    std::cout << "in thread " << BackgroundKS.size() << std::endl;
+    
+  } // GetKSStat
 };
 
 int main(int argc, char *argv[]) {
-  (void)argc;
-  int nBin = 100;
-  TH1D* KSTest_sign = new TH1D("KS_signal_sign", ";KS Test result (background hypothesis);Rate [Hz]", nBin, 0, 1.01);
-  TH1D* KSTest_back = new TH1D("KS_signal_back", "", nBin, 0, 1.1);
+
+  CLI::App app{"KS Optimiser"};
+
+  std::string filename = "";
+  int nThread = 4;
+  std::string param = "sadc";
+  std::string outputfilename = "KS_optimiser.pdf";
+  app.add_option("-f,--file", filename, "Input filename");
+  app.add_option("-t,--thread", nThread, "Number of thread this will run on");
+  app.add_option("-p,--param", param, "Parameter name");
+  app.add_option("-o,--output", outputfilename, "Output file name");
+
+  CLI11_PARSE(app, argc, argv);
+
+  int nBin = 10;
+  TH1D* KSTest_sign = new TH1D("KS_signal_sign", ";KS Test result (background hypothesis);Rate [Hz]", nBin, 0, 1);
+  TH1D* KSTest_back = new TH1D("KS_signal_back", "", nBin, 0, 1);
   KSTest_sign->SetLineColor(kRed);
   KSTest_back->SetLineColor(kBlue);
   KSTest_sign->SetStats(0);
@@ -199,17 +288,32 @@ int main(int argc, char *argv[]) {
 
   std::vector<KS> KSs;
   std::vector<std::thread> threads;
-  TFile* f = new TFile("../build/RealTest.pdf.root", "READ");
-  TH1D* back_pdf = (TH1D*)f->Get((std::string("h_")+argv[1]+"_back_wire").c_str());
-  TH1D* sign_pdf = (TH1D*)f->Get((std::string("h_")+argv[1]+"_sign_wire").c_str());
-  int nThread = atoi(argv[2]);
-  
-  double BackgroundEvent = back_pdf->Integral() * 10.;
+  TFile* f = new TFile(filename.c_str(), "READ");
+  TH1D* back_pdf = (TH1D*)f->Get((std::string("h_")+param+"_back_wire").c_str());
+  TH1D* sign_pdf = (TH1D*)f->Get((std::string("h_")+param+"_sign_wire").c_str());
+  TVector3* Efficiency = (TVector3*)f->Get("Efficiency");
+  TVector3* BackgroundRate = (TVector3*)f->Get("BackgroundRate");
+
+  AddOverflow(back_pdf);
+  AddOverflow(sign_pdf);
+ 
+  double BackgroundEvent = BackgroundRate->X() * 10.;
   back_pdf->Scale(back_pdf->GetEntries() / back_pdf->Integral());
   sign_pdf->Scale(sign_pdf->GetEntries() / sign_pdf->Integral());
-  double SignalEvent = 10*0.791258;
+  double SignalEvent = 10 * Efficiency->X();
   std::cout << "BackgroundEvent " << BackgroundEvent << std::endl;
   std::cout << "Entries " << back_pdf->GetEntries() << std::endl;
+
+  int nToys = (double)back_pdf->GetEntries() / 10. / (double) nThread;
+  if (nToys == 0) {
+    nToys = (double)back_pdf->GetEntries() / 10.;
+    nThread = 1;
+  }
+  if (nToys < 10) {
+    std::cout << "not enough stats to make toys!" << std::endl;
+    exit(0);
+  }
+  
   for (int iThread=0; iThread<nThread; ++iThread) {
     KSs.push_back(KS());
     KSs.back().UniqueID = iThread;
@@ -218,11 +322,11 @@ int main(int argc, char *argv[]) {
     KSs.back().SetSignal    (sign_pdf);
     KSs.back().SetNBackgroundEvent(BackgroundEvent);
     KSs.back().SetNSignalEvent    (SignalEvent);
-    KSs.back().SetNToys((double)back_pdf->GetEntries() / 10. / (double) nThread / 100);
+    KSs.back().SetNToys(nToys);
   }
 
   for (std::vector<KS>::iterator it = KSs.begin(); it != KSs.end(); ++it) {
-    threads.push_back(std::thread(&KS::GetKSStat, it));
+    threads.push_back(std::thread(&KS::GetKSStatROOT, it));
   }
 
   std::cout << "threads setup" << std::endl;
@@ -243,17 +347,24 @@ int main(int argc, char *argv[]) {
   }
   KSTest_sign->Scale(0.1 /ntoys);
   KSTest_back->Scale(0.1 /ntoys);
+  
+  KSTest_sign->SetBinContent(100, KSTest_sign->GetBinContent(100) +  KSTest_sign->GetBinContent(101));
+  KSTest_back->SetBinContent(100, KSTest_back->GetBinContent(100) +  KSTest_back->GetBinContent(101));
+
+  KSTest_sign->SetBinContent(101, 0);
+  KSTest_back->SetBinContent(101, 0);
   std::vector<double> max = {KSTest_sign->GetMaximum(),KSTest_back->GetMaximum()};
+  std::vector<double> min = {KSTest_sign->GetMinimum(),KSTest_back->GetMinimum()};
   
   TCanvas c;
   gPad->SetLogy();
   
-  KSTest_sign->SetMinimum(1.e-2 / ntoys);
+  //KSTest_sign->SetMinimum(1.e-1 *);
   KSTest_sign->SetMaximum(10. * (*std::max_element(max.begin(), max.end())));
-  c.Print((std::string("KS")+argv[1]+".pdf[").c_str());
+  c.SaveAs((outputfilename+"[").c_str());
   KSTest_sign->Draw();
   KSTest_back->Draw("SAME");
-  c.SaveAs((std::string("KS")+argv[1]+".pdf").c_str());
+  c.SaveAs(outputfilename.c_str());
 
   TGraph* gr = new TGraph(KSTest_sign->GetNbinsX());
   for (int i=0; i<gr->GetN(); i++) {
@@ -267,11 +378,11 @@ int main(int argc, char *argv[]) {
   gr->SetTitle(";Fake rate [Hz];Efficiency");
   gr->Draw("ALP");
   
-  c.SaveAs((std::string("KS")+argv[1]+".pdf").c_str());
-  c.SaveAs((std::string("KS")+argv[1]+".pdf]").c_str());
+  c.SaveAs(outputfilename.c_str());
+  c.SaveAs((outputfilename+"]").c_str());
 
 
-  TFile f2((std::string("KS")+argv[1]+".root").c_str(), "RECREATE");
+  TFile f2((outputfilename+".root").c_str(), "RECREATE");
   gr->Write();
   KSTest_sign->Write();
   KSTest_back->Write();
