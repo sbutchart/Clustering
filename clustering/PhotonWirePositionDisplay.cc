@@ -4,6 +4,7 @@ void PhotonWirePositionDisplay::CreateGraphHit(std::map<int,TGraph*>&map_gr_wire
   int chan = (*im.Hit_Chan)[hit];
   if (!map_gr_wire[chan]) {
     map_gr_wire[chan] = new TGraph(2);
+    std::cout << (*im.Hit_Z_start)[hit] << " " << (*im.Hit_Z_end)[hit] << "\n";
     map_gr_wire[chan]->SetPoint(0, (*im.Hit_Z_start)[hit], (*im.Hit_Y_start)[hit]);
     map_gr_wire[chan]->SetPoint(1, (*im.Hit_Z_end  )[hit], (*im.Hit_Y_end  )[hit]);
     map_gr_wire[chan]->SetLineColor(kViolet);
@@ -54,7 +55,7 @@ PhotonWirePositionDisplay::PhotonWirePositionDisplay(std::string F, std::string 
   VertexXPosition(NULL) {
   map_h2_BackTracked = SetUpGraph("Position");
   map_h2_PosHit      = Get2DHistos("Diplay",";Z Position [cm];Y Position [cm]",
-                                   6, 0, 1392,
+                                   24, 0, 1392,
                                    100, -800, 800);
   
 }
@@ -62,36 +63,59 @@ PhotonWirePositionDisplay::PhotonWirePositionDisplay(std::string F, std::string 
 
 
 void PhotonWirePositionDisplay::DisplayEvent(int event, int type){
-  (void)type;
-  im.GetEntry(event);
+  bool found=false;
+  
+  while(!found) {
 
-  for (size_t hit=0; hit<im.PDS_OpHit_OpChannel->size(); ++hit) {
-    GenType gen = ConvertIntToGenType((*im.PDS_OpHit_True_GenType)[hit]);
-    map_h2_PosHit[gen] ->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
-    map_h2_PosHit[kAll]->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
-  }
+    im.GetEntry(event);
+    std::cout << "hereee " << event <<"\n";
+    for (auto & it: map_h2_PosHit) {
+      if (it.second)
+        it.second->Reset();
+    }
+    
+    for (auto & it: map_map_gr_wire) {
+      for (auto& it2: it.second) {
+        if (it2.second) {
+          delete it2.second;
+          it2.second = NULL;
+        }
+      }
+    }
+    map_map_gr_wire.clear();
+    for (size_t hit=0; hit<im.PDS_OpHit_OpChannel->size(); ++hit) {
+      //std::cout << (*im.PDS_OpHit_PE)[hit] << "\n";
+      GenType gen = ConvertIntToGenType((*im.PDS_OpHit_True_GenType)[hit]);
+      map_h2_PosHit[gen] ->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
+      map_h2_PosHit[kAll]->Fill((*im.PDS_OpHit_Z)[hit], (*im.PDS_OpHit_Y)[hit], (*im.PDS_OpHit_PE)[hit]);
+      if ((*im.PDS_OpHit_True_GenType)[hit]==type)
+        found = true;
+    }
 
-  for (size_t hit=0; hit<im.Hit_Chan->size(); ++hit) {
-    GenType gen = ConvertIntToGenType((*im.Hit_True_GenType)[hit]);
-    CreateGraphHit(map_map_gr_wire[gen],  hit);
-    CreateGraphHit(map_map_gr_wire[kAll], hit);
-  }
+    for (size_t hit=0; hit<im.Hit_Chan->size(); ++hit) {
+      GenType gen = ConvertIntToGenType((*im.Hit_True_GenType)[hit]);
+      std::cout << gen << "\n";
+      CreateGraphHit(map_map_gr_wire[gen],  hit);
+      CreateGraphHit(map_map_gr_wire[kAll], hit);
+    }
 
-  for (size_t iPart=0; iPart<im.True_Bck_VertY->size(); ++iPart) {
-    GenType gen = ConvertIntToGenType((*im.True_Bck_Mode)[iPart]);
-    map_h2_BackTracked[gen] ->Set(map_h2_BackTracked[gen]->GetN()+1);
-    map_h2_BackTracked[gen] ->SetPoint(map_h2_BackTracked[gen]->GetN()-1,(*im.True_Bck_VertZ)[iPart],(*im.True_Bck_VertY)[iPart]);
-    map_h2_BackTracked[kAll]->Set(map_h2_BackTracked[kAll]->GetN()+1);
-    map_h2_BackTracked[kAll]->SetPoint(map_h2_BackTracked[kAll]->GetN()-1,(*im.True_Bck_VertZ)[iPart],(*im.True_Bck_VertY)[iPart]);
+    for (size_t iPart=0; iPart<im.True_Bck_VertY->size(); ++iPart) {
+      GenType gen = ConvertIntToGenType((*im.True_Bck_Mode)[iPart]);
+      map_h2_BackTracked[gen] ->Set(map_h2_BackTracked[gen]->GetN()+1);
+      map_h2_BackTracked[gen] ->SetPoint(map_h2_BackTracked[gen]->GetN()-1,(*im.True_Bck_VertZ)[iPart],(*im.True_Bck_VertY)[iPart]);
+      map_h2_BackTracked[kAll]->Set(map_h2_BackTracked[kAll]->GetN()+1);
+      map_h2_BackTracked[kAll]->SetPoint(map_h2_BackTracked[kAll]->GetN()-1,(*im.True_Bck_VertZ)[iPart],(*im.True_Bck_VertY)[iPart]);
+    }
+    NHit            = new TLatex(50,  700,Form("N opt hits: %.0f    N wire hits: %d",
+                                               map_h2_PosHit[kSNnu]->GetEntries(),
+                                               (int)map_map_gr_wire[kSNnu].size()));
+    NHitTot         = new TLatex(50,  700,Form("N opt hits: %.0f    N wire hits: %d",
+                                               map_h2_PosHit[kAll]->GetEntries(),
+                                               (int)map_map_gr_wire[kAll].size()));
+    ++event;
   }
-  NHit            = new TLatex(50,  700,Form("N opt hits: %.0f    N wire hits: %d",
-                                             map_h2_PosHit[kSNnu]->GetEntries(),
-                                             (int)map_map_gr_wire[kSNnu].size()));
-  NHitTot         = new TLatex(50,  700,Form("N opt hits: %.0f    N wire hits: %d",
-                                             map_h2_PosHit[kAll]->GetEntries(),
-                                             (int)map_map_gr_wire[kAll].size()));
-  NeutrinoEnergy  = new TLatex(50, -700,Form("#nu energy: %.1f MeV",(*im.True_ENu  )[0]*1000.));
-  VertexXPosition = new TLatex(800,-700,Form("X Position: %.0f cm" ,(*im.True_VertX)[0]));
+  // NeutrinoEnergy  = new TLatex(50, -700,Form("#nu energy: %.1f MeV",(*im.True_ENu  )[0]*1000.));
+  // VertexXPosition = new TLatex(800,-700,Form("X Position: %.0f cm" ,(*im.True_VertX)[0]));
   c->Print("OpHitTrigger_results_evdisplay.pdf[");
   for (auto const& it : map_h2_PosHit) {
     it.second->Draw("COLZ");
@@ -102,8 +126,8 @@ void PhotonWirePositionDisplay::DisplayEvent(int event, int type){
     if (it.first != kAr39 && it.first != kAll && it.first != kKrypton)
       map_h2_BackTracked[it.first]->Draw("P");
     if(it.first == kSNnu || it.first == kAll) {
-      NeutrinoEnergy ->Draw();
-      VertexXPosition->Draw();
+      // NeutrinoEnergy ->Draw();
+      // VertexXPosition->Draw();
     }
     if (it.first == kSNnu){
       NHit   ->Draw();
