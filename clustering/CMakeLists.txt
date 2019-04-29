@@ -44,6 +44,12 @@ target_link_libraries(SimpleOptHit ${ROOT_LIBRARIES})
 add_executable(RunDAQClustering RunDAQClustering.cxx)
 target_link_libraries(RunDAQClustering Clustering)
 
+add_executable(RunDAQClustering_PhotonOnly RunDAQClustering_PhotonOnly.cxx)
+target_link_libraries(RunDAQClustering_PhotonOnly Clustering)
+
+add_executable(RunDAQClustering_WireOnly RunDAQClustering_WireOnly.cxx)
+target_link_libraries(RunDAQClustering_WireOnly Clustering)
+
 add_executable(AnalyseOpticalCluster AnalyseOpticalCluster.cxx)
 target_link_libraries(AnalyseOpticalCluster Clustering)
 
@@ -135,4 +141,7 @@ target_link_libraries(DumpForAI_Arbitrary Clustering)
 
 add_executable(RunXDependancy RunXDependancy.cxx)
 target_link_libraries(RunXDependancy Clustering)
+
+add_executable(Test test.cxx)
+#target_link_libraries(RunXDependancy Clustering)
 
