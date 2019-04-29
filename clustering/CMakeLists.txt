@@ -25,6 +25,8 @@ execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
 string(FIND "${LSB_RELEASE_ID_SHORT}" "Scientific" _cmp)
 if (_cmp GREATER -1)
   set(Boost_NO_BOOST_CMAKE ON)
+else()
+  string(CONCAT CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -std=c++1y")
 endif()
 
 find_package(Boost REQUIRED)
@@ -129,8 +131,6 @@ target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
 add_executable(Optimiser Optimiser.cxx)
 target_link_libraries(Optimiser ${ROOT_LIBRARIES})
 
-add_executable(Optimiser2D Optimiser2D.cxx)
-target_link_libraries(Optimiser2D ${ROOT_LIBRARIES})
 
 # add_executable(Outlier Outlier.cxx)
 # target_link_libraries(Outlier ${ROOT_LIBRARIES})
