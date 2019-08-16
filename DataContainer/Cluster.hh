@@ -1,9 +1,9 @@
 #ifndef CLUSTER_HH
 #define CLUSTER_HH
 
-#include "Hit.hh"
+#include "DataContainer/Hit.hh"
 
-#include "Helper.h"
+#include "Utils/Helper.h"
 
 class Cluster {
 

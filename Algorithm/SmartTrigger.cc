@@ -1,6 +1,6 @@
-#include "SmartTrigger.hh"
+#include "Algorithm/SmartTrigger.hh"
 
-#include "Helper.h"
+#include "Utils/Helper.h"
 
 SmartTrigger::SmartTrigger(const std::string f):
   fLikelihood_Sign(NULL),

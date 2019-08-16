@@ -1,9 +1,9 @@
 #ifndef TRIGGER_HH
 #define TRIGGER_HH
 
-#include "Cluster.hh"
-#include "WireCluster.hh"
-#include "OpticalCluster.hh"
+#include "DataContainer/Cluster.hh"
+#include "DataContainer/WireCluster.hh"
+#include "DataContainer/OpticalCluster.hh"
 
 class Trigger {
 public:

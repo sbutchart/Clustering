@@ -1,6 +1,6 @@
 #ifndef CLUSTERENERGYESTIMATOR_HH
 #define CLUSTERENERGYESTIMATOR_HH
-#include "WireCluster.hh"
+#include "DataContainer/WireCluster.hh"
 
 #include "TXMLEngine.h"
 #include "TMath.h"

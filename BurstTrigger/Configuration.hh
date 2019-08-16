@@ -67,7 +67,8 @@ public:
   TH1D* GetDistanceProbability    (){ return fDistanceProbability; }
   
   
-  Configuration(const Configuration& c) {
+  Configuration(const Configuration& c):
+    TObject(c){
     fNClusterCut                 = c.fNClusterCut;
     fClusterAlgorithm            = c.fClusterAlgorithm;
     fBackgroundRate              = c.fBackgroundRate;
@@ -236,7 +237,7 @@ public:
 
     std::vector<double> old_binning;
     const TArrayD* array = Input->GetXaxis()->GetXbins();
-    for (size_t i=0; i<array->GetSize(); ++i) {
+    for (int i=0; i<array->GetSize(); ++i) {
       if (array->At(i)>=1) old_binning.push_back(array->At(i));
     }
 
@@ -290,11 +291,11 @@ public:
     FillHistograms(fLatency_Burst, fTH1DLatency_Burst,
                    "Latency_Burst", "N SN interactions / 10 kT", "Latency [ms]");
     FillHistograms(fLatency_Burst95CL, fTH1DLatency_Burst95CL,
-                   "Latency_Burst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95\%CL");
+                   "Latency_Burst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95%CL");
     FillHistograms(fLatency_NoBurstBurst, fTH1DLatency_NoBurstBurst,
                    "Latency_NoBurstBurst", "N SN interactions / 10 kT", "Latency [ms] (no burst)");
     FillHistograms(fLatency_NoBurstBurst95CL, fTH1DLatency_NoBurstBurst95CL,
-                   "Latency_NoBurstBurst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95\%CL (no burst)");
+                   "Latency_NoBurstBurst95CL", "N SN interactions / 10 kT", "Upper limit on the Latency [ms] @ 95%CL (no burst)");
     ConvertToDistance(fTH1DEfficiency_Burst   , fTH1DEfficiency_Distance );
     ConvertToDistance(fTH1DLatency_Burst      , fTH1DLatency_Distance    );
     ConvertToDistance(fTH1DLatency_Burst95CL  , fTH1DLatency_Distance95CL);

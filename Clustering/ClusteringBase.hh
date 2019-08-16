@@ -5,15 +5,14 @@
 #include <vector>
 #include <algorithm>
 
-#include "Helper.h"
+#include "Utils/Helper.h"
+#include "Utils/Exceptions.hh"
 
-#include "Exceptions.hh"
+#include "IO/InputManager.hh"
+#include "IO/OutputManager.hh"
 
-#include "InputManager.hh"
-#include "OutputManager.hh"
-
-#include "ClusterEngine.hh"
-#include "Trigger.hh"
+#include "Algorithm/ClusterEngine.hh"
+#include "Algorithm/Trigger.hh"
 
 class ClusteringBase {
 protected:

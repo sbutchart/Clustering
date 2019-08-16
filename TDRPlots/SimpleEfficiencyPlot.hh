@@ -6,8 +6,8 @@
 // As function of the nhit cut that is applied to the trigger.
 
 
-#include "Helper.h"
-#include "EfficiencyPlotMarley.hh"
+#include "Utils/Helper.h"
+#include "TDRPlots/EfficiencyPlotMarley.hh"
 
 class SimpleEfficiencyPlot: public EfficiencyPlotMarley {
 

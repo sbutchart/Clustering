@@ -9,8 +9,8 @@
 #include "TH1D.h"
 #include "TTree.h"
 
-#include "WireCluster.hh"
-#include "Trigger.hh"
+#include "DataContainer/WireCluster.hh"
+#include "Algorithm/Trigger.hh"
 
 class SmartTrigger: public Trigger {
 public:

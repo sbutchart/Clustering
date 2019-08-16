@@ -5,8 +5,8 @@
 #include "TH1D.h"
 #include "TH2D.h"
 
-#include "Helper.h"
-#include "InputManager.hh"
+#include "Utils/Helper.h"
+#include "IO/InputManager.hh"
 
 
 class Display {

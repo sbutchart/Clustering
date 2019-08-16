@@ -1,7 +1,7 @@
 #ifndef OPTICALHIT_HH
 #define OPTICALHIT_HH
-#include "Hit.hh"
-#include "SimpleGeom.hh"
+#include "DataContainer/Hit.hh"
+#include "Utils/SimpleGeom.hh"
 
 #include <iostream>
 

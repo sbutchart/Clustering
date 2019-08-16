@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
     it.SetDistanceParametrisation((TF1*)fInverse->Clone());
     it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
     std::cout << "In a time window of " << it.fBurstTimeWindow
-              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
+              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "% of the events." << std::endl;
     if(it.fFractionInTimeWindow<0 || it.fFractionInTimeWindow>1.01){
       std::cout << "The fraction in TimeWindow is bonkers!! ("
                 << it.fFractionInTimeWindow << ")" << std::endl;
@@ -218,7 +218,7 @@ int main(int argc, char** argv) {
   gPad->SetGridy();
   for (auto& ThisConfig : Configs) {
     int color = vec_Colors.at(globalIt % vec_Colors.size());
-    int color2 = vec_Colors.at(globalIt% vec_Colors.size()+1);
+    //int color2 = vec_Colors.at(globalIt% vec_Colors.size()+1);
     ThisConfig.fTH1DFakeRate_Cut       ->SetLineColor(color);
     ThisConfig.fTH1DEfficiency_Burst   ->SetLineColor(color);
     ThisConfig.fTH1DEfficiency_Distance->SetLineColor(color);

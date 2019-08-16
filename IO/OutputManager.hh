@@ -8,11 +8,11 @@
 #include "TFile.h"
 #include "TTree.h"
 
-#include "OpticalCluster.hh"
-#include "WireCluster.hh"
-#include "InputManager.hh"
-#include "ClusterEngine.hh"
-#include "ClusterEnergyEstimator.hh"
+#include "DataContainer/OpticalCluster.hh"
+#include "DataContainer/WireCluster.hh"
+#include "IO/InputManager.hh"
+#include "Algorithm/ClusterEngine.hh"
+#include "Algorithm/ClusterEnergyEstimator.hh"
 
 class OutputManager {
   

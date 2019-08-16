@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
     it.SetDistanceParametrisation(fInverse);
     it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
     std::cout << "In a time window of " << it.fBurstTimeWindow
-              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
+              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "% of the events." << std::endl;
     if(it.fFractionInTimeWindow<0 || it.fFractionInTimeWindow>1.01){
       std::cout << "The fraction in TimeWindow is bonkers!! ("
                 << it.fFractionInTimeWindow << ")" << std::endl;

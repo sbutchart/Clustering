@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
   std::map<double,Configuration> Configs;
   std::vector<double> multiplicator = {0.001,0.004,0.01,0.04,0.1,0.4,1.,4,10.};
   double precision=0.1;
+  (void)precision;
   for (auto const& mult: multiplicator) {
     Configuration c;
     c.fBackgroundRate = 0.011156559 + 0.044626238 * mult;
@@ -106,7 +107,7 @@ int main(int argc, char** argv) {
     c.SetDistanceParametrisation(fInverse);
     c.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(c.fBurstTimeWindow*1000));
     std::cout << "In a time window of " << c.fBurstTimeWindow
-              << "sec, you get " << std::setprecision(9) << 100.*c.fFractionInTimeWindow << "\% of the events." << std::endl;
+              << "sec, you get " << std::setprecision(9) << 100.*c.fFractionInTimeWindow << "% of the events." << std::endl;
 
     if(c.fFractionInTimeWindow<0 || c.fFractionInTimeWindow>1.01){
       std::cout << "The fraction in TimeWindow is bonkers!! ("

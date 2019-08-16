@@ -1,9 +1,9 @@
 #ifndef HIT_HH
 #define HIT_HH
 
-#include "SimpleGeom.hh"
+#include "Utils/SimpleGeom.hh"
 
-#include "Helper.h"
+#include "Utils/Helper.h"
 
 typedef std::pair<double,double> extent;
 

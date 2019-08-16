@@ -1,6 +1,6 @@
-#include "PhotonTimingDisplay.hh"
-#include "PhotonWirePositionDisplay.hh"
-#include "WirePositionTimingDisplay.hh"
+#include "EventDisplay/PhotonTimingDisplay.hh"
+#include "EventDisplay/PhotonWirePositionDisplay.hh"
+#include "EventDisplay/WirePositionTimingDisplay.hh"
 
 #include <iostream>
 #include <unistd.h>

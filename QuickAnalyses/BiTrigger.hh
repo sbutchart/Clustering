@@ -6,10 +6,10 @@
 #include "TH2D.h"
 #include "TPad.h"
 
-#include "Cluster.hh"
-#include "OpticalCluster.hh"
-#include "Trigger.hh"
-#include "WireCluster.hh"
+#include "DataContainer/Cluster.hh"
+#include "DataContainer/OpticalCluster.hh"
+#include "DataContainer/WireCluster.hh"
+#include "Algorithm/Trigger.hh"
 
 struct ClusterEnsemble {
   ClusterEnsemble():

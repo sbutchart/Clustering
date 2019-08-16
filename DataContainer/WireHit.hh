@@ -1,8 +1,8 @@
 #ifndef WIREHIT_HH
 #define WIREHIT_HH
-#include "Helper.h"
+#include "Utils/Helper.h"
 #include <iomanip>
-#include "Hit.hh"
+#include "DataContainer/Hit.hh"
 
 class WireHit: public Hit {
 public:

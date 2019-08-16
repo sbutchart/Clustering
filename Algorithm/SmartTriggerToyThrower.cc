@@ -1,4 +1,4 @@
-#include "SmartTriggerToyThrower.hh"
+#include "Algorithm/SmartTriggerToyThrower.hh"
 
 
 void SmartTriggerToyThrower::ThrowToys() {

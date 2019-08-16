@@ -1,5 +1,6 @@
+cmake_minimum_required(VERSION 3.13)
+
 project(DAQWork)
-message(${CMAKE_CXX_COMPILER})
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
 #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
@@ -35,126 +36,16 @@ find_package(Boost REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 
-#add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc SmartTrigger.cc SmartTriggerToyThrower.cc BiTrigger.cc)
-add_library(Clustering SHARED WireCluster.cc WireHit.cc OpticalCluster.cc OpticalHit.cc ClusterEngine.cc ClusterEnergyEstimator.cc Clustering.cc)
-target_link_libraries(Clustering ${ROOT_LIBRARIES})
-
-add_library(Display SHARED PhotonTimingDisplay.cc PhotonWirePositionDisplay.cc WirePositionTimingDisplay.cc)
-target_link_libraries(Display ${ROOT_LIBRARIES})
-
-add_library(SimpleOptHit SHARED HitSimplePlot.cc)
-target_link_libraries(SimpleOptHit ${ROOT_LIBRARIES})
-
-add_executable(RunDAQClustering RunDAQClustering.cxx)
-target_link_libraries(RunDAQClustering Clustering)
-
-add_executable(RunDAQClustering_PhotonOnly RunDAQClustering_PhotonOnly.cxx)
-target_link_libraries(RunDAQClustering_PhotonOnly Clustering)
-
-add_executable(RunDAQClustering_WireOnly RunDAQClustering_WireOnly.cxx)
-target_link_libraries(RunDAQClustering_WireOnly Clustering)
-
-add_executable(AnalyseOpticalCluster AnalyseOpticalCluster.cxx)
-target_link_libraries(AnalyseOpticalCluster Clustering)
-
-add_executable(AnalyseBackgroundOpticalCluster AnalyseBackgroundOpticalCluster.cxx)
-target_link_libraries(AnalyseBackgroundOpticalCluster Clustering)
-
-add_executable(OptimiseNHitCut OptimiseNHitCut.cxx)
-target_link_libraries(OptimiseNHitCut Clustering)
-
-add_executable(OptimiseNPECut OptimiseNPECut.cxx)
-target_link_libraries(OptimiseNPECut Clustering)
-
-add_executable(GetEffBackRate GetEffBackRate.cxx)
-target_link_libraries(GetEffBackRate Clustering)
-
-add_executable(RunEventDiplay RunEventDisplay.cxx)
-target_link_libraries(RunEventDiplay Display)
-
-add_executable(AnalyseDAQClustering AnalyseDAQClustering.cxx)
-target_link_libraries(AnalyseDAQClustering Clustering)
-
-add_executable(RunSimpleHitInfo RunSimpleHitInfo.cxx)
-target_link_libraries(RunSimpleHitInfo SimpleOptHit)
-
-add_executable(PDSTiming PDSTiming.cxx)
-target_link_libraries(PDSTiming ${ROOT_LIBRARIES})
-
-add_executable(NeutronInfo NeutronInfo.cxx)
-target_link_libraries(NeutronInfo ${ROOT_LIBRARIES})
-
-# add_executable(RunSmartTrigger RunSmartTrigger.cxx)
-# target_link_libraries(RunSmartTrigger Clustering)
-# target_link_libraries(RunSmartTrigger ${Gperftools_LIBRARIES})
-
-add_executable(RunSmartTriggerStatisticalTests RunSmartTriggerStatisticalTests.cxx)
-target_link_libraries(RunSmartTriggerStatisticalTests Clustering)
-# target_link_libraries(RunSmartTrigger ${Gperftools_LIBRARIES})
-
-add_executable(RunSmartTrigger RunSmartTrigger.cxx)
-target_link_libraries(RunSmartTrigger ${ROOT_LIBRARIES})
-
-# add_executable(ThrowToySmartTrigger ThrowToySmartTrigger.cxx)
-# target_link_libraries(ThrowToySmartTrigger Clustering)
-
-# add_executable(RunBiTrigger RunBiTrigger.cxx)
-# target_link_libraries(RunBiTrigger Clustering)
-
-add_executable(BackgroundRateCalculator BackgroundRateCalculator.cxx)
-target_link_libraries(BackgroundRateCalculator Clustering)
-
-add_executable(CreateReweightingScheme CreateReweightingScheme.cxx)
-target_link_libraries(CreateReweightingScheme ${ROOT_LIBRARIES})
-
-add_executable(AnalyseWireClustering_SolarNu AnalyseWireClustering_SolarNu.cxx)
-target_link_libraries(AnalyseWireClustering_SolarNu ${ROOT_LIBRARIES})
-
-add_executable(EfficiencyCalculator EfficiencyCalculator.cxx)
-target_link_libraries(EfficiencyCalculator Clustering)
-
-add_executable(DumpSNRate DumpRate.cxx)
-target_link_libraries(DumpSNRate ${ROOT_LIBRARIES}) 
-
-add_executable(MakePEPlotForJose MakePEPlotForJose.C)
-target_link_libraries(MakePEPlotForJose ${ROOT_LIBRARIES})
-
-add_executable(AnalyseInputFile AnalyseInputFile.cxx)
-target_link_libraries(AnalyseInputFile Clustering)
-
-add_executable(AnalyseInputFile_Arb AnalyseInputFile_Arb.cxx)
-target_link_libraries(AnalyseInputFile_Arb Clustering)
-
-add_executable(TotalNEvents TotalNEvents.C)
-target_link_libraries(TotalNEvents ${ROOT_LIBRARIES})
-
-add_executable(Optimiser Optimiser.cxx)
-target_link_libraries(Optimiser ${ROOT_LIBRARIES})
-
-
-# add_executable(Outlier Outlier.cxx)
-# target_link_libraries(Outlier ${ROOT_LIBRARIES})
-
-add_executable(PlotEfficiencyAtNCut PlotEfficiencyAtNCut.cxx)
-target_link_libraries(PlotEfficiencyAtNCut ${ROOT_LIBRARIES})
-
-add_executable(GetBackgroundRateAt50PerCent GetBackgroundRateAt50PerCent.cxx)
-target_link_libraries(GetBackgroundRateAt50PerCent ${ROOT_LIBRARIES})
-
-add_executable(RunThreshold RunThreshold.cxx)
-target_link_libraries(RunThreshold Clustering)
-
-add_executable(DumpForAI DumpForAI.cxx)
-target_link_libraries(DumpForAI ${ROOT_LIBRARIES})
-
-add_executable(DumpForAI_Arbitrary DumpForAI_Arbitrary.cxx)
-target_link_libraries(DumpForAI_Arbitrary Clustering)
-
-add_executable(RunXDependancy RunXDependancy.cxx)
-target_link_libraries(RunXDependancy Clustering)
-
-add_executable(timingTest timingTest.cxx)
-target_link_libraries(timingTest ${ROOT_LIBRARIES})
-
-add_executable(RunNeutronStudyInd NeutronStudyInd.cxx)
-target_link_libraries(RunNeutronStudyInd Clustering)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Algorithm)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Analyser)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/BurstTrigger)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Clustering)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/DataContainer)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Dumper)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/EventDisplay)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IO)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/QuickAnalyses)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/RadiologicalCheatGenerator)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/TDRPlots)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/TriggerDecision)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Utils)

@@ -1,8 +1,8 @@
 #ifndef SMARTTRIGGERTOYTHROWER_HH
 #define SMARTTRIGGERTOYTHROWER_HH
-#include "SmartTrigger.hh"
+#include "Algorithm/SmartTrigger.hh"
 
-#include "Helper.h"
+#include "Utils/Helper.h"
 
 #include "TRandom3.h"
 
@@ -10,9 +10,9 @@ class LikelihoodTriggerToyThrow {
 
 public:
   LikelihoodTriggerToyThrow(){}
-  ThrowToys() {
+  // ThrowToys() {
     
-  }
+  // }
   
 private:
   std::piecewise_constant_distribution<double> signal_background_distrib_;

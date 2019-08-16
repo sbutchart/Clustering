@@ -7,8 +7,8 @@
 #include <vector>
 #include <iostream>
 
-#include "OpticalCluster.hh"
-#include "WireCluster.hh"
+#include "DataContainer/OpticalCluster.hh"
+#include "DataContainer/WireCluster.hh"
 
 class InputManager{
 protected:

@@ -4,15 +4,15 @@
 #include <iostream>
 #include <vector>
 
-#include "ClusteringBase.hh"
-#include "InputManager.hh"
-#include "Helper.h"
+#include "Clustering/ClusteringBase.hh"
+#include "IO/InputManager.hh"
+#include "Utils/Helper.h"
 
-#include "OpticalCluster.hh"
-#include "WireCluster.hh"
-#include "ClusterEnergyEstimator.hh"
-#include "ClusterEngine.hh"
-#include "Trigger.hh"
+#include "DataContainer/OpticalCluster.hh"
+#include "DataContainer/WireCluster.hh"
+#include "Algorithm/ClusterEnergyEstimator.hh"
+#include "Algorithm/ClusterEngine.hh"
+#include "Algorithm/Trigger.hh"
 
 
 class Clustering: public ClusteringBase {

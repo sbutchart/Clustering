@@ -1,7 +1,7 @@
 #ifndef PHOTONTIMINGDISPLAY_HH
 #define PHOTONTIMINGDISPLAY_HH
 
-#include "Display.hh"
+#include "EventDisplay/Display.hh"
 #include "TArrow.h"
 #include "TLatex.h"
 

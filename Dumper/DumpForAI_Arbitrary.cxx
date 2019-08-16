@@ -10,9 +10,9 @@
 #include <limits>
 #include <fstream>
 
-#include "ArbitraryAnaInputManager.hh"
-#include "ClusterEngine.hh"
-#include "Trigger.hh"
+#include "IO/ArbitraryAnaInputManager.hh"
+#include "Algorithm/ClusterEngine.hh"
+#include "Algorithm/Trigger.hh"
 
 
 int main(int argc, char** argv){

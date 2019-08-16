@@ -15,9 +15,9 @@
 #include "TProfile.h"
 #include "TTree.h"
 
-#include "Helper.h"
-#include "ClusterEngine.hh"
-#include "Trigger.hh"
+#include "Utils/Helper.h"
+#include "Algorithm/ClusterEngine.hh"
+#include "Algorithm/Trigger.hh"
 
 struct WrongFileException : public std::exception{
   const char * what () const throw () {

@@ -1,4 +1,4 @@
-#include "PhotonTimingDisplay.hh"
+#include "EventDisplay/PhotonTimingDisplay.hh"
 
 PhotonTimingDisplay::PhotonTimingDisplay(const std::string F, const std::string T): Display(F,T) {
   fPE_Mode = false;

@@ -135,7 +135,7 @@ TH1D* makeSNProbabilityVDistance()
                                     0.074,0.0605,  0.05, 0.038, 0.0255, 0.018, 0.012, 0.008, 0.0055, 0.0025, 0.002,  0.0015,  0.001, 
                                     0.0005, 0.0005,   0,    0};
 
-  for(unsigned int i = 1; i < h_SNProbabilityVDistance->GetSize()-1; i++)
+  for(int i = 1; i < h_SNProbabilityVDistance->GetSize()-1; i++)
   {
     h_SNProbabilityVDistance->SetBinContent(i,SNProb[i-1]);
   }

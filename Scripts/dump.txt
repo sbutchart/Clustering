@@ -1,0 +1,118 @@
+Run     20000047
+Subrun  0
+Event   27
+Channel 15152
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11178575_1079/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10808352_564_20180814T061418_g4_detsim-266d0ed7f-eeef-4a60-b009-48482a6381c5_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/61/26/04/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10808352_564_20180814T061418_g4_detsim-66d0ed7f-eeef-4a60-b009-48482a6381c5.root
+
+Run     20000047
+Subrun  0
+Event   48
+Channel 17575
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11178582_1080/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10808352_272_20180814T061127_g4_detsim-b108ce61-c6c1-4e78-bc46-0cf69dff8871_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/61/23/32/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10808352_272_20180814T061127_g4_detsim-b108ce61-c6c1-4e78-bc46-0cf69dff8871.root
+
+Run     20000047
+Subrun  0
+Event   29
+Channel 22129
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11178678_1104/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_352_20180814T121336_g4_detsim-496b4c32-cbd0-4f85-a32b-dff7010cca06_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/71/85/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_352_20180814T121336_g4_detsim-496b4c32-cbd0-4f85-a32b-dff7010cca06.root
+
+Run     20000047
+Subrun  0
+Event   83
+Channel 22797
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11179333_1226/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_997_20180814T122604_g4_detsim-82eb22f6-a671-4411-89cf-df524ce551de_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/50/80/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_997_20180814T122604_g4_detsim-82eb22f6-a671-4411-89cf-df524ce551de.root
+
+Run     20000047
+Subrun  0
+Event   27
+Channel 19807
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11179955_240/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_770_20180814T081346_g4_detsim-2c93d33b-42de-47dc-8294-7011e1405008_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/61/99/20/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_770_20180814T081346_g4_detsim-2c93d33b-42de-47dc-8294-7011e1405008.root
+
+Run     20000047
+Subrun  0
+Event   28
+Channel 30615
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11180099_282/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10809612_662_20180814T071400_g4_detsim-0f03cb63-7af7-4f42-9e93-a487acca1107_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/61/69/57/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10809612_662_20180814T071400_g4_detsim-0f03cb63-7af7-4f42-9e93-a487acca1107.root
+
+Run     20000047
+Subrun  0
+Event   70
+Channel 9947
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11180299_333/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_312_20180814T121319_g4_detsim-8f337826-804a-4a3b-84bc-185efbfba659_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/52/40/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_312_20180814T121319_g4_detsim-8f337826-804a-4a3b-84bc-185efbfba659.root
+
+Run     20000047
+Subrun  0
+Event   73
+Channel 2243
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11180753_441/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_221_20180814T121217_g4_detsim-3cf2499c-087b-4c73-bbb3-356c2a5dfdb8_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/52/78/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10817266_221_20180814T121217_g4_detsim-3cf2499c-087b-4c73-bbb3-356c2a5dfdb8.root
+
+Run     20000047
+Subrun  0
+Event   47
+Channel 22528
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181127_525/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10887276_135_20180822T201620_g4_detsim-5b590d54-89c1-4a71-a5c9-58a38c3d8b5d_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/77/38/69/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10887276_135_20180822T201620_g4_detsim-5b590d54-89c1-4a71-a5c9-58a38c3d8b5d.root
+
+Run     20000047
+Subrun  0
+Event   54
+Channel 14962
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181156_530/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10809612_928_20180814T071610_g4_detsim-abd34372-2c71-4568-b7c3-4e523fe5fe40_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/61/85/62/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10809612_928_20180814T071610_g4_detsim-abd34372-2c71-4568-b7c3-4e523fe5fe40.root
+
+Run     20000047
+Subrun  0
+Event   70
+Channel 2100
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181363_593/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_715_20180814T091243_g4_detsim-7662aa34-e8e5-46a1-b6fa-cc7bb9ccfa39_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/62/44/02/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_715_20180814T091243_g4_detsim-7662aa34-e8e5-46a1-b6fa-cc7bb9ccfa39.root
+
+Run     20000047
+Subrun  0
+Event   83
+Channel 6988
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181705_758/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_94_20180814T081104_g4_detsim-f96483cb-c034-4727-a0db-1308104bb93c_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/62/17/00/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_94_20180814T081104_g4_detsim-f96483cb-c034-4727-a0db-1308104bb93c.root
+
+Run     20000047
+Subrun  0
+Event   83
+Channel 25003
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181794_803/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_758_20180814T081346_g4_detsim-b263bc19-552a-4a88-8d64-0c33f9722012_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/62/09/55/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670400_758_20180814T081346_g4_detsim-b263bc19-552a-4a88-8d64-0c33f9722012.root
+
+Run     20000047
+Subrun  0
+Event   33
+Channel 17647
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181824_817/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_886_20180814T091522_g4_detsim-a85b4fd0-050f-40a7-b57a-b55101df5564_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/62/48/67/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_886_20180814T091522_g4_detsim-a85b4fd0-050f-40a7-b57a-b55101df5564.root
+
+Run     20000047
+Subrun  0
+Event   44
+Channel 6804
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181839_827/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10811874_735_20180814T111214_g4_detsim-bf28a9f2-cf94-4d24-ab37-613257e9727f_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/26/74/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10811874_735_20180814T111214_g4_detsim-bf28a9f2-cf94-4d24-ab37-613257e9727f.root
+
+Run     20000047
+Subrun  0
+Event   44
+Channel 7319
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11181938_886/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_519_20180814T091029_g4_detsim-7318a36a-b61b-4309-a84e-ac08bff03f5d_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/62/47/39/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10670425_519_20180814T091029_g4_detsim-7318a36a-b61b-4309-a84e-ac08bff03f5d.root
+
+Run     20000047
+Subrun  0
+Event   83
+Channel 17739
+File    /pnfs/dune/persistent/users/rodriges/mcc11_snb_radiologicals_snana_defaultnoise_pdreco/output/11182064_947/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10677161_859_20180814T131517_g4_detsim-c280a978-363a-4dda-9f8a-c4ec54136e53_defaultnoise_pdreco_snana.root
+enstore:/pnfs/dune/tape_backed/dunepro/mcc11/mc/detector-simulated/04/63/94/56/prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_10677161_859_20180814T131517_g4_detsim-c280a978-363a-4dda-9f8a-c4ec54136e53.root

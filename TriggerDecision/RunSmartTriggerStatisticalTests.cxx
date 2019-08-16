@@ -6,8 +6,8 @@
 // Copyright: 2019 (C) Pierre Lasorak
 //
 //
-#include "Helper.h"
-#include "MyCLI11.hh"
+#include "Utils/Helper.h"
+#include "Utils/CLI11.hpp"
 
 #include "TCanvas.h"
 #include "TColor.h"

@@ -2,8 +2,8 @@
 #define CLUSTERENGINE_HH
 #include <time.h>
 
-#include "WireCluster.hh"
-#include "OpticalCluster.hh"
+#include "DataContainer/WireCluster.hh"
+#include "DataContainer/OpticalCluster.hh"
 
 class ClusterEngine{
 
