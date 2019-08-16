@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
   efficiencies.Write("Efficiencies");
 
 
-  double scaleBackground = 1. / 2.2e-3 / nBackgroundEventGenerated;
+  double scaleBackground = 1. / 2.2e-3 / nBackgroundEventGenerated / 0.12;
   for (auto const& it: PDF_Background_config_notype) {
     it.second->Scale(scaleBackground);
     it.second->Write();

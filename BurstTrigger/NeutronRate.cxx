@@ -23,6 +23,9 @@
 
 const bool reproduceAlexResult = false;
 
+static const int nneutrino=10;
+static const std::string axisstr="SN triggering efficiency LMC";
+
 int main(int argc, char** argv) {
 
   int opt;
@@ -47,21 +50,22 @@ int main(int argc, char** argv) {
       OutputRootFile = optarg;
       break;
     case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
+      std::cerr << "Unknown option: '" << char(optopt) << "!" << std::endl;
       break;
     }
   }
     
-  std::vector<Configuration> Configs;
+  std::map<double,Configuration> Configs;
+  std::vector<double> multiplicator = {0.001,0.004,0.01,0.04,0.1,0.4,1.,4,10.};
   double precision=0.1;
-  for (double f=0; f<=100; f=f+precision) {
+  for (auto const& mult: multiplicator) {
     Configuration c;
-    c.fBackgroundRate = 0.0178016 + 0.044504 * f;
+    c.fBackgroundRate = 0.011156559 + 0.044626238 * mult;
     c.fBurstTimeWindow = 10;
-    c.fClusterEfficiency = 0.35;
-    Configs.push_back(c); 
+    c.fClusterEfficiency = 0.328914;
+    Configs[mult*100.] = c; 
   }
-  
+
   if (Configs.size() == 0) {
     std::cout << "No Config parsed." << std::endl;
   } else {
@@ -93,61 +97,64 @@ int main(int argc, char** argv) {
   
   SNBurstTrigger snb;
   snb.SetPoissonStatThreshold(100);
-  
+  std::map<double,double> Efficiency;
+
   //LOOP AROUND THE CLUSTERING CONFIGURATIONS.    
   for(auto& it : Configs){
-    it.SetDistanceProbability    (hSNProbabilityVDistance);
-    it.SetDistanceParametrisation(fInverse);
-    it.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(it.fBurstTimeWindow*1000));
-    std::cout << "In a time window of " << it.fBurstTimeWindow
-              << "sec, you get " << std::setprecision(9) << 100.*it.fFractionInTimeWindow << "\% of the events." << std::endl;
+    Configuration c = it.second;
+    c.SetDistanceProbability    (hSNProbabilityVDistance);
+    c.SetDistanceParametrisation(fInverse);
+    c.fFractionInTimeWindow = hTimeProfile->Integral(0,hTimeProfile->FindBin(c.fBurstTimeWindow*1000));
+    std::cout << "In a time window of " << c.fBurstTimeWindow
+              << "sec, you get " << std::setprecision(9) << 100.*c.fFractionInTimeWindow << "\% of the events." << std::endl;
 
-    if(it.fFractionInTimeWindow<0 || it.fFractionInTimeWindow>1.01){
+    if(c.fFractionInTimeWindow<0 || c.fFractionInTimeWindow>1.01){
       std::cout << "The fraction in TimeWindow is bonkers!! ("
-                << it.fFractionInTimeWindow << ")" << std::endl;
+                << c.fFractionInTimeWindow << ")" << std::endl;
       exit(1);
     }
     if (reproduceAlexResult) {
       snb.SetPoissonStatThreshold(0);
-      it.fFractionInTimeWindow = 1;
+      c.fFractionInTimeWindow = 1;
     }
-    snb.FillFakeRateNClusters(it);
-    snb.FindOnePerMonthFakeRate(it);
-    std::cout << "c.fNClusterCut " << it.fNClusterCut <<std::endl;
-    snb.FillEfficiencyBurst(it, 10, 11);
-    snb.FillEfficiencyBurst(it);
-    // it.FillHistograms();
-    // it.DumpAndPlot();
+    snb.FillFakeRateNClusters(c);
+    snb.FindOnePerMonthFakeRate(c);
+    std::cout << "c.fNClusterCut " << c.fNClusterCut <<std::endl;
+    snb.FillEfficiencyBurst(c, nneutrino, nneutrino+1);
+    std::cout << c.fEfficiency_Burst.at(nneutrino) << "\n";
+    Efficiency[it.first] = c.fEfficiency_Burst.at(nneutrino);
   }
 
 
   TCanvas can;
   can.Print("NeutronBurstRate.pdf[");
 
-  TGraph* effLMC = new TGraph((int)2/precision);
+  TGraph* effLMC = new TGraph(multiplicator.size());
   effLMC->SetLineWidth(2);
 
-  TGraph* CutLMC = new TGraph((int)2/precision);
+  TGraph* CutLMC = new TGraph(multiplicator.size());
   CutLMC->SetLineWidth(2);
-
   int globalIt=0;
-  for (auto& ThisConfig : Configs) {
-    double f=globalIt*precision;
-    effLMC->SetPoint(globalIt, f, ThisConfig.fEfficiency_Burst.at(10));
-    CutLMC->SetPoint(globalIt, f, ThisConfig.fNClusterCut);
+  
+  for (auto& it : Efficiency) {
+    double rate = it.first;
+    effLMC->SetPoint(globalIt, rate, it.second);
+    //CutLMC->SetPoint(globalIt, rate, it.second.fNClusterCut);
     globalIt++;
   }
   effLMC->SetMaximum(1);
-  effLMC->SetMinimum(1e-5);
+  effLMC->SetMinimum(0.);
   gPad->SetGridx();
   gPad->SetGridy();
-  gPad->SetLogy();
+  // gPad->SetLogy();
   gPad->SetLogx();
-  effLMC->SetTitle(";Neutron rate [#times default];SN triggering efficiency at 10 evts");
+  effLMC->SetTitle((";Neutron capture rate [Hz];"+axisstr).c_str());
+  
   effLMC->Draw();
+  effLMC->GetXaxis()->SetTitleOffset(1.5*effLMC->GetXaxis()->GetTitleOffset());
   can.Print("NeutronBurstRate.pdf");
   can.Clear();
-  CutLMC->SetTitle(";Neutron rate [#times default];SN triggering threshold");
+  CutLMC->SetTitle(";Neutron capture rate [Hz];SN triggering threshold");
   CutLMC->Draw();
   can.Print("NeutronBurstRate.pdf");
   can.Print("NeutronBurstRate.pdf]");
@@ -159,9 +166,10 @@ int main(int argc, char** argv) {
   TTree* tree = new TTree("Configurations","Configurations");
   tree->Branch("Configuration", &Con);
   for (auto& it: Configs) {
-    Con = &it;
+    Con = &it.second;
     tree->Fill();
   }
+  effLMC->Write();
   tree->Write();
   fOutput->Close();
   return 0;

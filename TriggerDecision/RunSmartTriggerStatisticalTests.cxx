@@ -41,15 +41,29 @@ vector<pair<TH1D*,TH1D*>> PlotHistos(vector<pair<vector<double>,vector<double>>>
   vector<int> ColorBank {kBlack};
   vector<pair<TH1D*,TH1D*>> histo_to_plot;
 
-  for (auto const& it: vec_to_plot) {
-    if (it.first.size()==0) continue;
-    double max1 = *max_element(it.first.begin(), it.first.end());
-    double min1 = *min_element(it.first.begin(), it.first.end());
-    //double max2 = *max_element(it.second.begin(), it.second.end());
-    double min2 = *min_element(it.second.begin(), it.second.end());
 
-    pair<TH1D*,TH1D*> histo_pair = make_pair(new TH1D("", "", 50, min(min1, min2)*0.8, max1*1.2),
-                                             new TH1D("", "", 50, min(min1, min2)*0.8, max1*1.2));
+  for (size_t i=0; i<vec_to_plot.size(); ++i) {
+    auto const& it = vec_to_plot[i];
+    if (it.first.size()==0) continue;
+    double max1 = *max_element(it.first .begin(), it.first .end());
+    double min1 = *min_element(it.first .begin(), it.first .end());
+    double max2 = *max_element(it.second.begin(), it.second.end());
+    double min2 = *min_element(it.second.begin(), it.second.end());
+    double gmin = min(min1, min2);
+    double gmax = max(max1, max2);
+    gmax = max1;
+    
+    if (names[i] == "loglikelihood" || names[i] == "loglikelihoodnorm")
+      gmin = min1;
+      
+    if (gmin < 0) gmin = gmin * 1.2;
+    else gmin = gmin * 0.8;
+
+    if (gmax < 0) gmax = gmax * 0.8;
+    else gmax = gmax * 1.2;
+      
+    pair<TH1D*,TH1D*> histo_pair = make_pair(new TH1D("", "", 100, gmin, gmax),
+                                             new TH1D("", "", 100, gmin, gmax));
     for (auto const& it2: it.first) {
       histo_pair.first->Fill(it2);
     }
@@ -57,21 +71,22 @@ vector<pair<TH1D*,TH1D*>> PlotHistos(vector<pair<vector<double>,vector<double>>>
       histo_pair.second->Fill(it2);
     }
     AddOverflow(histo_pair.second);
+    AddUnderflow(histo_pair.second);
     histo_to_plot.push_back(histo_pair);
   }
 
   
   for (size_t it=0; it<histo_to_plot.size(); ++it) {
     string title = titles[it]+";"+xaxis[it]+";nToys";
-    TLegend* leg = new TLegend(0.6, 0.7, 0.9, 0.9);
+    TLegend* leg = new TLegend(0.6, 0.8, 0.9, 0.9);
 
     histo_to_plot[it].first ->SetLineColor(ColorBank[it%ColorBank.size()]);
     histo_to_plot[it].second->SetLineColor(ColorBank[it%ColorBank.size()]);
     histo_to_plot[it].first ->SetLineStyle(1);
     histo_to_plot[it].second->SetLineStyle(2);
     
-    histo_to_plot[it].first->SetMaximum(10.*max(histo_to_plot[it].first->GetMaximum(), histo_to_plot[it].second->GetMaximum()));
-    histo_to_plot[it].first->SetMinimum(0.8*min(histo_to_plot[it].first->GetMinimum(0.0), histo_to_plot[it].second->GetMinimum(0.0)));
+    histo_to_plot[it].first->SetMaximum(100.*max(histo_to_plot[it].first->GetMaximum(), histo_to_plot[it].second->GetMaximum()));
+    histo_to_plot[it].first->SetMinimum(0.8 *min(histo_to_plot[it].first->GetMinimum(0.0), histo_to_plot[it].second->GetMinimum(0.0)));
     histo_to_plot[it].first ->SetTitle(title.c_str());
     histo_to_plot[it].second->SetTitle(title.c_str());
     histo_to_plot[it].first ->SetName((names[it]+"_back"    ).c_str());
@@ -266,8 +281,9 @@ double GetChiSquare(TH1D* test, TH1D* pdf) {
 
 double GetChiSquareNormalisation(TH1D* test, TH1D* pdf) {
   
-  AssertGoodHistos(test,pdf);
-  
+//  AssertGoodHistos(test,pdf);
+  (void)test;
+  (void)pdf;
   TH1D* test_norm = new TH1D("test_norm", "test_norm", 1, 0, 1);
   TH1D* pdf_norm  = new TH1D("pdf_norm",  "pdf_norm",  1, 0, 1);
 
@@ -278,26 +294,68 @@ double GetChiSquareNormalisation(TH1D* test, TH1D* pdf) {
   
   delete test_norm;
   delete pdf_norm;
-  
+  test_norm = NULL;
+  pdf_norm  = NULL;
+
   return Chi2;
 }
 
+static int ntimes=0;
 double GetLikelihoodStat(TH1D* test, TH1D* pdf) {
+  
   double llh=0;
   for (int iBin=0; iBin<=test->GetNcells(); ++iBin) {
-    if (pdf->GetBinContent(iBin) == 0)
-      llh += +50;
-    else {
-      double f= TMath::Factorial(test->GetBinContent(iBin));
-      if (f != f) continue;
-      double contrib = -2*TMath::Log(TMath::Power(pdf->GetBinContent(iBin), test->GetBinContent(iBin)) * TMath::Exp(-pdf->GetBinContent(iBin)) / f);
+    double pdfi  = pdf ->GetBinContent(iBin);
+    double testi = test->GetBinContent(iBin);
+    if (pdfi == 0 && testi == 0) {
+      continue;
+    } else if (pdfi != 0 && testi == 0) {
+      llh += -2 * pdfi;
+    } else if (pdfi == 0 && testi != 0) {
+      llh += -100;
+    } else {
+      double contrib = -2 * (testi * TMath::Log(testi / pdfi) + (pdfi - testi));
       if (contrib != contrib || isinf(contrib)) contrib = 0;
       llh += contrib;
     }
   }
+  
+  if (llh > -5 && ntimes < 0) {
+    std::cout << llh << "\n";
+    TCanvas c;
+    c.cd();
+    test->SetStats(1);
+    test->SetLineColor(kBlue);
+    pdf ->SetLineColor(kRed);
+    TText tex(140, 0.4, Form("LLH = %f",llh));
+    test->Draw();
+    pdf ->Draw("SAME");
+    tex.Draw();
+    c.SaveAs(Form("ZeroLLH_%i.png",ntimes));
+    ntimes++;
+  }
   return llh;
 }
 
+double GetLikelihoodStatNorm(TH1D* test, TH1D* pdf) {
+  
+//  AssertGoodHistos(test,pdf);
+
+  TH1D* test_norm = new TH1D("test_norm", "test_norm", 1, 0, 1);
+  TH1D* pdf_norm  = new TH1D("pdf_norm",  "pdf_norm",  1, 0, 1);
+
+  test_norm->SetBinContent(1, test->Integral());
+  pdf_norm ->SetBinContent(1, pdf ->Integral());
+  
+  double Chi2 = GetLikelihoodStat(test_norm, pdf_norm);
+  
+  delete test_norm;
+  delete pdf_norm;
+  test_norm = NULL;
+  pdf_norm  = NULL;
+
+  return Chi2;
+}
 double GetChiSquareShape(TH1D* test, TH1D* pdf) {
   
   AssertGoodHistos(test,pdf);
@@ -331,7 +389,8 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
   background->SetDefaultBufferSize(0);
   signal    ->BufferEmpty(0);
   background->BufferEmpty(0);
-  
+
+  background->Scale(1./0.12); //forgot the detector scaling here....
   double efficiency = (*efficiencies)[config];
   double background_rate = background->Integral();
   background->Scale(10);
@@ -351,7 +410,7 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
   
   TText text_eff (8, 0.9*max_h, Form("Individual SN event efficiency = %.f%%", efficiency*100));
   TText text_back(8, 0.8*max_h, Form("Background rate = %f Hz", background_rate));
-  text_eff.SetTextSize(0.04);
+  text_eff .SetTextSize(0.04);
   text_back.SetTextSize(0.04);
   signal->SetStats(0);
   signal->SetMaximum(max_h);
@@ -374,24 +433,25 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
   pair<vector<double>,vector<double>> CVMStat;
   pair<vector<double>,vector<double>> AndersonDarlingStat;
   pair<vector<double>,vector<double>> LikelihoodStat;
+  pair<vector<double>,vector<double>> LikelihoodStatNorm;
   CurrentProg=0;
   TCanvas bank_shape, bank_absol;
 
   bank_shape.Print(Form("Bank_Shape_Config_%i.pdf[",config));
   bank_absol.Print(Form("Bank_Absol_Config_%i.pdf[",config));
 
-  TH1D* Clock = new TH1D("Clock", ";nToy;Time [ms]", nToy, 0, nToy);
+  //TH1D* Clock = new TH1D("Clock", ";nToy;Time [ms]", nToy, 0, nToy);
 
   for (int iToy=0; iToy<nToy; ++iToy) {
     PrintProgress(iToy, nToy);
     
-
     TH1D* background_trial = (TH1D*)background->Clone();
     TH1D* signal_trial     = (TH1D*)signal->Clone();
     
     background_trial->Reset();
     signal_trial    ->Reset();
-    
+    background_trial->SetName("BACKGROUND");
+    signal_trial    ->SetName("BACKGROUND+SIGNAL");
     int nBackground          = rand.Poisson(background_rate * 10);
     int nSignalAndBackground = rand.Poisson(background_rate * 10) + rand.Poisson(efficiency * 10);
     
@@ -404,13 +464,10 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
     for (int iSignalAndBackground=0; iSignalAndBackground<nSignalAndBackground; ++iSignalAndBackground) {
       signal_trial->Fill(signal->GetRandom());
     }
-    
+    //auto startTime=std::chrono::steady_clock::now();
+
     Chi2Absolute.first         .push_back(GetChiSquare             (background_trial, background));
-
-    auto startTime=std::chrono::steady_clock::now();
     Chi2Normalisation.first    .push_back(GetChiSquareNormalisation(background_trial, background));
-    auto now=std::chrono::steady_clock::now();
-
     Chi2Shape.first            .push_back(GetChiSquareShape        (background_trial, background));
     BinomialNormalisation.first.push_back(GetBinomialTest          (background_trial, background));
     GeometricalTest.first      .push_back(GetGeometricalTest       (background_trial, background));
@@ -418,7 +475,8 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
     CVMStat.first              .push_back(GetCVMStat               (background_trial, background));
     AndersonDarlingStat.first  .push_back(GetAndersonDarlingStat   (background_trial, background));
     LikelihoodStat.first       .push_back(GetLikelihoodStat        (background_trial, background));
-    
+    LikelihoodStatNorm.first   .push_back(GetLikelihoodStatNorm    (background_trial, background));
+
     Chi2Absolute.second         .push_back(GetChiSquare             (signal_trial,     background));
     Chi2Normalisation.second    .push_back(GetChiSquareNormalisation(signal_trial,     background));
     Chi2Shape.second            .push_back(GetChiSquareShape        (signal_trial,     background));
@@ -428,60 +486,71 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
     CVMStat.second              .push_back(GetCVMStat               (signal_trial,     background));
     AndersonDarlingStat.second  .push_back(GetAndersonDarlingStat   (signal_trial,     background));
     LikelihoodStat.second       .push_back(GetLikelihoodStat        (signal_trial,     background));
+    LikelihoodStatNorm.second   .push_back(GetLikelihoodStatNorm    (signal_trial,     background));
 
     //std::cout << std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count() << "\n";
-    Clock->Fill(iToy, std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count());
+    //auto now=std::chrono::steady_clock::now();
+
+    // Clock->Fill(iToy, std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count());
     
-    if (iToy<-1) {
-      TH1D* background_trial_shape = (TH1D*)background_trial->Clone();
-      TH1D* signal_trial_shape     = (TH1D*)signal_trial    ->Clone();
+    // if (iToy<-1) {
+    //   TH1D* background_trial_shape = (TH1D*)background_trial->Clone();
+    //   TH1D* signal_trial_shape     = (TH1D*)signal_trial    ->Clone();
       
-      background_trial_shape->SetLineColor(kBlue);
-      signal_trial_shape    ->SetLineColor(kRed);
+    //   background_trial_shape->SetLineColor(kBlue);
+    //   signal_trial_shape    ->SetLineColor(kRed);
       
-      bank_absol.cd();
+    //   bank_absol.cd();
    
-      background_trial->SetMaximum(1.2*max(background_trial->GetMaximum(),
-                                           signal_trial->GetMaximum()));
+    //   background_trial->SetMaximum(1.2*max(background_trial->GetMaximum(),
+    //                                        signal_trial->GetMaximum()));
 
-      background_trial_shape->Draw();
-      signal_trial_shape    ->Draw("SAME");
-      bank_absol.Print(Form("Bank_Absol_Config_%i.pdf",config));
+    //   background_trial_shape->Draw();
+    //   signal_trial_shape    ->Draw("SAME");
+    //   bank_absol.Print(Form("Bank_Absol_Config_%i.pdf",config));
 
-      if(background_trial_shape->Integral()>0)background_trial_shape->Scale(1./background_trial_shape->Integral());
-      if(signal_trial_shape    ->Integral()>0)signal_trial_shape    ->Scale(1./signal_trial_shape    ->Integral());
+    //   if(background_trial_shape->Integral()>0)background_trial_shape->Scale(1./background_trial_shape->Integral());
+    //   if(signal_trial_shape    ->Integral()>0)signal_trial_shape    ->Scale(1./signal_trial_shape    ->Integral());
       
-      bank_shape.cd();
-      background_trial_shape->SetMaximum(1.2*max(background_trial_shape->GetMaximum(),
-                                                 signal_trial_shape->GetMaximum()));
-      background_trial_shape->SetStats(0);
-      background_trial_shape->Draw();
-      signal_trial_shape    ->Draw("SAME");
-      TLatex chi2_1(100,0.9*background_trial_shape->GetMaximum(),Form("#chi^{2}_{signal+background} = %f", Chi2Shape.second.back()));
-      TLatex chi2_2(100,0.8*background_trial_shape->GetMaximum(),Form("#chi^{2}_{background} = %f", Chi2Shape.first.back()));
-      chi2_1.Draw();
-      chi2_2.Draw();
-      bank_shape.Print(Form("Bank_Shape_Config_%i.pdf",config));
-    }
-    
+    //   bank_shape.cd();
+    //   background_trial_shape->SetMaximum(1.2*max(background_trial_shape->GetMaximum(),
+    //                                              signal_trial_shape->GetMaximum()));
+    //   background_trial_shape->SetStats(0);
+    //   background_trial_shape->Draw();
+    //   signal_trial_shape    ->Draw("SAME");
+    //   TLatex chi2_1(100,0.9*background_trial_shape->GetMaximum(),Form("#chi^{2}_{signal+background} = %f", Chi2Shape.second.back()));
+    //   TLatex chi2_2(100,0.8*background_trial_shape->GetMaximum(),Form("#chi^{2}_{background} = %f", Chi2Shape.first.back()));
+    //   chi2_1.Draw();
+    //   chi2_2.Draw();
+    //   bank_shape.Print(Form("Bank_Shape_Config_%i.pdf",config));
+    // }
+
+    delete background_trial;
+    delete signal_trial;
   }
   bank_shape.Print(Form("Bank_Shape_Config_%i.pdf]",config));
   bank_absol.Print(Form("Bank_Absol_Config_%i.pdf]",config));
-  TCanvas time_prof_canvas;
-  time_prof_canvas.Print("time_prof_canvas.pdf[");
-  time_prof_canvas.cd();
-  Clock->Draw();
-  time_prof_canvas.Print("time_prof_canvas.pdf");
-  time_prof_canvas.Print("time_prof_canvas.pdf]");
+  // TCanvas time_prof_canvas;
+  // time_prof_canvas.Print("time_prof_canvas.pdf[");
+  // time_prof_canvas.cd();
+  // Clock->Draw();
+  // time_prof_canvas.Print("time_prof_canvas.pdf");
+  // time_prof_canvas.Print("time_prof_canvas.pdf]");
 
   vector<pair<vector<double>,vector<double>>> Chi2Plot {Chi2Absolute, Chi2Normalisation, Chi2Shape,
                                                         BinomialNormalisation, GeometricalTest,
-                                                        KSStat, CVMStat, AndersonDarlingStat, LikelihoodStat};
+                                                        KSStat, CVMStat, AndersonDarlingStat, LikelihoodStat, LikelihoodStatNorm};
+//  vector<pair<vector<double>,vector<double>>> Chi2Plot {Chi2Absolute, Chi2Normalisation, BinomialNormalisation, LikelihoodStat};
+  //vector<pair<vector<double>,vector<double>>> Chi2Plot {};
+  // vector<string> Chi2Title  {"Full #chi^{2}", "#chi^{2} (Normalisation only)", "Binomial Normalisation Test", "Likelihood", "Likelihood Normalisation"};
+  // vector<string> Chi2XName {"#chi^{2}", "#chi^{2}", "Binomial test", "-2log(L)", "-2log(L)"};
+  // vector<string> Chi2Name  {"chi2", "chi2_norm", "binom_test", "loglikelihood", "loglikelihoodnorm"};
+
   vector<string> Chi2Title  {"Full #chi^{2}", "#chi^{2} (Normalisation only)", "#chi^{2} (Shape only)",
                             "Binomial Normalisation Test", "Bhattacharyya Distance Test",
-                            "Kolmogorov Smirnov", "Cramer Von Mises", "Anderson Darling", "Likelihood"};
-  vector<string> Chi2XName {"#chi^{2}", "#chi^{2}", "#chi^{2}", "Binomial test", "BDM", "KS", "CVM", "AD", "-2log(L)"};
-  vector<string> Chi2Name  {"chi2", "chi2_norm", "chi2_shape", "binom_test", "BDM", "KS", "CVM", "AD", "loglikelihood"};
+                             "Kolmogorov Smirnov", "Cramer Von Mises", "Anderson Darling", "Likelihood", "Likelihood Normalisation"};
+  vector<string> Chi2XName {"#chi^{2}", "#chi^{2}", "#chi^{2}", "Binomial test", "BDM", "KS", "CVM", "AD", "-2log(L)", "-2log(L)"};
+  vector<string> Chi2Name  {"chi2", "chi2_norm", "chi2_shape", "binom_test", "BDM", "KS", "CVM", "AD", "loglikelihood", "loglikelihoodnorm"};
   c.cd();
   vector<pair<TH1D*,TH1D*>> histos = PlotHistos(Chi2Plot, Chi2Title, Chi2Name, Chi2XName);
 
@@ -501,7 +570,9 @@ void AnalyseConfig(int config, TFile* file, int nToy) {
     vector<double> yval;
     if (name != "Bhattacharyya Distance Test" &&
         name != "Kolmogorov Smirnov" &&
-        name != "Binomial Normalisation Test") {
+        name != "Binomial Normalisation Test" &&
+        name != "Likelihood" &&
+        name != "Likelihood Normalisation") {
       for (int iBin=0; iBin<=it.first->GetNcells(); ++iBin) {
         if (it.first->GetBinContent(iBin) !=0 || it.second->GetBinContent(iBin) != 0) {
           yval.push_back(it.second->Integral(iBin,nbins) / total_integral_signback);
@@ -591,4 +662,4 @@ int main(int argc, char** argv) {
 // EOF
 //
 //____________________________________________________________________ 
-//  
+//

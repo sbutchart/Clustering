@@ -78,7 +78,7 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
 
   
   for(int Burst=burstMin; Burst<burstMax; Burst++){
-    if (Burst%10000==0) std::cout << "Burst " << Burst << " / " << burstMax << std::endl;
+    if (Burst) std::cout << "Burst " << Burst << " / " << burstMax << std::endl;
     if (IsOne) {
       c.fEfficiency_Burst[Burst] = 1;
       continue;
@@ -96,7 +96,7 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
       continue;
     }
 
-      for (int i=1; i<NMaxClusters+1; ++i) {
+    for (int i=1; i<NMaxClusters+1; ++i) {
       double BinCenter = Poisson->GetBinCenter(i);
       Poisson->SetBinContent(i, TMath::PoissonI(BinCenter,TotalClusters));
     }

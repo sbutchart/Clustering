@@ -770,6 +770,20 @@ inline void AddOverflow(TH1D& histo){
   histo.SetBinContent(histo.GetXaxis()->GetNbins()+1,0);
 }
 
+inline void AddUnderflow(TH1D* histo){
+  histo->SetBinContent(1,
+                       histo->GetBinContent(0)+
+                       histo->GetBinContent(1));
+  histo->SetBinContent(0,0);
+}
+
+inline void AddUnderflow(TH1D& histo){
+  histo.SetBinContent(1,
+                      histo.GetBinContent(0)+
+                      histo.GetBinContent(1));
+  histo.SetBinContent(0,0);
+}
+
 inline TH1D* DoSignalOverNoise(const TH1D* signal,
                                const TH1D* noise) {
 
