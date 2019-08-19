@@ -1,11 +1,3 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-project(BurstTrigger)
-set(CMAKE_BUILD_TYPE Debug)
-list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-
-find_package(ROOT REQUIRED COMPONENTS RIO Net)
-
-include(${ROOT_USE_FILE})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 ROOT_GENERATE_DICTIONARY(G__Configuration Configuration.hh LINKDEF LinkDef.h)
 
