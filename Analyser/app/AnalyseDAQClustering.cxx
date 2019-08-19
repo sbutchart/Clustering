@@ -1,9 +1,9 @@
 #include <algorithm>    // std::min_element, std::max_element
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
 
 #include "Utils/Helper.h"
+#include "Utils/CLI11.hpp"
 
 #include "TFile.h"
 #include "TCanvas.h"
@@ -35,41 +35,19 @@ std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
 }
 
 int main(int argc, char** argv){
-
-  int opt;
-  // Shut GetOpt error messages down (return '?'): 
-  extern char *optarg;
-  extern int  optopt;
+  CLI::App app{"A program to produce a pdf output containing various interesting things that have to be checked out when running the clustering"};
 
   int nHitCut=-1, RequestedConfig=0;
   std::string InputFile;
   std::string OutputFile;
   int nEvent = 0;
+  app.add_option("-i,--input",  InputFile,       "Input filename (root file, the output file of RunDAQClustering)")->required();
+  app.add_option("-c,--config", RequestedConfig, "What configuration of the clustering to analyse")->required();
+  app.add_option("-o,--output", OutputFile,      "Output file name (with pdf extension)")->required();
+  app.add_option("-e,--event",  nEvent,          "The number of events to run on (not sure this is working properly, use with caution)");
+  app.add_option("--hitcut",    nHitCut,         "An extra hit cut that can be applied here. Minimum number of hits a cluster should have to be considered");
+  CLI11_PARSE(app, argc, argv);
 
-  while ( (opt = getopt(argc, argv, "h:o:i:n:c:")) != -1 ) {  // for each option...
-    switch ( opt ) {
-    case 'h':
-      nHitCut = atoi(optarg);
-      break;
-    case 'i':
-      InputFile = optarg;
-      break;
-    case 'c':
-      RequestedConfig = atoi(optarg);
-      break;
-    case 'n':
-      nEvent = atoi(optarg);
-      break;
-    case 'o':
-      OutputFile = optarg;
-      break;
-    case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
-      break;
-    }
-  }
-
-  
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
 
   int    Cluster       ;

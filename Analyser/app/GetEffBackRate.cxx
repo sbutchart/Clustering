@@ -12,8 +12,9 @@
 #include "TString.h"
 #include "TROOT.h"
 
+#include "Utils/CLI11.hpp"
+
 #include "Clustering/Clustering.hh"
-#include <unistd.h>
 
 std::map<int,double> map_TypeToWeight;
 
@@ -132,37 +133,20 @@ void GetBackgroundRate(const int Config,
 }
 
 int main(int argc, char** argv) {
-  int opt;
-  extern char *optarg;
-  extern int   optopt;
 
   std::string InputFile  = "";
   std::string OutputFile = "BackEff.txt";
   int Config = -1;
   int nHit = -1;
   double DetectorScaling = 0.12;
-  while ( (opt = getopt(argc, argv, "i:o:c:s:h:")) != -1 ) {  // for each option...
-    switch ( opt ) {
-    case 'i':
-      InputFile  = std::string(optarg);
-      break;
-    case 'o':
-      OutputFile = std::string(optarg);
-      break;
-    case 'c':
-      Config = atoi(optarg);
-      break;
-    case 'h':
-      nHit = atoi(optarg);
-      break;
-    case 's':
-      DetectorScaling = atoi(optarg);
-      break;
-    case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
-      break;
-    }
-  }
+  CLI::App app{"A program to calculate the efficiency of the clustering and the background rate"};
+
+  app.add_option("-i,--input",   InputFile,       "Input filename (root file, the output file of RunDAQClustering)")->required();
+  app.add_option("-c,--config",  Config,          "What configuration of the clustering to analyse")->required();
+  app.add_option("-o,--output",  OutputFile,      "Output file name (text file, default: BackEff.txt)");
+  app.add_option("-s,--scaling", DetectorScaling, "Detector scaling to go from workspace to 10kT. Default is 0.12 which corresponds to the ratio of volume of the 1x2x6 and the 10kT");
+  app.add_option("--hitcut",     nHit,            "An extra hit cut that can be applied here. Minimum number of hits a cluster should have to be considered");
+  CLI11_PARSE(app, argc, argv);
 
   if (nHit < 0) {
     std::cout << "You have to set nhit cut (option -h)" << std::endl;
