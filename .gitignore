@@ -44,7 +44,9 @@ Makefile
 *.root
 *.png
 
-*.xml
+# Grid stuff
+*.tar
+#*.xml I want my xml!
 
 build/
 build*/
