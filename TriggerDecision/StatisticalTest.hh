@@ -1,20 +1,29 @@
 #pragma once
 #include "TH1D.h"
+#include "TMath.h"
 
 #include <memory>
+#include <assert.h>
+#include <iostream>
+
 
 class StatisticalTest {
 public:
   StatisticalTest():
-    fPDF(nullptr) { };
+    PDF_(nullptr) { };
 
   ~StatisticalTest() {
-    fPDF.reset(nullptr);
+    std::cout << "freeing stat test\n";
   };
+  double operator()(const TH1D& test) const {
+    return Calculate(test);
+  }
+  double operator()(const std::unique_ptr<TH1D> test) const {
+    return Calculate(*test);
+  }
   
-  double Calculate(const TH1D* test) const {
-    assert (fPDF.get() != nullptr);
-    assert (test != nullptr);
+  double Calculate(const TH1D& test) const {
+    assert (PDF_.get() != nullptr);
     AssertGoodHisto(test);
     
     try {
@@ -25,15 +34,20 @@ public:
     }
   };
   
-  virtual void SetPDF(const TH1D* histo) { fPDF.reset((TH1D*)histo->Clone()); };
+  virtual void SetPDF(const TH1D* histo) {
+    PDF_ = std::unique_ptr<TH1D>((TH1D*)histo->Clone());
+    PDF_->SetName((std::string(histo->GetName())+"Clone").c_str());
+    PDF_->SetDirectory(NULL);
+
+  };
 
 protected:
-  virtual double Evaluate(const TH1D*) const = 0;
-  std::unique_ptr<TH1D> fPDF;
+  virtual double Evaluate(const TH1D&) const = 0;
+  std::unique_ptr<TH1D> PDF_;
 
 private:
-  void AssertGoodHisto(const TH1D* test) const {
-    if (test->GetNcells() != fPDF->GetNcells()) {
+  void AssertGoodHisto(const TH1D& test) const {
+    if (test.GetNcells() != PDF_->GetNcells()) {
       std::cerr << "Bins are different for test and pdf\n";
       throw;
     }
@@ -48,11 +62,11 @@ public:
     StatisticalTest(){};
 
 protected:
-  virtual double const Evaluate(TH1D* test) {
+  virtual double Evaluate(const TH1D& test) const {
     double llh=0;
-    for (int iBin=0; iBin<=test->GetNcells(); ++iBin) {
-      double pdfi  = fPDF->GetBinContent(iBin);
-      double testi = test->GetBinContent(iBin);
+    for (int iBin=0; iBin<=test.GetNcells(); ++iBin) {
+      double pdfi  = PDF_->GetBinContent(iBin);
+      double testi = test.GetBinContent(iBin);
       if (pdfi == 0 && testi == 0) {
         continue;
       } else if (pdfi != 0 && testi == 0) {
@@ -80,18 +94,20 @@ public:
     TH1D* normalised = (TH1D*)histo->Clone();
     double integral = normalised->Integral();
     assert (integral != 0);
-    normalised->SetName((std::string(histo->GetName()+"_norm")).c_str());
+    normalised->SetName(((std::string(histo->GetName())+"_norm")).c_str());
     normalised->Scale(1./ integral);
-    fPDF.reset(normalised);
+    PDF_.reset(normalised);
+    PDF_->SetDirectory(NULL);
+
   };
 
 protected:
-  virtual double const Evaluate(TH1D* test) {
-    TH1D* normalised = (TH1D*)histo->Clone();
+  virtual double Evaluate(const TH1D& test) const {
+    TH1D* normalised = (TH1D*)test.Clone();
     double integral = normalised->Integral();
     if (integral <= 0) return 0;
     normalised->Scale(1./ integral);
-    return LikelihoodTest::Evaluate(normalised);
+    return LikelihoodTest::Evaluate(*normalised);
   }
   
 };
@@ -103,19 +119,21 @@ public:
 
   virtual void SetPDF(const TH1D* histo) {
     double integral = histo->Integral();
-    fPDF = std::make_unique<TH1D>(new TH1D((std::string(histo->GetName()+"_norm")).c_str(),
-                                           histo->GetTitle(), 1, 0, 1));
-    fPDF->SetBinContent(integral);
+    PDF_ = std::make_unique<TH1D>((std::string(histo->GetName())+"_norm").c_str(),
+                                  histo->GetTitle(), 1, 0, 1);
+    PDF_->SetBinContent(1, integral);
+    PDF_->SetDirectory(NULL);
+
   };
 
 protected:
-  virtual double const Evaluate(TH1D* test) {
-    double integral = test->Integral();
+  virtual double Evaluate(const TH1D& test) const {
+    double integral = test.Integral();
     if (integral <= 0) return 0;
-    std::unique_ptr<TH1D> test_norm = std::make_unique<TH1D>(new TH1D((std::string(histo->GetName()+"_norm")).c_str(),
-                                                                      histo->GetTitle(), 1, 0, 1));
+    std::unique_ptr<TH1D> test_norm = std::unique_ptr<TH1D>(new TH1D((std::string(test.GetName())+"_norm").c_str(),
+                                                                test.GetTitle(), 1, 0, 1));
     test_norm->Scale(1./ integral);
-    return LikelihoodTest::Evaluate(test_norm.get());
+    return LikelihoodTest::Evaluate(*test_norm);
   }
   
-}
+};
