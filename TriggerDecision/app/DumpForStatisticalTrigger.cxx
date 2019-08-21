@@ -64,8 +64,10 @@ int main(int argc, char** argv) {
   int Event=0;
   double SumADC=0;
   int MarleyIndex=0;
-  vector<int> *GenType = NULL;
-  vector<double> *ENu = NULL;
+
+  vector<int>    *GenType = NULL;
+  vector<double> *ENu     = NULL;
+  vector<double> *Time    = NULL;
   int Event_true = 0;
   
   unique_ptr<TChain> InputChain     = make_unique<TChain>(InputChainName    .c_str());
@@ -76,10 +78,12 @@ int main(int argc, char** argv) {
   if (myfile.is_open()){
     cout << "Parsing list of files...\n";
     while ( getline (myfile,line) ){
-      cout << line << '\n';
       InputChain->Add(line.c_str());
       InputTrueChain->Add(line.c_str());
     }
+  } else {
+    cerr << "File " << InputListFile << " doesnt exist.\n";
+    throw;
   }
   
   InputChain->SetBranchAddress("Config",        &Config     );
@@ -88,8 +92,9 @@ int main(int argc, char** argv) {
   InputChain->SetBranchAddress("GenType",       &GenType    );
   InputChain->SetBranchAddress("MarleyIndex",   &MarleyIndex);
   
-  InputTrueChain->SetBranchAddress("ENu",   &ENu  );
-  InputTrueChain->SetBranchAddress("Event", &Event_true);
+  InputTrueChain->SetBranchAddress("ENu",      &ENu       );
+  InputTrueChain->SetBranchAddress("MarlTime", &Time      );
+  InputTrueChain->SetBranchAddress("Event",    &Event_true);
   size_t nMarleyEventGenerated=0;
   size_t nBackgroundEventGenerated=0;
 
@@ -98,13 +103,15 @@ int main(int argc, char** argv) {
 
   
   TTree* sum_adc_enu = new TTree("mapping", "mapping");
-  double enu_tree=0, sum_adc_tree=0;
+  double enu_tree=0, sum_adc_tree=0, time_tree=0;
   int config_tree=0;
+  sum_adc_enu->Branch("Time",          &time_tree   );
   sum_adc_enu->Branch("ENu",           &enu_tree    );
   sum_adc_enu->Branch(Feature.c_str(), &sum_adc_tree);
   sum_adc_enu->Branch("Config",        &config_tree );
 
   map<string, map<int, map<int, double> > > enu_mapping;//[filename(ouch)][event][marleyindex] -> enu
+  map<string, map<int, map<int, double> > > time_mapping;//[filename(ouch)][event][marleyindex] -> time
   
   for (int iEntry = 0; iEntry<InputTrueChain->GetEntries(); ++iEntry) {
     InputTrueChain->GetEntry(iEntry);
@@ -112,6 +119,10 @@ int main(int argc, char** argv) {
     int i=0;
     for (auto const& enu: (*ENu)) {
       enu_mapping[InputTrueChain->GetFile()->GetName()][Event_true][i++] = enu;
+    }
+    i=0;
+    for (auto const& timeit: (*Time)) {
+      time_mapping[InputTrueChain->GetFile()->GetName()][Event_true][i++] = timeit;
     }
     size_t pos=string(InputTrueChain->GetFile()->GetName()).find("prodbackground_5x_radiological");
     if (pos == string::npos) {
@@ -133,7 +144,8 @@ int main(int argc, char** argv) {
     if (type == 1) {
       nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
       sum_adc_tree = SumADC/100;
-      enu_tree = enu_mapping[InputChain->GetFile()->GetName()][Event][MarleyIndex];
+      enu_tree    = enu_mapping [InputChain->GetFile()->GetName()][Event][MarleyIndex];
+      time_tree   = time_mapping[InputChain->GetFile()->GetName()][Event][MarleyIndex];
       config_tree = Config;
       sum_adc_enu->Fill();
       //cout << MarleyIndex << "\n";
@@ -143,7 +155,7 @@ int main(int argc, char** argv) {
         PDF_Background_config_perfile_notype[InputChain->GetFile()][Config]->Fill(SumADC/100.);
       } else {
         for (int iConfig=0; iConfig<nConfig; ++iConfig) {
-          std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << "\n";
+          // std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << "\n";
           PDF_Background_config_perfile_notype[InputChain->GetFile()][iConfig] =  make_shared<TH1D>(("PDF_Background_perfile_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
         }
       }
@@ -155,7 +167,7 @@ int main(int argc, char** argv) {
     } else {
       for (int iConfig=0; iConfig<nConfig; ++iConfig) {
         for (int iBack=0; iBack<10; ++iBack) {
-          std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << " " << iBack << "\n";
+          // std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << " " << iBack << "\n";
           PDF_Background_config_perfile[InputChain->GetFile()][iConfig][iBack] = make_shared<TH1D>(("PDF_Background_perfile"+to_string(iBack)+"_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
         }
       }
