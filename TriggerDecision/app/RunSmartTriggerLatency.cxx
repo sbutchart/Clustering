@@ -8,7 +8,7 @@
 //
 
 #include "TriggerDecision/StatisticalTest.hh"
-#include "TriggerDecision/TriggerSensitivityCalculator.hh"
+#include "TriggerDecision/TriggerLatencyCalculator.hh"
 
 #include "Utils/Helper.h"
 #include "Utils/CLI11.hpp"
@@ -31,17 +31,6 @@
 
 
 
-    // LikelihoodStat     .first .push_back(GetLikelihoodStat     (background_trial));
-    // LikelihoodStat     .second.push_back(GetLikelihoodStat     (signal_trial    ));
-
-    // LikelihoodStatNorm .first .push_back(GetLikelihoodStatNorm (background_trial));
-    // LikelihoodStatNorm .second.push_back(GetLikelihoodStatNorm (signal_trial    ));
-
-    // LikelihoodStatShape.first .push_back(GetLikelihoodStatShape(background_trial));
-    // LikelihoodStatShape.second.push_back(GetLikelihoodStatShape(signa_trial     ));
-
-
-
 int main(int argc, char** argv) {
 
   CLI::App app{"SmartTrigger"};
@@ -59,8 +48,8 @@ int main(int argc, char** argv) {
   app.add_option("--method",  Method,         "Method can be \"Likelihood\", \"LikelihoodNorm\" or \"LikelihoodShape\"")->required();
 
   CLI11_PARSE(app, argc, argv);
-  TriggerSensitivityCalculator tsc(nEvent, 10, nToy, nThread, Config, InputFileName, OutputFileName, Method);
-  tsc.Compute();
+  TriggerLatencyCalculator tlc(nEvent, 10, nToy, nThread, Config, InputFileName, OutputFileName, Method);
+  tlc.Compute();
   
   return 0;
 }

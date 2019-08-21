@@ -4,6 +4,7 @@
 #include <future>
 
 #include "TriggerDecision/StatisticalTest.hh"
+#include "Utils/Helper.h"
 
 #include "TRandom3.h"
 #include "TH1D.h"
@@ -66,7 +67,7 @@ public:
 
     OutputFile_->cd();
     OutputTree_ = new TTree("Throws", "Throws");
-    OutputTree_->Branch("BackgroundTestStatistics", &BackgroundStatistic_);
+    OutputTree_->Branch("BackgroundTestStatistics3", &BackgroundStatistic_);
     OutputTree_->Branch("SignalTestStatistics",     &SignalStatistic_    );
 
 
@@ -98,10 +99,8 @@ public:
       threads.push_back(std::async(&TriggerSensitivityCalculator::ThreadedCompute, this));
       Seed_++;
     }
-    std::cout << "yoyoyo\n";
     for (auto& it: threads) {
       std::pair<std::vector<double>, std::vector<double>> signal_back = it.get();
-      std::cout << signal_back.first.size() << " " << signal_back.second.size() << "\n";
       for (size_t i=0; signal_back.first.size(); ++i) {
         SignalStatistic_     = signal_back.first [i];
         BackgroundStatistic_ = signal_back.second[i];
@@ -199,6 +198,7 @@ private:
     std::vector<double> BackgroundStatisticVector;
 
     for (int iToy=0; iToy<nToy_; ++iToy) {
+      PrintProgress(iToy,nToy_);
       ThrowHistos(rand, BackgroundTest, SignalTest);
       double SignalStatistic     = StatisticalTest_->Calculate(*SignalTest);
       double BackgroundStatistic = StatisticalTest_->Calculate(*BackgroundTest);
@@ -216,8 +216,7 @@ private:
     }
     delete SignalTest    ;
     delete BackgroundTest;
-    std::cout <<"test3\n";
-w    return std::make_pair(SignalStatisticVector,BackgroundStatisticVector);
+    return std::make_pair(SignalStatisticVector,BackgroundStatisticVector);
   }
 
 };

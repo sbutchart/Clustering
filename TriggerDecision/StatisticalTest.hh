@@ -13,7 +13,6 @@ public:
     PDF_(nullptr) { };
 
   ~StatisticalTest() {
-    std::cout << "freeing stat test\n";
   };
   double operator()(const TH1D& test) const {
     return Calculate(test);

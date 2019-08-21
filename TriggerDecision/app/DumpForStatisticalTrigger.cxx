@@ -4,6 +4,7 @@
 
 #include "TH1D.h"
 #include "TChain.h"
+#include "TTree.h"
 #include "TFile.h"
 #include "TVectorT.h"
 
@@ -26,12 +27,6 @@ int GetGenType(vector<int> GenType) {
     }
   }
   return type;
-}
-
-std::string slurp(std::ifstream& in) {
-  std::stringstream sstr;
-  sstr << in.rdbuf();
-  return sstr.str();
 }
 
 int main(int argc, char** argv) {
@@ -71,7 +66,7 @@ int main(int argc, char** argv) {
   int MarleyIndex=0;
   vector<int> *GenType = NULL;
   vector<double> *ENu = NULL;
-  
+  int Event_true = 0;
   
   unique_ptr<TChain> InputChain     = make_unique<TChain>(InputChainName    .c_str());
   unique_ptr<TChain> InputTrueChain = make_unique<TChain>(InputTrueChainName.c_str());
@@ -87,19 +82,37 @@ int main(int argc, char** argv) {
     }
   }
   
-  InputChain->SetBranchAddress("Config",  &Config );
-  InputChain->SetBranchAddress("Event",   &Event  );
-  InputChain->SetBranchAddress(Feature.c_str(),  &SumADC );
-  InputChain->SetBranchAddress("GenType", &GenType);
-  InputChain->SetBranchAddress("MarleyIndex", &MarleyIndex);
+  InputChain->SetBranchAddress("Config",        &Config     );
+  InputChain->SetBranchAddress("Event",         &Event      );
+  InputChain->SetBranchAddress(Feature.c_str(), &SumADC     );
+  InputChain->SetBranchAddress("GenType",       &GenType    );
+  InputChain->SetBranchAddress("MarleyIndex",   &MarleyIndex);
   
-  InputTrueChain->SetBranchAddress("ENu", &ENu);
+  InputTrueChain->SetBranchAddress("ENu",   &ENu  );
+  InputTrueChain->SetBranchAddress("Event", &Event_true);
   size_t nMarleyEventGenerated=0;
   size_t nBackgroundEventGenerated=0;
+
+  unique_ptr<TFile> OutputFile = make_unique<TFile>(OutputFileName.c_str(), "RECREATE");
+  OutputFile->cd();
+
+  
+  TTree* sum_adc_enu = new TTree("mapping", "mapping");
+  double enu_tree=0, sum_adc_tree=0;
+  int config_tree=0;
+  sum_adc_enu->Branch("ENu",           &enu_tree    );
+  sum_adc_enu->Branch(Feature.c_str(), &sum_adc_tree);
+  sum_adc_enu->Branch("Config",        &config_tree );
+
+  map<string, map<int, map<int, double> > > enu_mapping;//[filename(ouch)][event][marleyindex] -> enu
   
   for (int iEntry = 0; iEntry<InputTrueChain->GetEntries(); ++iEntry) {
     InputTrueChain->GetEntry(iEntry);
     nMarleyEventGenerated+=ENu->size();
+    int i=0;
+    for (auto const& enu: (*ENu)) {
+      enu_mapping[InputTrueChain->GetFile()->GetName()][Event_true][i++] = enu;
+    }
     size_t pos=string(InputTrueChain->GetFile()->GetName()).find("prodbackground_5x_radiological");
     if (pos == string::npos) {
       nBackgroundEventGenerated++;
@@ -108,6 +121,7 @@ int main(int argc, char** argv) {
     }
   }
 
+  cout << "Filled the map for true\n";
   
   int nEntries = InputChain->GetEntries();
 
@@ -118,6 +132,10 @@ int main(int argc, char** argv) {
     int type = GetGenType(*GenType);
     if (type == 1) {
       nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
+      sum_adc_tree = SumADC/100;
+      enu_tree = enu_mapping[InputChain->GetFile()->GetName()][Event][MarleyIndex];
+      config_tree = Config;
+      sum_adc_enu->Fill();
       //cout << MarleyIndex << "\n";
     } else {
       PDF_Background_config_notype[Config]->Fill(SumADC/100.);
@@ -156,11 +174,9 @@ int main(int argc, char** argv) {
     efficiencies[it.first] /= nMarleyEventGenerated;
   }
     
-  unique_ptr<TFile> OutputFile = make_unique<TFile>(OutputFileName.c_str(), "RECREATE");
-  OutputFile->cd();
   efficiencies.Print();
   efficiencies.Write("Efficiencies");
-
+  sum_adc_enu->Write();
 
   double scaleBackground = 1. / 2.2e-3 / nBackgroundEventGenerated / 0.12;
   for (auto const& it: PDF_Background_config_notype) {

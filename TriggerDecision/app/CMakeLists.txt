@@ -1,3 +1,6 @@
 add_executable(SmartTriggerStatisticalTests RunSmartTriggerStatisticalTests.cxx)
 target_link_libraries(SmartTriggerStatisticalTests Clustering)
 
+add_executable(DumpForStatisticalTrigger DumpForStatisticalTrigger.cxx)
+target_link_libraries(DumpForStatisticalTrigger Clustering)
+
