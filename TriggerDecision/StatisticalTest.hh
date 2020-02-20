@@ -11,9 +11,9 @@ class StatisticalTest {
 public:
   StatisticalTest():
     PDF_(nullptr) { };
-
-  ~StatisticalTest() {
-  };
+  
+  virtual ~StatisticalTest() { };
+  
   double operator()(const TH1D& test) const {
     return Calculate(test);
   }
@@ -59,7 +59,8 @@ class LikelihoodTest:public StatisticalTest {
 public:
   LikelihoodTest():
     StatisticalTest(){};
-
+  ~LikelihoodTest() { };
+  
 protected:
   virtual double Evaluate(const TH1D& test) const {
     double llh=0;
@@ -88,7 +89,7 @@ class LikelihoodShapeTest:public LikelihoodTest {
 public:
   LikelihoodShapeTest():
     LikelihoodTest(){};
-
+  ~LikelihoodShapeTest() {};
   virtual void SetPDF(const TH1D* histo) {
     TH1D* normalised = (TH1D*)histo->Clone();
     double integral = normalised->Integral();
@@ -115,7 +116,8 @@ class LikelihoodNormalisationTest:public LikelihoodTest {
 public:
   LikelihoodNormalisationTest():
     LikelihoodTest(){};
-
+  ~LikelihoodNormalisationTest() {}
+  
   virtual void SetPDF(const TH1D* histo) {
     double integral = histo->Integral();
     PDF_ = std::make_unique<TH1D>((std::string(histo->GetName())+"_norm").c_str(),
