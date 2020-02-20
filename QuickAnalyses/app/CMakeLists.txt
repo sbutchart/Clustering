@@ -6,6 +6,7 @@ add_executable(Optimiser2D           Optimiser2D.cxx      )
 add_executable(Optimiser             Optimiser.cxx        )
 add_executable(RunBiTrigger          RunBiTrigger.cxx     )
 add_executable(Threshold             RunThreshold.cxx     )
+add_executable(CosSpeed              Cos.cxx     )
 
 target_link_libraries(MakePEPlotForJose    Algorithm DataContainer ${ROOT_LIBRARIES})
 target_link_libraries(PDSTiming            Algorithm DataContainer ${ROOT_LIBRARIES})
@@ -15,3 +16,4 @@ target_link_libraries(Optimiser2D          Algorithm DataContainer ${ROOT_LIBRAR
 target_link_libraries(Optimiser            Algorithm DataContainer ${ROOT_LIBRARIES})
 target_link_libraries(RunBiTrigger         Algorithm DataContainer BiTrigger ${ROOT_LIBRARIES})
 target_link_libraries(Threshold            Algorithm DataContainer ${ROOT_LIBRARIES})
+target_link_libraries(CosSpeed             ${ROOT_LIBRARIES})
