@@ -30,36 +30,30 @@
 #include <vector>
 
 
-
-    // LikelihoodStat     .first .push_back(GetLikelihoodStat     (background_trial));
-    // LikelihoodStat     .second.push_back(GetLikelihoodStat     (signal_trial    ));
-
-    // LikelihoodStatNorm .first .push_back(GetLikelihoodStatNorm (background_trial));
-    // LikelihoodStatNorm .second.push_back(GetLikelihoodStatNorm (signal_trial    ));
-
-    // LikelihoodStatShape.first .push_back(GetLikelihoodStatShape(background_trial));
-    // LikelihoodStatShape.second.push_back(GetLikelihoodStatShape(signa_trial     ));
-
-
-
 int main(int argc, char** argv) {
 
   CLI::App app{"SmartTrigger"};
-  std::string InputFileName = "";
+  std::string InputSignalFileName  = "";
+  std::string InputBackgroundFileName  = "";
   std::string OutputFileName = "";
   std::string Method = "Likelihood";
   
   int Config, nToy, nThread=1, nEvent;
-  app.add_option("--ntoy",    nToy,           "Number of toys to throw"  )->required();
-  app.add_option("--nthread", nThread,        "Number of threads to use" );
-  app.add_option("--nevent",  nEvent,         "Number of event in the SN")->required();
-  app.add_option("--config",  Config,         "Which config to run on"   )->required();
-  app.add_option("--output",  OutputFileName, "Output file name (root)"  )->required();
-  app.add_option("--input",   InputFileName,  "Input file nam (root)"    )->required();
-  app.add_option("--method",  Method,         "Method can be \"Likelihood\", \"LikelihoodNorm\" or \"LikelihoodShape\"")->required();
-
+  app.add_option("--ntoy",            nToy,                    "Number of toys to throw"          )->required();
+  app.add_option("--nthread",         nThread,                 "Number of threads to use"         );
+  app.add_option("--nevent",          nEvent,                  "Number of event in the SN"        )->required();
+  app.add_option("--config",          Config,                  "Which config to run on"           )->required();
+  app.add_option("--output",          OutputFileName,          "Output file name (root)"          )->required();
+  app.add_option("--inputsignal",     InputSignalFileName,     "Input signal file name (root)"    )->required();
+  app.add_option("--inputbackground", InputBackgroundFileName, "Input background file name (root)")->required();
+  app.add_option("--method",          Method,                  "Method can be \"Likelihood\", \"LikelihoodNorm\" or \"LikelihoodShape\"")->required();
+  
   CLI11_PARSE(app, argc, argv);
-  TriggerSensitivityCalculator tsc(nEvent, 10, nToy, nThread, Config, InputFileName, OutputFileName, Method);
+  TriggerSensitivityCalculator tsc(nEvent, 10, nToy, nThread, Config,
+                                   InputSignalFileName,
+                                   InputBackgroundFileName,
+                                   OutputFileName,
+                                   Method);
   tsc.Compute();
   
   return 0;

@@ -16,22 +16,24 @@
 
 class TriggerSensitivityCalculator{
 public:
-  TriggerSensitivityCalculator(const int         nSNEvent      ,
-                               const float       TimeWindow    ,
-                               const int         nToy          ,
-                               const int         nThread       ,
-                               const int         Config        ,
-                               const std::string InputFileName ,
-                               const std::string OutputFileName,
-                               const std::string Method        ) :
-    nSNEvent_                 (nSNEvent      ),
-    TimeWindow_               (TimeWindow    ),
-    nToy_                     (nToy          ),
-    nThread_                  (nThread       ),
-    Config_                   (Config        ),
-    InputFileName_            (InputFileName ),
+  TriggerSensitivityCalculator(const int         nSNEvent               ,
+                               const float       TimeWindow             ,
+                               const int         nToy                   ,
+                               const int         nThread                ,
+                               const int         Config                 ,
+                               const std::string InputSignalFileName    ,
+                               const std::string InputBackgroundFileName,
+                               const std::string OutputFileName         ,
+                               const std::string Method) :
+    nSNEvent_                 (nSNEvent               ),
+    nToy_                     (nToy                   ),
+    nThread_                  (nThread                ),
+    Config_                   (Config                 ),
+    InputSignalFileName_      (InputSignalFileName    ),
+    InputBackgroundFileName_  (InputBackgroundFileName),
     OutputFileName_           (OutputFileName),
-    InputFile_                (new TFile(InputFileName_ .c_str(), "READ")),
+    InputSignalFile_          (new TFile(InputSignalFileName_    .c_str(), "READ")),
+    InputBackgroundFile_      (new TFile(InputBackgroundFileName_.c_str(), "READ")),
     OutputFile_               (new TFile(OutputFileName_.c_str(), "RECREATE")),
     SignalPDF_                (nullptr),
     BackgroundPDF_            (nullptr),
@@ -47,11 +49,11 @@ public:
     Method_                   (Method),
     StatisticalTest_          (nullptr){
 
-    SignalPDF_     = (TH1D*)InputFile_->Get(Form("PDF_Background_1_config%i",Config_));
-    BackgroundPDF_ = (TH1D*)InputFile_->Get(Form("PDF_Background_config%i",  Config_));
+    SignalPDF_     = (TH1D*)InputSignalFile_    ->Get(Form("PDF_Background_1_config%i",Config_));
+    BackgroundPDF_ = (TH1D*)InputBackgroundFile_->Get(Form("PDF_Background_config%i",  Config_));
     SignalPDF_    ->SetDirectory(NULL);
     BackgroundPDF_->SetDirectory(NULL);
-    TVectorD* effs = (TVectorD*)InputFile_->Get("Efficiencies");
+    TVectorD* effs = (TVectorD*)InputSignalFile_->Get("Efficiencies");
     Efficiency_ = (*effs)[Config_];
 
     assert (BackgroundPDF_->Integral() != 0 &&
@@ -68,7 +70,7 @@ public:
     OutputFile_->cd();
     OutputTree_ = new TTree("Throws", "Throws");
     OutputTree_->Branch("BackgroundTestStatistics3", &BackgroundStatistic_);
-    OutputTree_->Branch("SignalTestStatistics",     &SignalStatistic_    );
+    OutputTree_->Branch("SignalTestStatistics",     &SignalStatistic_     );
 
 
     if (Method_ == "Likelihood") {
@@ -88,8 +90,8 @@ public:
 
   
   ~TriggerSensitivityCalculator() {
+    StatisticalTest_.reset();
     OutputFile_->Close();
-    InputFile_->Close();
   }
 
   
@@ -115,13 +117,14 @@ public:
   
 private:
   int                 nSNEvent_                 ;
-  float               TimeWindow_               ;
   int                 nToy_                     ;
   int                 nThread_                  ;
   int                 Config_                   ;
-  std::string         InputFileName_            ;
+  std::string         InputSignalFileName_      ;
+  std::string         InputBackgroundFileName_  ;
   std::string         OutputFileName_           ;
-  TFile*              InputFile_                ;
+  TFile*              InputSignalFile_          ;
+  TFile*              InputBackgroundFile_      ;
   TFile*              OutputFile_               ;
   TH1D*               SignalPDF_                ;
   TH1D*               BackgroundPDF_            ;
@@ -166,11 +169,9 @@ private:
     Double_t x = histo->GetBinLowEdge(ibin+1);
     if (r1 > integral[ibin]) x += histo->GetBinWidth(ibin+1) * (r1-integral[ibin])/(integral[ibin+1] - integral[ibin]);
     return x;
- }
+  }
  
 
-
-  
   void ThrowHistos(TRandom3& rand, TH1D* Background, TH1D* Signal) const {
     Background->Reset();
     Signal    ->Reset();
