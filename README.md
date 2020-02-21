@@ -4,7 +4,7 @@ Supernova Clustering and triggering code at DUNE.
 ## Installation
 To compile it, you need to make sure you have a ROOT setup (`source <wherever root is>/bin/thisroot.sh`), have `cmake` and `boost`.
 I usually setup a developer version of `dunetpc` and that gives me everything I need on the fnal machines.
-```
+```sh
 git clone <whatever the address of this is>
 cd <wherever you want to build>
 mkdir build
@@ -52,7 +52,7 @@ The output file therefore has (amongst other things):
 
 ## Running clustering
 This is ran using:
-```
+```sh
 ./build/Clustering/app/DAQClustering
 ```
 
