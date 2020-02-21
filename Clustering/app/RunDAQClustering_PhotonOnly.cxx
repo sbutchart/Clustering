@@ -1,10 +1,8 @@
 #include "Clustering/Clustering.hh"
+#include "Utils/CLI11.hpp"
 
 int main(int argc, char** argv){
-    int opt;
-  // Shut GetOpt error messages down (return '?'): 
-  extern char *optarg;
-  extern int  optopt;
+  CLI::App app{"A program to run the clustering"};
 
   int nEvent=-1;
   int PrintLevel=-1;
@@ -16,43 +14,20 @@ int main(int argc, char** argv){
   std::string OutputFile   = "";
   std::string ERecoXMLFile = "";
   std::string InputTree    = "";
-  while ( (opt = getopt(argc, argv, "a:c:e:f:i:n:o:p:s:t:")) != -1 ) {  // for each option...
-    switch ( opt ) {
-    case 'a':
-      nAPA = atoi(optarg);
-      break;
-    case 'c':
-      Config = atoi(optarg);
-      break;
-    case 'e':
-      ERecoXMLFile = std::string(optarg);
-      break;
-    case 'f':
-      OutputOffset = atoi(optarg);
-      break;
-    case 'i':
-      InputFile  = std::string(optarg);
-      break;
-    case 'n':
-      nEvent = atoi(optarg);
-      break;
-    case 'o':
-      OutputFile = std::string(optarg);
-      break;
-    case 'p':
-      PrintLevel = atoi(optarg);
-      break;
-    case 's':
-      Offset = atoi(optarg);
-      break;
-    case 't':
-      InputTree = std::string(optarg);
-      break;
-    case '?':  // unknown option...
-      std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
-      break;
-    }
-  }
+
+  app.add_option("-a,--n-apa",  nAPA,            "Number of APA to consider, this can be used for time tests, default to all of the APA");
+  app.add_option("-c,--config", Config,          "What configuration of the clustering to run (default, run all the config)");
+  app.add_option("--e-reco",    ERecoXMLFile,    "The XML file containing all the weights for the neural network for energy reconstruction (default, doesn't do energy reconstruction)");
+  app.add_option("-o,--output", OutputFile,      "Output file name (with root extension)")->required();
+  app.add_option("-i,--input",  InputFile,       "Input filename (root file, the output file of SNAna_Module)")->required();
+  app.add_option("-e,--event",  nEvent,          "The number of events to run on (not sure this is working properly, use with caution)");
+  app.add_option("-p,--print",  PrintLevel,      "Print level, (number between -1 and 2 for increasing debug messages)");
+  app.add_option("-t,--tree",   InputTree,       "The name of the tree in the input file")->required();
+  app.add_option("--offset",    OutputOffset,    "The offset in event numbers for the output file");
+  CLI11_PARSE(app, argc, argv);
+
+
+  
   Clustering c;
   c.SetOutputOffset(OutputOffset);
   c.SetInputFile   (InputFile   );
