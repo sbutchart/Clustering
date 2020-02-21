@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.8)
 
 project(DAQWork)
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
