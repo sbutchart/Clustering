@@ -296,8 +296,8 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->Project("h_nchan_time_back_wire", "TimeWidth:NChan",  Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut)); std::cout << "Projected h_nchan_time_back_wire" << std::endl;
   t_Output_triggeredclusteredhits->Project("h_nchan_nhit_sign_wire", "NHits:NChan",      Form("Type==1 && Config==%i && NHits>=%i", RequestedConfig, nHitCut)); std::cout << "Projected h_nchan_nhit_sign_wire" << std::endl;
   t_Output_triggeredclusteredhits->Project("h_nchan_nhit_back_wire", "NHits:NChan",      Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut)); std::cout << "Projected h_nchan_nhit_back_wire" << std::endl;
-
-  h_sadc_hits_sign_wire ->Scale(1. / (double) h_nhit_sign_wire->GetEntries());
+  if (h_nhit_sign_wire->GetEntries())
+    h_sadc_hits_sign_wire ->Scale(1. / (double) h_nhit_sign_wire->GetEntries());
   h_nhit_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   h_sadc_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   h_time_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
@@ -309,7 +309,8 @@ int main(int argc, char** argv){
   h_nchan_time_sign_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   h_nchan_nhit_sign_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   
-  h_sadc_hits_back_wire ->Scale(1. / (double) h_nhit_back_wire->GetEntries());
+  if (h_nhit_back_wire->GetEntries())
+    h_sadc_hits_back_wire ->Scale(1. / (double) h_nhit_back_wire->GetEntries());
   h_nhit_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   h_sadc_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
   h_time_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
