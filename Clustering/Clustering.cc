@@ -22,6 +22,9 @@ void Clustering::RunClustering(){
   std::cout << " - " << ConfigEnd - ConfigBegin << " configurations" << std::endl;
   std::cout << " - " << fNEvent << " events" << std::endl;
   size_t nMaxMarleyPerEvent=0;
+
+  size_t nhit_wire_total=0;
+  size_t nhit_opti_total=0;
   
   for (fCurrentEvent=fOffset; fCurrentEvent<fNEvent+fOffset; ++fCurrentEvent) {
 
@@ -58,6 +61,8 @@ void Clustering::RunClustering(){
     std::vector<OpticalHit*> vec_OptiHit;
     if (fUseTPC) fSNIM->GetWireHits   (vec_WireHit);
     if (fUsePDS) fSNIM->GetOpticalHits(vec_OptiHit);
+    nhit_wire_total += vec_WireHit.size();
+    nhit_opti_total += vec_OptiHit.size();
 
     int nneutron = 0;
     for (auto const& it:vec_WireHit) {
@@ -85,6 +90,12 @@ void Clustering::RunClustering(){
       fSimpleTrigger->SetWireChanWidthMin(fcut_MinChanWidth[fCurrentConfig]);
       fSimpleTrigger->SetWireSADCMin     (fcut_TotalADC    [fCurrentConfig]);
       fSimpleTrigger->SetOptiNHitsMin    (fcut_OptHitInCluster[fCurrentConfig]);
+
+      if (fPrintLevel > -1) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "nWireHits " << vec_WireHit.size() << "\n";
+        std::cout << "nOptiHits " << vec_OptiHit.size() << "\n";
+      }
 
       std::vector<WireCluster*>    vec_WireCluster;
       std::vector<OpticalCluster*> vec_OptiCluster;
@@ -139,6 +150,17 @@ void Clustering::RunClustering(){
     }
     vec_WireHit.clear();
     vec_OptiHit.clear();
+  }
+
+  if (fUseTPC && nhit_wire_total==0) {
+    std::cout << "Warning!! it looks like you wanted to run with TPC information, but there wasn't any hit in the file you provided.\n";
+    std::cout << "This looks very fishy and probably the file you are running on isn't valid.\n";
+    std::cout << "You won't get any cluster out of no hits!\n";
+  }
+  if (fUsePDS && nhit_opti_total==0) {
+    std::cout << "Warning!! it looks like you wanted to run with PDS information, but there wasn't any ophit in the file you provided.\n";
+    std::cout << "This looks very fishy and probably the file you are running on isn't valid.\n";
+    std::cout << "You won't get any cluster out of no hits!\n";
   }
   
   fSOM->Write();
