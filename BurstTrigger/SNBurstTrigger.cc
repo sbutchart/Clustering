@@ -78,7 +78,7 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
 
   
   for(int Burst=burstMin; Burst<burstMax; Burst++){
-    if (Burst) std::cout << "Burst " << Burst << " / " << burstMax << std::endl;
+//    if (Burst) std::cout << "Burst " << Burst << " / " << burstMax << std::endl;
     if (IsOne) {
       c.fEfficiency_Burst[Burst] = 1;
       continue;
@@ -86,8 +86,6 @@ void SNBurstTrigger::FillEfficiencyBurst(Configuration& c, const int burstMin, c
     
     double NSignal       = Burst * c.fFractionInTimeWindow * c.fClusterEfficiency;
     double TotalClusters = c.fBackgroundRate * c.fBurstTimeWindow + NSignal;
-    if (c.fNClusterCut == 7)
-      std::cout << "TotalClusters " << TotalClusters << std::endl;
     double RMS           = sqrt(TotalClusters);
     int    NMaxClusters  = (int)std::ceil(TotalClusters + 20*RMS);
     TH1D *Poisson = new TH1D("f_Poisson", "", NMaxClusters, -0.5, NMaxClusters-0.5);
