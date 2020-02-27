@@ -64,7 +64,11 @@ Command line parameters:
  - *Optional* the configuration, what parameters of the clustering algorithm to run with: `-c/--config` this is a number between 0 and whatever the size of the vectors in [here](https://github.com/plasorak/Clustering/blob/reorganisation/Clustering/Clustering.hh#L89). Nominally you can just go with 0, but if you don't specify this, it will run over _all_ the configurations, which could really make this stage slow.
  - *Optional* number of event: `-e/--event`
 
-
+Note an interesting file for TESTING can be found here:
+```sh
+/dune/data/users/plasorak/trigprim2000ManyConfig/Clustered_snanatrigprim2000_prodmarley_nue_spectrum_radiological_timedep_hudepohl_11.2M_3perevent_dune10kt_1x2x6_g4_detsim_defaultnoise_pdreco_snana.root
+```
+This file has 3 SN events per larsoft event and therefore shouldn't be used calculate efficiencies...
 ## Analyse the result
 ### Visual output
 ```sh
@@ -74,7 +78,7 @@ That will produce a big `pdf` document which contains a lot of information about
 
 Command line parameters:
  - `-h/--help` to get an idea of the command line parameters.
- - *Required* input file from the clustering stage: `-i/--input` (this is a file)
+ - *Required* input file from the clustering stage: `-i/--input` (this is a cluster file)
  - *Required* output file where all the clusters get saved: `-o/--output` (this is a pdf file)
  - *Required* the configuration, what parameters of the cluster algorithm you want to plot with: `-c/--config` this is a number between 0 and whatever the size of the vectors in [here](https://github.com/plasorak/Clustering/blob/reorganisation/Clustering/Clustering.hh#L89). Nominally you can just go with 0.
  - *Optional* number of event: `-e/--event` (not sure thisis working correctly, use with caution)
@@ -86,11 +90,22 @@ But sometimes, we just want to know how the is performing _overall_ (in the SN t
 ./build/Analyser/app/GetEffBackRate
 ```
 
-
 Command line parameters:
  - `-h/--help` to get an idea of the command line parameters.
- - *Required* input file from the clustering stage: `-i/--input` (this is a file)
+ - *Required* input file from the clustering stage: `-i/--input` (this is a cluster file)
+ - *Optional* (but important) the output file: `-o/--output` a text file where the background and efficiency will be saved, with their respective uncertainties.
  - *Required* the configuration, what parameters of the cluster algorithm you want to plot with: `-c/--config` this is a number between 0 and whatever the size of the vectors in [here](https://github.com/plasorak/Clustering/blob/reorganisation/Clustering/Clustering.hh#L89). Nominally you can just go with 0.
  - *Optional* number of event: `-e/--event` (not sure thisis working correctly, use with caution)
  - *Optional* you can also specify a number of hits cut: `--hitcut` (default is 0, which is whatever the clustering algorithm is in the previous stage).
  - *Optional* (but VERY IMPORTANT!) detector scaling ; this is how you get to a full 10kT module from whatever you generated in larsoft. By default this is 0.12, i.e. the workspace that was used to generate the radiological background was 12% of the total volume of the 10kT.
+
+## Supernova sensitivities
+### Tranditional counting approach
+To get plot with the traditionnal approach one can use:
+
+``` sh
+./build/BurstTrigger/SNBurst --output-pdf tradi.pdf --output-root tradi.root -t ../BurstTrigger/data/SNTheoryDistributions.root --input-text BackEff.txt
+```
+This will create `tradi.pdf` which contain histograms related to the efficiency of the trigger.
+
+
