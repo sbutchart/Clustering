@@ -196,13 +196,13 @@ public:
          it != input.end(); ++it) {
       std::map<double,double>::const_iterator next=std::next(it,1);
       if (next==input.end()) break;
-      bins.push_back(0.5*(it->first + next->first));
+      double b = 0.5*(it->first + next->first);
+      bins.push_back(b);
     }
     bins.push_back(input.crbegin()->first);
 
     if("Efficiency_Burst" == Title){
       for(auto const& it:bins){
-        std::cout <<it << std::endl;
         if (it>30)
           break;
       }
@@ -214,7 +214,7 @@ public:
     for (auto const& it:input) {
       if (it.second>=0){
         histo->SetBinContent(histo->FindBin(it.first), it.second);
-        if (it.first < 30)std::cout <<it.first << " " << it.second << std::endl;
+        //if (it.first < 30)std::cout <<it.first << " " << it.second << std::endl;
 
       }
     }
@@ -233,7 +233,7 @@ public:
       Output=NULL;
     }
 
-    std::cout << "Configuration::ConvertToDistance(): Converting histogram " << Input->GetName() << std::endl;
+    //std::cout << "Configuration::ConvertToDistance(): Converting histogram " << Input->GetName() << std::endl;
 
     std::vector<double> old_binning;
     const TArrayD* array = Input->GetXaxis()->GetXbins();
@@ -268,7 +268,7 @@ public:
     if (Input == NULL) return;
     if (fDistanceProbability == NULL) return;
 
-    std::cout << "Configuration::ConvertToCoverage(): Converting histogram " << Input->GetName() << std::endl;
+    //std::cout << "Configuration::ConvertToCoverage(): Converting histogram " << Input->GetName() << std::endl;
     if (Output) {
       delete Output;
       Output=NULL;
@@ -302,7 +302,7 @@ public:
     ConvertToDistance(fTH1DLatency_NoBurstBurst      , fTH1DLatency_NoBurstDistance    );
     ConvertToDistance(fTH1DLatency_NoBurstBurst95CL  , fTH1DLatency_NoBurstDistance95CL);
     ConvertToCoverage(fTH1DEfficiency_Distance, fTH1DCoverage            );
-    std::cout << "Configuration::FillHistograms(): Finished filling histograms" << std::endl;
+    //std::cout << "Configuration::FillHistograms(): Finished filling histograms" << std::endl;
   };
 
   void DumpAndPlot(std::string Name="Config.pdf") {
