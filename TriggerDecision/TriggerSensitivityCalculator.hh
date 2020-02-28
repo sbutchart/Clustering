@@ -56,8 +56,8 @@ public:
     TVectorD* effs = (TVectorD*)InputSignalFile_->Get("Efficiencies");
     Efficiency_ = (*effs)[Config_];
 
-    assert (BackgroundPDF_->Integral() != 0 &&
-            SignalPDF_    ->Integral() != 0);
+    assert(BackgroundPDF_->Integral() != 0);
+    assert(SignalPDF_    ->Integral() != 0);
     
     BackgroundPDF_->Scale(1./0.12); // Detector scaling got lost somewhere
     BackgroundPDF_->Scale(TimeWindow);
