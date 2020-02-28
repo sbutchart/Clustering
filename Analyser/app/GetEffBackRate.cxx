@@ -160,24 +160,26 @@ int main(int argc, char** argv) {
   TTree *TrueInfo            = (TTree*)f_Input->Get("TrueInfo");
   TH1D* config_histo = new TH1D("config_histo",";Config;Clusters", 200, 0, 200);
   
-  ClusteredWireHit->Project("config_histo", "Config");
+  ClusteredWireHit   ->Project("config_histo", "Config");
   ClusteredOpticalHit->Project("config_histo", "Config");
+
   int nMaxConfig=0;
   for (int i=1; i<200; ++i) {
     if (config_histo->GetBinContent(i)>0)
       ++nMaxConfig;
   }
+
   std::cout << "This file contains " << nMaxConfig << " configs." << std::endl;
   int nConfig = (Config==-1? nMaxConfig: Config+1);
   int iterConfig = (Config==-1? 0:Config);
   
   if (Config >= nMaxConfig) {
-    std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << nMaxConfig << std::endl;
+    std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << nMaxConfig << ")\n";
     exit(1);
   }
   
   int nEventOriginally = (int)TrueInfo->GetEntries();
-  std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS" << std::endl;
+  std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS\n";
  
   map_TypeToWeight[0] = 1.; //NOISE 
   map_TypeToWeight[1] = 1.; //MARLEY

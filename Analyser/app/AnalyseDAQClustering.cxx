@@ -467,10 +467,9 @@ int main(int argc, char** argv){
       t_TrueInfo->GetEntry(map_Event_TrueEntry[ThisEvent]);
       eff_enu ->Fill(map_index_detected[i], ENu->at(i) * 1000.);
       eff_elep->Fill(map_index_detected[i], ENu_Lep->at(i) * 1000.);
-      std::cout << DirX->at(i) << std::endl;
-      eff_dirx->Fill(map_index_detected[i], DirX->at(i));
-      eff_diry->Fill(map_index_detected[i], DirY->at(i));
-      eff_dirz->Fill(map_index_detected[i], DirZ->at(i));
+      if (DirX->at(i) == DirX->at(i)) eff_dirx->Fill(map_index_detected[i], DirX->at(i));
+      if (DirY->at(i) == DirY->at(i)) eff_diry->Fill(map_index_detected[i], DirY->at(i));
+      if (DirZ->at(i) == DirZ->at(i)) eff_dirz->Fill(map_index_detected[i], DirZ->at(i));
       eff_posx->Fill(map_index_detected[i], PosX->at(i));
       eff_posy->Fill(map_index_detected[i], PosY->at(i));
       eff_posz->Fill(map_index_detected[i], PosZ->at(i));
