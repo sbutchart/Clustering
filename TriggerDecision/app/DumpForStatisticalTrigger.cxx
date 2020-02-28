@@ -139,7 +139,14 @@ int main(int argc, char** argv) {
   for (int iEntry=0; iEntry<nEntries; ++iEntry) {
     InputChain->GetEntry(iEntry);
     PrintProgress(iEntry,nEntries);
-
+    if (Config>=nConfig) {
+      std::cout << "Config : " << Config << "\n";
+      std::cout << "nConfig : " << nConfig << "\n";
+      std::cout << "number of config is inconsistent! change nconfig to be Config+1\n";
+      throw;
+    }
+      
+    
     int type = GetGenType(*GenType);
     if (type == 1) {
       nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
@@ -161,7 +168,7 @@ int main(int argc, char** argv) {
       }
     }
     PDF_Background_config[Config][type]->Fill(SumADC/100.);
-    
+
     if (PDF_Background_config_perfile[InputChain->GetFile()].size()>0) {
       PDF_Background_config_perfile[InputChain->GetFile()][Config][type]->Fill(SumADC/100.);
     } else {
@@ -185,7 +192,7 @@ int main(int argc, char** argv) {
     }
     efficiencies[it.first] /= nMarleyEventGenerated;
   }
-    
+  OutputFile->cd();
   efficiencies.Print();
   efficiencies.Write("Efficiencies");
   sum_adc_enu->Write();
@@ -216,4 +223,5 @@ int main(int argc, char** argv) {
       }
     }
   }
+    OutputFile->Close();
 }
