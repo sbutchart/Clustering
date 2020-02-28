@@ -100,12 +100,47 @@ Command line parameters:
  - *Optional* (but VERY IMPORTANT!) detector scaling ; this is how you get to a full 10kT module from whatever you generated in larsoft. By default this is 0.12, i.e. the workspace that was used to generate the radiological background was 12% of the total volume of the 10kT.
 
 ## Supernova sensitivities
-### Tranditional counting approach
+### Traditional counting approach
 To get plot with the traditionnal approach one can use:
 
 ``` sh
 ./build/BurstTrigger/SNBurst --output-pdf tradi.pdf --output-root tradi.root -t ../BurstTrigger/data/SNTheoryDistributions.root --input-text BackEff.txt
 ```
 This will create `tradi.pdf` which contain histograms related to the efficiency of the trigger.
+It will also create afile called `tradi.root`, which can be fed into:
 
+``` sh
+./build/BurstTrigger/PlotSNBurst -i tradi.root -o nice_pdf.pdf
+```
 
+### Likelihood approach
+To get the sensitivity with the likelihood trigger on has to run 2 steps:
+ - The first step to get the background and signal PDF.
+ - Second step is to actually run the trigger simulations.
+Note in the previous case (counting approach), getting the PDF is just the same as getting the number of events (i.e. background rate and efficiency).
+
+To realise the first step, it's basically something quite similar to what is realised by `AnalyseDAQClustering`, but not quite, since you need to be careful about normalisations etc..
+
+``` sh
+./TriggerDecision/app/DumpForStatisticalTrigger --list ../FileLists/prodmarley_nue_spectrum_radiological_timedep_hudepohl_1.2M_3perevent_dune10kt_1x2x6_snanatrigprim2000_clustered_manyconfig.list --nconfig 48
+```
+
+Runs over a list of files which has 48 configurations in them (this will take a while to run). It creates an output file `LikelihoodTrigger.root` (you can modify this name in the command line) whichcontains many PDF for all the configurations and files. An example of a file is here:
+
+``` sh
+/dune/app/users/plasorak/thiago_clustering/Clustering/build/LikelihoodTrigger.root
+```
+
+Then, you can run:
+``` sh
+./TriggerDecision/app/SmartTriggerStatisticalTests --ntoy 10000 --nevent 10 --config 2 --output out.root --method Likelihood --inputsignal LikelihoodTrigger.root  --inputbackground LikelihoodTrigger.root
+```
+This will throw 10k toys for supernova of 10 events using the configuration number 2 of the file before. Note, you can have different files for the PDF of the signal and background (in case, for example, where you used a file which had only radiological samples in them).
+
+Once you have run that, you are done, because `out.root` now contains 10000 likelihoods in the case where you have background and signal+background. You can just plot them and get the sensitivity by using the python script:
+
+``` sh
+python TriggerDecision/MakeLikelihoodPlots.py
+```
+_Note this is not in the build directory._
+You will need to have `uproot` (which I have no clue how to install on the gpvm, but otherwise I think you can do `pip install uproot` on your laptop), and change the first line `file = uproot.open('~/Desktop/real_llh_trig_lmc.root')` to be whatever/wherever the file `out.root` is.
