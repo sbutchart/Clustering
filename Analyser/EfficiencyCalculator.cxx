@@ -43,22 +43,14 @@ int main (int argc, char** argv) {
     }
   }
 
-  std::map<int,ArbitraryAnaInputManager*> aaim;
-  aaim[1600] = new ArbitraryAnaInputManager();
-  aaim[2000] = new ArbitraryAnaInputManager();
-  aaim[2400] = new ArbitraryAnaInputManager();
-  aaim[2800] = new ArbitraryAnaInputManager();
-  aaim[3200] = new ArbitraryAnaInputManager();
-  aaim[3600] = new ArbitraryAnaInputManager();
-  aaim[4000] = new ArbitraryAnaInputManager();
-
-  aaim[1600]->SetInputTree("arbitrary1600/SimTree");
-  aaim[2000]->SetInputTree("arbitrary2000/SimTree");
-  aaim[2400]->SetInputTree("arbitrary2400/SimTree");
-  aaim[2800]->SetInputTree("arbitrary2800/SimTree");
-  aaim[3200]->SetInputTree("arbitrary3200/SimTree");
-  aaim[3600]->SetInputTree("arbitrary3600/SimTree");
-  aaim[4000]->SetInputTree("arbitrary4000/SimTree");
+  std::map<int,SNAnaInputManager*> aaim;
+  // aaim[1600] = new SNAnaInputManager(); aaim[1600]->SetInputTree("arbitrary1600/SimTree");
+  aaim[2000] = new SNAnaInputManager(); aaim[2000]->SetInputTree("snanatrigprim2000/SimTree");
+  // aaim[2400] = new ArbitraryAnaInputManager(); aaim[2400]->SetInputTree("arbitrary2400/SimTree");
+  // aaim[2800] = new ArbitraryAnaInputManager(); aaim[2800]->SetInputTree("arbitrary2800/SimTree");
+  // aaim[3200] = new ArbitraryAnaInputManager(); aaim[3200]->SetInputTree("arbitrary3200/SimTree");
+  // aaim[3600] = new ArbitraryAnaInputManager(); aaim[3600]->SetInputTree("arbitrary3600/SimTree");
+  // aaim[4000] = new ArbitraryAnaInputManager(); aaim[4000]->SetInputTree("arbitrary4000/SimTree");
 
   for (auto& it: aaim) {
     it.second->SetInputFile(InFileName);
@@ -143,6 +135,8 @@ int main (int argc, char** argv) {
       std::vector<WireCluster*> vec_WireCluster;
       clusteng.ClusterHits2(vec_WireHit, vec_WireCluster);
       wiretrigger.IsTriggering(vec_WireCluster);
+
+      for (auto const& it: vec_WireCluster) std::cout << it->GetWirePlane() << std::endl;
 
       for (size_t c=0; c<vec_WireCluster.size(); ++c) {
         WireCluster* clust = vec_WireCluster[c];

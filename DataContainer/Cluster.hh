@@ -197,6 +197,7 @@ public:
   double GetTrueDirection(const Direction d) const { return fTrueDirection.at(d);          };
   size_t GetNHit         ()                  const { return fNHit;                         };
   bool   GetType         ()                  const { return (fTrueGenType==kSNnu);         };
+  int    GetGenType      ()                  const { return int(fTrueGenType);             };
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };

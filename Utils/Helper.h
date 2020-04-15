@@ -21,6 +21,8 @@
 #include "TPad.h"
 #include "TProfile.h"
 #include "TEfficiency.h"
+#include "TLine.h"
+#include "TArrow.h"
 
 #include <algorithm>
 #include <cassert>
@@ -873,6 +875,22 @@ inline double GetStatThreshold(const TH1D* signal,
 
 }
 
+/* std::map<TLine*, TArrow*> MakeArrow(int  position,  */
+/* 				    int  length  ,  */
+/* 				    int  height) { */
+  
+/*   std::map<TLine*, TArrow*> CutLine; */
+/*   TLine *MyCutLine = new TLine(position, 0, position, length); */
+/*   MyCutLine->SetLineWidth(2); */
+/*   MyCutLine->SetLineColor(kBlack); */
+/*   TArrow *arrow = new TArrow(position, length, position+height, length); */
+/*   arrow->SetLineWidth(2); */
+/*   arrow->SetArrowSize(0.02); */
+/*   arrow->SetLineColor(kBlack); */
+/*   CutLine[MyCutLine] = arrow; */
+/*   return CutLine; */
+  
+/* } */
 
 
 #endif

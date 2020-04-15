@@ -9,12 +9,14 @@ public:
   WireCluster(std::vector<Hit*>&);
   WireCluster():
     Cluster(),
+    fWirePlane     (0),
     fMC_UnderlyingE(0),
     fNElectron     (0){
   };
   
   virtual ~WireCluster() {};
   using Cluster::Print;
+  int    GetWirePlane     () const { return fWirePlane                   ; };
   bool   GetIsSelected    () const { return fIsSelected                  ; };
   double GetHitSumADC     () const { return fSumPeak                     ; };
   double GetMC_UnderlyingE() const { return fMC_UnderlyingE              ; };
@@ -32,6 +34,7 @@ protected:
   };
   
 private:
+  int    fWirePlane;
   double fMC_UnderlyingE;
   double fNElectron;
 };
