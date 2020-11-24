@@ -115,16 +115,18 @@ void ClusterEngine::ClusterHits2_sort(std::vector<WireHit*>& vec_Hits,
           vec_TempHits2.push_back(vec_TempHits[j  ]);
           vec_TempHits2.push_back(vec_TempHits[j+1]);
 
-          while((j+timeCount+1)<vec_TempHits.size() && 
-                std::abs(vec_TempHits[j+timeCount]->GetHitTime()-vec_TempHits[j+timeCount+1]->GetHitTime())
-                <=fTimeWindow)
-          {
-            if(vec_TempHits[j + timeCount + 1]->GetHitSADC()>fMinHitADC)
-              vec_TempHits2.push_back(vec_TempHits[j + timeCount + 1]);
-            timeCount++;
-          }
+          while((j+timeCount+1)<vec_TempHits.size() && (
+	(std::abs(vec_TempHits[j+timeCount]->GetHitTime()                                       -vec_TempHits[j+timeCount+1]->GetHitTime()                                         ) <=fTimeWindow ) ||
+	(std::abs(vec_TempHits[j+timeCount]->GetHitTime()+vec_TempHits[j+timeCount]->GetHitRMS()-vec_TempHits[j+timeCount+1]->GetHitTime()                                         ) <=fTimeWindow ) ||
+	(std::abs(vec_TempHits[j+timeCount]->GetHitTime()                                       -vec_TempHits[j+timeCount+1]->GetHitTime()-vec_TempHits[j+timeCount+1]->GetHitRMS()) <=fTimeWindow ) ||
+	(std::abs(vec_TempHits[j+timeCount]->GetHitTime()+vec_TempHits[j+timeCount]->GetHitRMS()-vec_TempHits[j+timeCount+1]->GetHitTime()-vec_TempHits[j+timeCount+1]->GetHitRMS()) <=fTimeWindow )	))
+	    {
+	      if(vec_TempHits[j + timeCount + 1]->GetHitSADC()>fMinHitADC)
+		vec_TempHits2.push_back(vec_TempHits[j + timeCount + 1]);
+	      timeCount++;
+	    }
 
-          j = j + timeCount;
+	  j = j + timeCount;
           vec_Clusters.push_back(new WireCluster(vec_TempHits2));
           vec_TempHits2.clear();
           //fVecClusters.push_back(temp);
