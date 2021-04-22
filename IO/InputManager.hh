@@ -267,14 +267,28 @@ public:
       }
       if((*Hit_Chan)[j] > fAPA_Channel[fNAPA])
         continue;
-      WireHit* wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
-                                (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
-                                (*Hit_True_Energy)[j], (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
-                                0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
-                                0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
-                                0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
-                                (*Hit_True_X)[j],      (*Hit_True_Y)[j],        (*Hit_True_Z)[j],
-                                marley_index,          (*Hit_True_nElec)[j]);
+
+      WireHit* wh;
+
+      if( !Hit_True_Energy->empty() && !Hit_True_X->empty() && !Hit_True_Y->empty() && !Hit_True_Z->empty() && !Hit_True_nElec->empty())
+	wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
+				  (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
+				  (*Hit_True_Energy)[j], (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
+				  0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
+				  0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
+				  0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
+				  (*Hit_True_X)[j],      (*Hit_True_Y)[j],        (*Hit_True_Z)[j],
+				  marley_index,          (*Hit_True_nElec)[j]);
+      else
+	wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
+				  (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
+				  -1,                    (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
+				  0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
+				  0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
+				  0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
+				  -1,                    -1,                      -1,
+			          marley_index,          -1);
+     	
       if (wh->GetChannel() < 200000 ||
           abs(wh->GetPosition(kX)) < 20000 ||
           abs(wh->GetPosition(kY)) < 20000 ||
