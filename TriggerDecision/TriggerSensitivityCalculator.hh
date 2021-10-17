@@ -59,12 +59,22 @@ public:
     assert(BackgroundPDF_->Integral() != 0);
     assert(SignalPDF_    ->Integral() != 0);
     
-    BackgroundPDF_->Scale(1./0.12); // Detector scaling got lost somewhere
+    //BackgroundPDF_->Scale(1./0.12); // Detector scaling got lost somewhere
     BackgroundPDF_->Scale(TimeWindow);
 
     BackgroundRate_ = BackgroundPDF_->Integral();
     
-    SignalPDF_->Scale(nSNEvent_ * Efficiency_ / SignalPDF_->Integral());
+    //SignalPDF_->Scale(nSNEvent_ * Efficiency_ / SignalPDF_->Integral());
+    if(Config_ == 0)
+      SignalPDF_->Scale(nSNEvent_ * 0.39524 / SignalPDF_->Integral());
+    else if(Config_ == 13)
+      SignalPDF_->Scale(nSNEvent_ * 0.51257 / SignalPDF_->Integral());      
+    else if(Config_ == 14)
+      SignalPDF_->Scale(nSNEvent_ * 0.44927 / SignalPDF_->Integral());
+
+    //SignalPDF_->Scale(nSNEvent_ * 0.513 / SignalPDF_->Integral());
+    //SignalPDF_->Scale(nSNEvent_ * 0.8 / SignalPDF_->Integral());
+    //SignalPDF_->Scale(nSNEvent_  / SignalPDF_->Integral());
     SignalPDF_->Add(BackgroundPDF_);
 
     OutputFile_->cd();
@@ -178,6 +188,9 @@ private:
     int nBackground          = rand.Poisson(BackgroundPDF_->Integral());
     int nSignalAndBackground = rand.Poisson(SignalPDF_    ->Integral());
 
+    //std::cout<<nBackground<<" "<<nSignalAndBackground<<"\n";
+    //std::cout<<"#################\n\n";
+
     for (int iBackground=0; iBackground<nBackground; ++iBackground) {
       Background->Fill(GetRandom(rand, BackgroundPDF_));
     }
@@ -185,6 +198,9 @@ private:
     for (int iSignalAndBackground=0; iSignalAndBackground<nSignalAndBackground; ++iSignalAndBackground) {
       Signal->Fill(GetRandom(rand, SignalPDF_));
     }
+
+    //for(int i=0;i<Background->GetNbinsX();i++)
+    //std::cout<<Background->GetBinLowEdge(i+1)<<"\t"<<BackgroundPDF_->GetBinContent(i+1) << " - "<<Background->GetBinContent(i+1)<<"\t|\t"<<SignalPDF_->GetBinContent(i+1) <<" - "<<Signal->GetBinContent(i+1)<<"\n";
   }
   
   std::pair<std::vector<double>,std::vector<double>> ThreadedCompute() {

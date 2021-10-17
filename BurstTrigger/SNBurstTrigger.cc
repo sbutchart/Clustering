@@ -9,7 +9,7 @@ void SNBurstTrigger::FillFakeRateNClusters(Configuration& c) const {
   for(int nClusters=1; nClusters<Max; nClusters++){
     if(BackgroundMean > PoissonStatThreshold){
       double nRMS     = (nClusters-BackgroundMean) / RMS;
-      double fraction = (1 - TMath::Erf(nRMS / std::sqrt(2.))) / 2.;
+      double fraction = (1 - TMath::Erf(nRMS / std::sqrt(2.))) / 2.;  // 1 - gaussian CDF
       double fakeRate = fraction * c.fBackgroundRate;
       c.fFakeRate_Cut[nClusters] = fakeRate;
     } else {

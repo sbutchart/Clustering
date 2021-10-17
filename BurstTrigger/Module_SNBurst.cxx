@@ -144,6 +144,16 @@ int main(int argc, char** argv) {
     l_perMonth_2->Draw();
     can.Print(OutputPdfFile.c_str());
 
+    //print on the screen the N clusters to give an one per month bg count (Thiago)
+    int nbin = ThisConfig.fTH1DFakeRate_Cut->GetNbinsX();
+    for(int i=1;i<=nbin;i++){
+      double bg_rate = ThisConfig.fTH1DFakeRate_Cut->GetBinContent(i);
+      if(bg_rate<ThisConfig.fTargetFakeRate){
+	std::cout<<ThisConfig.fTH1DFakeRate_Cut->GetBinCenter(i)<<"\n";
+	break;
+      }
+    }
+
     gPad->SetLogy(false);
     gPad->SetLogx(false);
     ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(0,50);
