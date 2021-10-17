@@ -4,6 +4,8 @@
 #include "TH2D.h"
 #include "TTree.h"
 #include "TCanvas.h"
+#include "TStyle.h"
+#include "TLine.h"
 
 #include <iostream>
 #include <unistd.h>
@@ -24,8 +26,9 @@ int main(int argc, char** argv){
   std::string InputFile = "/dune/data2/users/plasorak/Generate_Electron_gen_g4_detsim_addnoise_trigprim_arbitraryana_nonoise.root";
   std::string OutputFile = "Test.pdf";
   int nEvent = 0;
+  int isHD   = 0;
 
-  while ( (opt = getopt(argc, argv, "o:i:n:")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, "o:i:n:d:")) != -1 ) {  // for each option...
     switch ( opt ) {
     case 'i':
       InputFile = optarg;
@@ -36,14 +39,31 @@ int main(int argc, char** argv){
     case 'o':
       OutputFile = optarg;
       break;
+    case 'd':
+      isHD = atoi(optarg);
+      break;
     case '?':  // unknown option...
       std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
       break;
     }
   }
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
-  TTree *hit_tree = (TTree*)f_Input->Get("arbitraryanatrigprim2000/SNSimTree");
-  
+  //TTree *hit_tree = (TTree*)f_Input->Get("arbitraryanatrigprim2000/SNSimTree");
+  TTree *hit_tree = (TTree*)f_Input->Get("snanatrigprim16/SNSimTree");
+ 
+  int x_leng,y_leng,z_leng;
+
+  if(isHD){
+    x_leng = 360;
+    y_leng = 600;
+    z_leng = 1400;
+  }
+  else{
+    x_leng = 300;
+    y_leng = 500;
+    z_leng = 900;    
+  }
+
   if (nEvent == 0) {
     nEvent = hit_tree->GetEntries();
   } else {
@@ -55,46 +75,49 @@ int main(int argc, char** argv){
   minX = minY = minZ = std::numeric_limits<double>::max();
   maxX = maxY = maxZ = std::numeric_limits<double>::min();
   
-  TH2D* th2dhitXDistance      = new TH2D("TH2DhitXDistance",      ";X Distance [cm];nhits",       20, -500,  500, 25, 0, 25);
-  TH2D* th2dhitYDistance      = new TH2D("TH2DhitYDistance",      ";Y Distance [cm];nhits",       20, -800,  800, 25, 0, 25);
-  TH2D* th2dhitZDistance      = new TH2D("TH2DhitZDistance",      ";Z Distance [cm];nhits",       20, -100, 1600, 25, 0, 25);
-  TH2D* th2dhitEnergyLepton   = new TH2D("TH2DhitEnergyLepton",   ";Energy Lepton [MeV];nhits",   20,    0,   30, 25, 0, 25);
+  TH2D* th2dhitXDistance      = new TH2D("TH2DhitXDistance",      ";X Distance [cm];nhits",       20, x_leng*-1,  x_leng, 20, 0, 20);
+  TH2D* th2dhitYDistance      = new TH2D("TH2DhitYDistance",      ";Y Distance [cm];nhits",       20, y_leng*-1,  y_leng, 20, 0, 20);
+  TH2D* th2dhitZDistance      = new TH2D("TH2DhitZDistance",      ";Z Distance [cm];nhits",       20,    0, z_leng, 20, 0, 20);
+  TH2D* th2dhitEnergyLepton   = new TH2D("TH2DhitEnergyLepton",   ";Momentum Electron [MeV];nhits",   40,    0,   20, 20, 0, 20);
 
   TH1D* th1notrigNHit           = new TH1D("TH1DnotrigNHit",           ";NHits;nEvents",                 20,    0,   20);
-  TH1D* th1notrigXDistance      = new TH1D("TH1DnotrigXDistance",      ";X Distance [cm];nEvents",       20, -500,  500);
-  TH1D* th1notrigYDistance      = new TH1D("TH1DnotrigYDistance",      ";Y Distance [cm];nEvents",       20, -800,  800);
-  TH1D* th1notrigZDistance      = new TH1D("TH1DnotrigZDistance",      ";Z Distance [cm];nEvents",       20, -100, 1600);
+  TH1D* th1notrigXDistance      = new TH1D("TH1DnotrigXDistance",      ";X Distance [cm];nEvents",       20, x_leng*-1,  x_leng);
+  TH1D* th1notrigYDistance      = new TH1D("TH1DnotrigYDistance",      ";Y Distance [cm];nEvents",       20, y_leng*-1,  y_leng);
+  TH1D* th1notrigZDistance      = new TH1D("TH1DnotrigZDistance",      ";Z Distance [cm];nEvents",       20,    0, z_leng);
   TH1D* th1notrigTDistance      = new TH1D("TH1DnotrigTDistance",      ";T [tick];nEvents",              20,    0, 4000);
-  TH1D* th1notrigEnergyLepton   = new TH1D("TH1DnotrigEnergyLepton",   ";Energy Lepton [MeV];nEvents",   20,    0,   30);
+  TH1D* th1notrigEnergyLepton   = new TH1D("TH1DnotrigEnergyLepton",   ";Momentum Electron [MeV];nEvents",   40,    0,   20);
 
   TH1D* th1trigNHit           = new TH1D("TH1DtrigNHit",           ";NHits;nEvents",                 20,    0,   20);
-  TH1D* th1trigXDistance      = new TH1D("TH1DtrigXDistance",      ";X Distance [cm];nEvents",       20, -500,  500);
-  TH1D* th1trigYDistance      = new TH1D("TH1DtrigYDistance",      ";Y Distance [cm];nEvents",       20, -800,  800);
-  TH1D* th1trigZDistance      = new TH1D("TH1DtrigZDistance",      ";Z Distance [cm];nEvents",       20, -100, 1600);
+  TH1D* th1trigXDistance      = new TH1D("TH1DtrigXDistance",      ";X Distance [cm];nEvents",       20, x_leng*-1,  x_leng);
+  TH1D* th1trigYDistance      = new TH1D("TH1DtrigYDistance",      ";Y Distance [cm];nEvents",       20, y_leng*-1,  y_leng);
+  TH1D* th1trigZDistance      = new TH1D("TH1DtrigZDistance",      ";Z Distance [cm];nEvents",       20,    0, z_leng);
   TH1D* th1trigTDistance      = new TH1D("TH1DtrigTDistance",      ";T [tick];nEvents",              20,    0, 4000);
-  TH1D* th1trigEnergyLepton   = new TH1D("TH1DtrigEnergyLepton",   ";Energy Lepton [MeV];nEvents",   20,    0,   30);
+  TH1D* th1trigEnergyLepton   = new TH1D("TH1DtrigEnergyLepton",   ";Momentum Electron [MeV];nEvents",   40,    0,   20);
 
-  TProfile* hitXDistance      = new TProfile("hitXDistance",      ";XDistance;nhits"   , 20, -500,  500);
-  TProfile* hitYDistance      = new TProfile("hitYDistance",      ";YDistance;nhits"   , 20, -800,  800);
-  TProfile* hitZDistance      = new TProfile("hitZDistance",      ";ZDistance;nhits"   , 20, -100, 1600);
-  TProfile* hitEnergyLepton   = new TProfile("hitEnergyLepton",   ";EnergyLepton;nhits", 20,    0,   30);
+  TProfile* hitXDistance      = new TProfile("hitXDistance",      ";XDistance;nhits"   , 20, x_leng*-1,  x_leng);
+  TProfile* hitYDistance      = new TProfile("hitYDistance",      ";YDistance;nhits"   , 20, y_leng*-1,  y_leng);
+  TProfile* hitZDistance      = new TProfile("hitZDistance",      ";ZDistance;nhits"   , 20,    0, z_leng);
+  TProfile* hitEnergyLepton   = new TProfile("hitEnergyLepton",   ";MomentumElectron;nhits", 40,    0,   20);
 
-  TH1D* histoEnergyLepton   = new TH1D("histoEnergyLepton",   ";EnergyLepton;", 20,    0,   30);
+  TH1D* histoEnergyLepton   = new TH1D("histoEnergyLepton",   ";MomentumElectron;", 40,    0,   20);
 
-  TEfficiency* effXDistance      = new TEfficiency("EfficiencyXDistance",      ";X Distance [cm];Efficiency",       20, -500,  500);
-  TEfficiency* effYDistance      = new TEfficiency("EfficiencyYDistance",      ";Y Distance [cm];Efficiency",       20, -800,  800);
-  TEfficiency* effZDistance      = new TEfficiency("EfficiencyZDistance",      ";Z Distance [cm];Efficiency",       20, -100, 1600);
-  TEfficiency* effEnergyLepton   = new TEfficiency("EfficiencyEnergyLepton",   ";Energy Lepton [MeV];Efficiency",   20,    0,   30);
+  TEfficiency* effXDistance      = new TEfficiency("EfficiencyXDistance",      ";X Distance [cm];Efficiency",       20, x_leng*-1,  x_leng);
+  TEfficiency* effYDistance      = new TEfficiency("EfficiencyYDistance",      ";Y Distance [cm];Efficiency",       20, y_leng*-1,  y_leng);
+  TEfficiency* effZDistance      = new TEfficiency("EfficiencyZDistance",      ";Z Distance [cm];Efficiency",       20,    0, z_leng);
+  TEfficiency* effEnergyLepton   = new TEfficiency("EfficiencyEnergyLepton",   ";Momentum Electron [MeV];Efficiency",   40,    0,   20);
+  TEfficiency* effEnergyXDista   = new TEfficiency("EfficiencyEnergyDistan",   ";Momentum Electron [MeV];X Distance [cm]",   20,    0,   20, 10, x_leng*-1, x_leng);
 
-  TH2D* th2dNoBThitXDistance      = new TH2D("TH2DNoBThitXDistance",      ";X Distance [cm];nNoBTHits",       20, -500,  500, 20, 0, 100);
-  TH2D* th2dNoBThitYDistance      = new TH2D("TH2DNoBThitYDistance",      ";Y Distance [cm];nNoBTHits",       20, -800,  800, 20, 0, 100);
-  TH2D* th2dNoBThitZDistance      = new TH2D("TH2DNoBThitZDistance",      ";Z Distance [cm];nNoBTHits",       20, -100, 1600, 20, 0, 100);
-  TH2D* th2dNoBThitEnergyLepton   = new TH2D("TH2DNoBThitEnergyLepton",   ";Energy Lepton [MeV];nNoBTHits",   20,    0,   30, 20, 0, 100);
+  //TH2D* th2dNoBThitXDistance      = new TH2D("TH2DNoBThitXDistance",      ";X Distance [cm];nNoBTHits",       20, x_leng*-1,  x_leng, 20, 0, 100);
+  //TH2D* th2dNoBThitYDistance      = new TH2D("TH2DNoBThitYDistance",      ";Y Distance [cm];nNoBTHits",       20, y_leng*-1,  y_leng, 20, 0, 100);
+  //TH2D* th2dNoBThitZDistance      = new TH2D("TH2DNoBThitZDistance",      ";Z Distance [cm];nNoBTHits",       20,    0, z_leng, 20, 0, 100);
+  //TH2D* th2dNoBThitEnergyLepton   = new TH2D("TH2DNoBThitEnergyLepton",   ";Energy Lepton [MeV];nNoBTHits",   40,    0,   20, 20, 0, 100);
 
-  TProfile* hitNoBTXDistance      = new TProfile("hitNoBTXDistance",      ";XDistance;nNoBTHits"   , 20, -500,  500);
-  TProfile* hitNoBTYDistance      = new TProfile("hitNoBTYDistance",      ";YDistance;nNoBTHits"   , 20, -800,  800);
-  TProfile* hitNoBTZDistance      = new TProfile("hitNoBTZDistance",      ";ZDistance;nNoBTHits"   , 20, -100, 1600);
-  TProfile* hitNoBTEnergyLepton   = new TProfile("hitNoBTEnergyLepton",   ";EnergyLepton;nNoBTHits", 20,    0,   30);
+  TProfile* hitNoBTXDistance      = new TProfile("hitNoBTXDistance",      ";XDistance;nNoBTHits"   , 20, x_leng*-1,  x_leng);
+  TProfile* hitNoBTYDistance      = new TProfile("hitNoBTYDistance",      ";YDistance;nNoBTHits"   , 20, y_leng*-1,  y_leng);
+  TProfile* hitNoBTZDistance      = new TProfile("hitNoBTZDistance",      ";ZDistance;nNoBTHits"   , 20,    0, z_leng);
+  TProfile* hitNoBTEnergyLepton   = new TProfile("hitNoBTEnergyLepton",   ";MomentumElectron;nNoBTHits", 20,    0,   30);
+
+  Int_t NColHit;
 
   std::vector<int>                 * Hit_View             = NULL;
   std::vector<int>                 * Hit_Size             = NULL;
@@ -123,6 +146,8 @@ int main(int argc, char** argv){
   std::vector<float>               * True_Dirz        = NULL;
   std::vector<float>               * True_Time        = NULL;
                                                               
+  hit_tree->SetBranchAddress("NColHit"                 , &NColHit                 );
+
   hit_tree->SetBranchAddress("Hit_View"                 , &Hit_View                 );
   hit_tree->SetBranchAddress("Hit_Size"                 , &Hit_Size                 );
   hit_tree->SetBranchAddress("Hit_TPC"                  , &Hit_TPC                  );
@@ -159,7 +184,7 @@ int main(int argc, char** argv){
   clusteng.SetPositionOpt  (300);
   clusteng.SetBucketSize   (1);
       
-  wiretrigger.SetWireNHitsMin    (6);
+  wiretrigger.SetWireNHitsMin    (3);
   wiretrigger.SetWireNChanMin    (2);
   wiretrigger.SetWireChanWidthMin(0);
   wiretrigger.SetWireSADCMin     (0);
@@ -172,9 +197,15 @@ int main(int argc, char** argv){
     hit_tree->GetEntry(iEvent);
     std::map<int, int> nhit;
 
+    Double_t ElectMom = sqrt( True_E->at(0)*True_E->at(0) - 0.511*0.511*1e-6);
+
     nhit.clear();
     for (auto const& it:(*Hit_True_GenType))
       if (it == 1) nhit[0]++;
+
+    if(!isHD){
+      nhit[0] = NColHit;
+    }
     
     std::vector<WireHit*> vec_WireHit;
     for (size_t j=0; j<Hit_View->size(); ++j) {
@@ -196,9 +227,14 @@ int main(int argc, char** argv){
     for (size_t c=0; c<vec_WireCluster.size(); ++c) {
       WireCluster* clust = vec_WireCluster[c];
       if (clust->GetIsTriggering()) {
-        if (clust->GetType() == 1) {
-          eff[0]++;
-        }
+	if(isHD){
+	  if (clust->GetType() == 1) {
+	    eff[0]++;
+	  }
+	}
+	else{
+	  eff[0]++;
+	}
       }
     }
 
@@ -211,11 +247,11 @@ int main(int argc, char** argv){
       if (True_VertY->at(i) > maxY) maxY = True_VertY->at(i);
       if (True_VertZ->at(i) > maxZ) maxZ = True_VertZ->at(i);
             
-      // if (std::abs(True_VertX->at(i)) < 200 &&
-      //     std::abs(True_VertY->at(i)) < 300 &&
-      //     True_VertZ->at(i) > 100 &&
-      //     True_VertZ->at(i) < 1000) {
-      if (true) {
+      if (std::abs(True_VertX->at(i)) < x_leng &&
+	  std::abs(True_VertY->at(i)) < y_leng &&
+	  True_VertZ->at(i) > 0 &&
+	  True_VertZ->at(i) < z_leng) {
+	//if (true) {
         nInterestingEvent++;
         nDetectedEvent += eff[i]>0;
         if (eff[i]==0){
@@ -225,35 +261,36 @@ int main(int argc, char** argv){
           std::cout << "VertY : " << True_VertY->at(i)           << std::endl;
           std::cout << "VertZ : " << True_VertZ->at(i)           << std::endl;
           std::cout << "VertT : " << True_VertexT->at(i)         << std::endl;
-          std::cout << "ELep  : " << True_E->at(i) * 1000.       << std::endl;
+          std::cout << "ELep  : " <<ElectMom * 1000.       << std::endl;
           th1notrigNHit          ->Fill(nhit[0]                     );
           th1notrigXDistance     ->Fill(True_VertX->at(i)           );
           th1notrigYDistance     ->Fill(True_VertY->at(i)           );
           th1notrigZDistance     ->Fill(True_VertZ->at(i)           );
           th1notrigTDistance     ->Fill(True_VertexT->at(i)         );
-          th1notrigEnergyLepton  ->Fill(True_E->at(i) * 1000. );
+          th1notrigEnergyLepton  ->Fill(ElectMom * 1000. );
         } else {
             th1trigNHit          ->Fill(nhit[0]                     );
             th1trigXDistance     ->Fill(True_VertX->at(i)           );
             th1trigYDistance     ->Fill(True_VertY->at(i)           );
             th1trigZDistance     ->Fill(True_VertZ->at(i)           );
             th1trigTDistance     ->Fill(True_VertexT->at(i)         );
-            th1trigEnergyLepton  ->Fill(True_E->at(i) * 1000. );
+            th1trigEnergyLepton  ->Fill(ElectMom * 1000. );
           }
             
-        th2dhitXDistance     ->Fill(True_VertX->at(i)          , nhit[i]);        
-        th2dhitYDistance     ->Fill(True_VertY->at(i)          , nhit[i]);        
-        th2dhitZDistance     ->Fill(True_VertZ->at(i)          , nhit[i]);        
-        th2dhitEnergyLepton  ->Fill(True_E->at(i) * 1000., nhit[i]);
-        hitXDistance         ->Fill(True_VertX->at(i)          , nhit[i]);
-        hitYDistance         ->Fill(True_VertY->at(i)          , nhit[i]);
-        hitZDistance         ->Fill(True_VertZ->at(i)          , nhit[i]);
-        hitEnergyLepton      ->Fill(True_E->at(i) * 1000., nhit[i]);
+        th2dhitXDistance     ->Fill(True_VertX->at(i)          , nhit[0]);        
+        th2dhitYDistance     ->Fill(True_VertY->at(i)          , nhit[0]);        
+        th2dhitZDistance     ->Fill(True_VertZ->at(i)          , nhit[0]);        
+        th2dhitEnergyLepton  ->Fill(ElectMom * 1000., nhit[0]);
+        hitXDistance         ->Fill(True_VertX->at(i)          , nhit[0]);
+        hitYDistance         ->Fill(True_VertY->at(i)          , nhit[0]);
+        hitZDistance         ->Fill(True_VertZ->at(i)          , nhit[0]);
+        hitEnergyLepton      ->Fill(ElectMom * 1000., nhit[0]);
         effXDistance         ->Fill(eff[i]>0, True_VertX->at(i)          );
         effYDistance         ->Fill(eff[i]>0, True_VertY->at(i)          );
         effZDistance         ->Fill(eff[i]>0, True_VertZ->at(i)          );
-        effEnergyLepton      ->Fill(eff[i]>0, True_E->at(i) * 1000.);
-        histoEnergyLepton    ->Fill(True_E->at(i) * 1000.);
+        effEnergyLepton      ->Fill(eff[i]>0,ElectMom * 1000.);
+	effEnergyXDista      ->Fill(eff[i]>0,ElectMom * 1000., True_VertX->at(i));
+        histoEnergyLepton    ->Fill(ElectMom * 1000.);
       }
     }
 
@@ -296,24 +333,37 @@ int main(int argc, char** argv){
   histoEnergyLepton  ->SetLineColor(kRed);
 
   histoEnergyLepton  ->Scale(18. / histoEnergyLepton  ->GetMaximum());
-  std::cout <<"efficiency " << (double)nDetectedEvent/nInterestingEvent << std::endl;
 
-    
+  double IntergralEff =  (double)nDetectedEvent/nInterestingEvent;
+  std::cout <<"efficiency " << IntergralEff << std::endl;
+
+  auto plain = new TStyle("plain","Default Style");
+
+  plain->SetPadTickX(kTRUE);
+  plain->SetPadTickY(kTRUE);
+  plain->SetPadGridX(kTRUE);
+  plain->SetPadGridY(kTRUE);
+  plain->cd();
+
+  TLine l1(x_leng*-1.0, IntergralEff, x_leng*1.0, IntergralEff); l1.SetLineWidth(2); l1.SetLineStyle(7);
+
   TCanvas* c = new TCanvas();
   c->Print((OutputFile+"[").c_str());
   th2dhitXDistance     ->Draw("COLZ"); hitXDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
   th2dhitYDistance     ->Draw("COLZ"); hitYDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
   th2dhitZDistance     ->Draw("COLZ"); hitZDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());  
-  th2dhitEnergyLepton  ->Draw("COLZ"); hitEnergyLepton  ->Draw("SAME"); histoEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
-  effXDistance     ->Draw(); c->Print(OutputFile.c_str());
-  effYDistance     ->Draw(); c->Print(OutputFile.c_str());
-  effZDistance     ->Draw(); c->Print(OutputFile.c_str());
-  effEnergyLepton  ->Draw(); c->Print(OutputFile.c_str());
+  //th2dhitEnergyLepton  ->Draw("COLZ"); hitEnergyLepton  ->Draw("SAME"); histoEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
+  th2dhitEnergyLepton  ->Draw("COLZ"); hitEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
+  effXDistance     ->Draw(); l1.Draw(); c->Print(OutputFile.c_str());
+  effYDistance     ->Draw(); l1.DrawLine(y_leng*-1.0,IntergralEff,y_leng*1.0,IntergralEff); c->Print(OutputFile.c_str());
+  effZDistance     ->Draw(); l1.DrawLine(0., IntergralEff, z_leng*1.0,IntergralEff); c->Print(OutputFile.c_str());
+  effEnergyLepton  ->Draw(); l1.DrawLine(0., IntergralEff, 22., IntergralEff); c->Print(OutputFile.c_str());
+  effEnergyXDista  ->Draw("colz"); c->Print(OutputFile.c_str());
 
-  th2dNoBThitXDistance     ->Draw("COLZ"); hitNoBTXDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th2dNoBThitYDistance     ->Draw("COLZ"); hitNoBTYDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th2dNoBThitZDistance     ->Draw("COLZ"); hitNoBTZDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());  
-  th2dNoBThitEnergyLepton  ->Draw("COLZ"); hitNoBTEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
+  //th2dNoBThitXDistance     ->Draw("COLZ"); hitNoBTXDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
+  //th2dNoBThitYDistance     ->Draw("COLZ"); hitNoBTYDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
+  //th2dNoBThitZDistance     ->Draw("COLZ"); hitNoBTZDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());  
+  //th2dNoBThitEnergyLepton  ->Draw("COLZ"); hitNoBTEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
 
   th1trigNHit          ->SetLineColor(kRed);
   th1trigXDistance     ->SetLineColor(kRed);
@@ -322,12 +372,12 @@ int main(int argc, char** argv){
   th1trigTDistance     ->SetLineColor(kRed);
   th1trigEnergyLepton  ->SetLineColor(kRed);
 
-  th1notrigNHit          ->Draw(); th1trigNHit          ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th1notrigXDistance     ->Draw(); th1trigXDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th1notrigYDistance     ->Draw(); th1trigYDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th1notrigZDistance     ->Draw(); th1trigZDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th1notrigTDistance     ->Draw(); th1trigTDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
-  th1notrigEnergyLepton  ->Draw(); th1trigEnergyLepton  ->Draw("SAME"); c->Print(OutputFile.c_str());
+  th1notrigNHit          ->Draw("E"); th1trigNHit          ->Draw("E SAME"); c->Print(OutputFile.c_str());
+  th1notrigXDistance     ->Draw("E"); th1trigXDistance     ->Draw("E SAME"); th1notrigXDistance->GetYaxis()->SetRangeUser(0,400); c->Print(OutputFile.c_str());
+  th1notrigYDistance     ->Draw("E"); th1trigYDistance     ->Draw("E SAME"); th1notrigYDistance->GetYaxis()->SetRangeUser(0,400); c->Print(OutputFile.c_str());
+  th1notrigZDistance     ->Draw("E"); th1trigZDistance     ->Draw("E SAME"); th1notrigZDistance->GetYaxis()->SetRangeUser(0,400); c->Print(OutputFile.c_str());
+  //th1notrigTDistance     ->Draw(); th1trigTDistance     ->Draw("SAME"); c->Print(OutputFile.c_str());
+  th1notrigEnergyLepton  ->Draw("E"); th1trigEnergyLepton  ->Draw("E SAME"); c->Print(OutputFile.c_str());
   
   c->Print((OutputFile+"]").c_str());
 
