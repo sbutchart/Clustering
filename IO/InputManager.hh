@@ -270,6 +270,14 @@ public:
 
       WireHit* wh;
 
+      
+      if((*Hit_Time)[j]<100){
+	(*Hit_Time)[j]=-999;
+	(*Hit_RMS)[j]=0;
+	(*Hit_Chan)[j]=0;
+      }
+      
+
       if( !Hit_True_Energy->empty() && !Hit_True_X->empty() && !Hit_True_Y->empty() && !Hit_True_Z->empty() && !Hit_True_nElec->empty())
 	wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
 				  (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
