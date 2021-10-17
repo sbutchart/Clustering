@@ -70,7 +70,8 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
     LookForAPA(gen);
     ev++;
   }
-  int spread = 50;
+  //int spread = 50;
+  int spread = 200;
   f_map_wire_time = Get2DHistos("EventDisplay",";Channel number;Time [ticks];ADC",
                                 2*spread,fChan-spread,fChan+spread,
                                 2*spread,fTime-spread,fTime+spread);
@@ -82,13 +83,18 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
       GenType g = ConvertIntToGenType((*im.Hit_True_GenType)[i]);
       nHit_type[g]++;
       float initial_time = (*im.Hit_Time)[i];
-      float adc = (*im.Hit_SADC)[i];
-      f_map_wire_time[g]->Fill(chan,initial_time,adc*2);
+      //float adc = (*im.Hit_SADC)[i];
+      //f_map_wire_time[g]->Fill(chan,initial_time,adc*2);
+      f_map_wire_time[g]->Fill(chan,initial_time);
       std::cout << g << " -> " << chan << " : " << (*im.Hit_RMS)[i] << std::endl;
       
       for(size_t time=0; time<(*im.Hit_RMS)[i];++time) {
-        f_map_wire_time[g]   ->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
-        f_map_wire_time[kAll]->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
+        //f_map_wire_time[g]   ->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
+        //f_map_wire_time[kAll]->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time,adc);
+        //f_map_wire_time[g]   ->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time);
+        //f_map_wire_time[kAll]->Fill(chan,initial_time-(*im.Hit_RMS)[i]/2+time);
+        f_map_wire_time[g]   ->Fill(chan,initial_time+time);
+        f_map_wire_time[kAll]->Fill(chan,initial_time+time);
       }
     }
     
@@ -97,6 +103,7 @@ void WirePositionTimingDisplay::DisplayEvent(const int nevent=-1, const int gent
   gPad->SetRightMargin(1.5*gPad->GetRightMargin());
   gPad->SetGridx();
   gPad->SetGridy();
+  gStyle->SetPalette(1);
   gStyle->SetOptStat("orme");
   for (auto const& it: f_map_wire_time) {
     it.second->SetEntries(nHit_type[it.first]);
