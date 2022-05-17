@@ -586,14 +586,35 @@ inline void autoColorHists(TPad* pad, int whichColours=kBrewerSet1Palette)
 enum GenType{
   kOther=0,
   kSNnu=1,
-  kAPA=2,
-  kCPA=3,
-  kAr39=4,
-  kNeutron=5,
-  kKrypton=6,
-  kPolonium=7,
-  kRadon=8,
-  kAr42=9,
+  kAr39_Lar=2,
+  kAr42_Lar=3,
+  kK42_Lar=4,
+  kKr85_Lar=5,
+  kRn222_Lar=6,
+  kPo218_Lar=7,
+  kPb214_Lar=8,
+  kBi214_Lar=9,
+  kPb210_Lar=10,
+  kK40_CPA=11,
+  kAr42_CPA=12,
+  kU238_CPA=13,
+  kPo218_CPA=14,
+  kPb214_CPA=15,
+  kBi214_CPA=16,
+  kPb210_CPA=17,
+  kBi210_CPA=18,
+  kCo60_APA=19,
+  kU238_APA=20,
+  kRn222_PDS=21,
+  kNeutron=22,
+  //kAPA=2,
+  //kCPA=3,
+  //kAr39=4,
+  //kNeutron=5,
+  //kKrypton=6,
+  //kPolonium=7,
+  //kRadon=8,
+  //kAr42=9,
   kAllBackground,
   kAll
 };
@@ -609,14 +630,35 @@ enum Direction {
 static const std::vector<Direction> AllDirection = {kX,kY,kZ,kT};
 static const std::vector<GenType>   AllGenType   = {kOther,
                                                     kSNnu,
-                                                    kAPA,
-                                                    kCPA,
-                                                    kAr39,
-                                                    kNeutron,
-                                                    kKrypton,
-                                                    kPolonium,
-                                                    kRadon,
-                                                    kAr42,
+						    kAr39_Lar,
+						    kAr42_Lar,
+						    kK42_Lar,
+						    kKr85_Lar,
+						    kRn222_Lar,
+						    kPo218_Lar,
+						    kPb214_Lar,
+						    kBi214_Lar,
+						    kPb210_Lar,
+						    kK40_CPA,
+						    kAr42_CPA,
+						    kU238_CPA,
+						    kPo218_CPA,
+						    kPb214_CPA,
+						    kBi214_CPA,
+						    kPb210_CPA,
+						    kBi210_CPA,
+						    kCo60_APA,
+						    kU238_APA,
+						    kRn222_PDS,
+						    kNeutron,
+                                                    //kAPA,
+                                                    //kCPA,
+                                                    //kAr39,
+                                                    //kNeutron,
+                                                    //kKrypton,
+                                                    //kPolonium,
+                                                    //kRadon,
+                                                    //kAr42,
                                                     kAllBackground,
                                                     kAll};
 
@@ -650,16 +692,37 @@ inline GenType ConvertIntToGenType(int i) {
   switch (i) {
   case  0: return kOther;
   case  1: return kSNnu;
-  case  2: return kAPA;
-  case  3: return kCPA;
-  case  4: return kAr39;
-  case  5: return kNeutron;
-  case  6: return kKrypton;
-  case  7: return kPolonium;
-  case  8: return kRadon;
-  case  9: return kAr42;         
-  case 10: return kAllBackground;
-  case 11: return kAll;
+  case  2: return kAr39_Lar;
+  case  3: return kAr42_Lar;
+  case  4: return kK42_Lar;
+  case  5: return kKr85_Lar;
+  case  6: return kRn222_Lar;
+  case  7: return kPo218_Lar;
+  case  8: return kPb214_Lar;
+  case  9: return kBi214_Lar;
+  case 10: return kPb210_Lar;
+  case 11: return kK40_CPA;
+  case 12: return kAr42_CPA;
+  case 13: return kU238_CPA;
+  case 14: return kPo218_CPA;
+  case 15: return kPb214_CPA;
+  case 16: return kBi214_CPA;
+  case 17: return kPb210_CPA;
+  case 18: return kBi210_CPA;
+  case 19: return kCo60_APA;
+  case 20: return kU238_APA;
+  case 21: return kRn222_PDS;
+  case 22: return kNeutron;
+    //  case  2: return kAPA;
+    //  case  3: return kCPA;
+    //  case  4: return kAr39;
+    //  case  5: return kNeutron;
+    //  case  6: return kKrypton;
+    //  case  7: return kPolonium;
+    //  case  8: return kRadon;
+    //  case  9: return kAr42;         
+  case 23: return kAllBackground;
+  case 24: return kAll;
   }
   return kOther;
 }
@@ -669,30 +732,72 @@ class Helper{
 public:
   Helper(){
     GenName[kSNnu] =          "SN#nu"         ;
-    GenName[kAPA] =           "APA"           ;
-    GenName[kCPA] =           "CPA"           ;
-    GenName[kAr39] =          "Ar39"          ;
+    GenName[kAr39_Lar] =      "LAr 39Ar"      ;
+    GenName[kAr42_Lar] =      "LAr 42Ar"      ;
+    GenName[kK42_Lar] =       "LAr 42K"       ;
+    GenName[kKr85_Lar] =      "LAr 85Kr"      ;
+    GenName[kRn222_Lar] =     "LAr 222Rn"     ;
+    GenName[kPo218_Lar] =     "LAr 218Po"     ;
+    GenName[kPb214_Lar] =     "LAr 214Pb"     ;
+    GenName[kBi214_Lar] =     "LAr 214Bi"     ;
+    GenName[kPb210_Lar] =     "LAr 210Pb"     ;
+    GenName[kK40_CPA] =       "CPA 40K"       ;
+    GenName[kAr42_CPA] =      "CPA 42K"       ;
+    GenName[kU238_CPA] =      "CPA 238U"      ;
+    GenName[kPo218_CPA] =     "CPA 218Po"     ;
+    GenName[kPb214_CPA] =     "CPA 214Pb"     ;
+    GenName[kBi214_CPA] =     "CPA 214Bi"     ;
+    GenName[kPb210_CPA] =     "CPA 210Pb"     ;
+    GenName[kBi210_CPA] =     "CPA 210Bi"     ;
+    GenName[kCo60_APA] =      "APA 60Co"      ;
+    GenName[kU238_APA] =      "APA 238U"      ;
+    GenName[kRn222_PDS] =     "PDS 222Rn"     ;
     GenName[kNeutron] =       "Neutron"       ;
-    GenName[kKrypton] =       "Krypton"       ;
-    GenName[kPolonium] =      "Polonium"      ;
-    GenName[kRadon] =         "Radon"         ;
-    GenName[kAr42] =          "Ar42"          ;
-    GenName[kOther] =         "Other (not BT)";
+    //GenName[kAPA] =           "APA"           ;
+    //GenName[kCPA] =           "CPA"           ;
+    //GenName[kAr39] =          "Ar39"          ;
+    //GenName[kNeutron] =       "Neutron"       ;
+    //GenName[kKrypton] =       "Krypton"       ;
+    //GenName[kPolonium] =      "Polonium"      ;
+    //GenName[kRadon] =         "Radon"         ;
+    //GenName[kAr42] =          "Ar42"          ;
+    GenName[kOther] =         "Noise";
     GenName[kAllBackground] = "AllBackground" ;
     GenName[kAll] =           "All"           ;
     
-    ShortGenName[kSNnu] =          "SNnu"          ;
-    ShortGenName[kAPA] =           "APA"           ;
-    ShortGenName[kCPA] =           "CPA"           ;
-    ShortGenName[kAr39] =          "Ar39"          ;
-    ShortGenName[kNeutron] =       "Neutron"       ;
-    ShortGenName[kKrypton] =       "Krypton"       ;
-    ShortGenName[kPolonium] =      "Polonium"      ;
-    ShortGenName[kRadon] =         "Radon"         ;
-    ShortGenName[kAr42] =          "Ar42"          ;
-    ShortGenName[kOther] =         "Other/Noise"   ;
-    ShortGenName[kAllBackground] = "AllBackground" ;
-    ShortGenName[kAll] =           "All"           ;
+    ShortGenName[kSNnu] =          "SNnu"         ;
+    ShortGenName[kAr39_Lar] =      "LAr39Ar"      ;
+    ShortGenName[kAr42_Lar] =      "LAr42Ar"      ;
+    ShortGenName[kK42_Lar] =       "LAr42K"       ;
+    ShortGenName[kKr85_Lar] =      "LAr85Kr"      ;
+    ShortGenName[kRn222_Lar] =     "LAr222Rn"     ;
+    ShortGenName[kPo218_Lar] =     "LAr218Po"     ;
+    ShortGenName[kPb214_Lar] =     "LAr214Pb"     ;
+    ShortGenName[kBi214_Lar] =     "LAr214Bi"     ;
+    ShortGenName[kPb210_Lar] =     "LAr210Pb"     ;
+    ShortGenName[kK40_CPA] =       "CPA40K"       ;
+    ShortGenName[kAr42_CPA] =      "CPA42K"       ;
+    ShortGenName[kU238_CPA] =      "CPA238U"      ;
+    ShortGenName[kPo218_CPA]=      "CPA218Po"     ;
+    ShortGenName[kPb214_CPA]=      "CPA214Pb"     ;
+    ShortGenName[kBi214_CPA]=      "CPA214Bi"     ;
+    ShortGenName[kPb210_CPA]=      "CPA210Pb"     ;
+    ShortGenName[kBi210_CPA]=      "CPA210Bi"     ;
+    ShortGenName[kCo60_APA] =      "APA60Co"      ;
+    ShortGenName[kU238_APA] =      "APA238U"      ;
+    ShortGenName[kRn222_PDS] =     "PDS222Rn"     ;
+    ShortGenName[kNeutron] =       "Neutron"      ;
+    //ShortGenName[kAPA] =           "APA"           ;
+    //ShortGenName[kCPA] =           "CPA"           ;
+    //ShortGenName[kAr39] =          "Ar39"          ;
+    //ShortGenName[kNeutron] =       "Neutron"       ;
+    //ShortGenName[kKrypton] =       "Krypton"       ;
+    //ShortGenName[kPolonium] =      "Polonium"      ;
+    //ShortGenName[kRadon] =         "Radon"         ;
+    //ShortGenName[kAr42] =          "Ar42"          ;
+    ShortGenName[kOther] =         "Noise"  ;
+    ShortGenName[kAllBackground] = "AllBackground";
+    ShortGenName[kAll] =           "All"          ;
   };
   std::map<GenType,std::string> GenName;
   std::map<GenType,std::string> ShortGenName;

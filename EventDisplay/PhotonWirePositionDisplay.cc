@@ -123,7 +123,8 @@ void PhotonWirePositionDisplay::DisplayEvent(int event, int type){
     for (auto const& it_gr : map_map_gr_wire[it.first])
       it_gr.second->Draw("LP");
 
-    if (it.first != kAr39 && it.first != kAll && it.first != kKrypton)
+    //if (it.first != kAr39 && it.first != kAll && it.first != kKrypton)  //why?
+    if (it.first != kAr39_Lar && it.first != kAll && it.first != kKr85_Lar) 
       map_h2_BackTracked[it.first]->Draw("P");
     if(it.first == kSNnu || it.first == kAll) {
       // NeutrinoEnergy ->Draw();
