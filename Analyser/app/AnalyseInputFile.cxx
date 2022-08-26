@@ -484,5 +484,9 @@ int main(int argc, char** argv){
   std::cout << "maxX " << maxX << std::endl;
   std::cout << "maxY " << maxY << std::endl;
   std::cout << "maxZ " << maxZ << std::endl;
+
+  TFile fNew((OutputFile+".root").c_str(),"recreate");
+  effEnergyNeutrino->Write("effEnergyNeutrino");
+  fNew.Close();
  
 }
