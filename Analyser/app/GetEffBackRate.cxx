@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
   
   int nEventOriginally = (int)TrueInfo->GetEntries();
   std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS\n";
- 
+  /* 
   map_TypeToWeight[0] = 1.; //NOISE 
   map_TypeToWeight[1] = 1.; //MARLEY
   map_TypeToWeight[2] = 1.; //CO60
@@ -191,13 +191,17 @@ int main(int argc, char** argv) {
   map_TypeToWeight[7] = 1.; //PO
   map_TypeToWeight[8] = 1.; //RN
   map_TypeToWeight[9] = 1.; //AR42
+  */
+  for(int i=0;i<kAllBackground;++i)
+    map_TypeToWeight[i] = 1;
 
   std::vector<double>* dummy=NULL;
 
   int nEvent = TrueInfo->GetEntries();
   int in_Event;
   TrueInfo->SetBranchAddress("Event", &in_Event);
-  TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  //TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  TrueInfo->SetBranchAddress("ENu", &dummy);
 
   std::map<int,int> map_Event_nMarley;
   int nMarleyEvent=0;
@@ -242,7 +246,7 @@ int main(int argc, char** argv) {
     GetBackgroundRate(c,
                       map_Config_nWireBackCluster,
                       nEventOriginally,
-                      2.246e-3,
+                      (8500/2e6),
                       DetectorScaling,
                       map_Config_WireBackRate[c]);
 
