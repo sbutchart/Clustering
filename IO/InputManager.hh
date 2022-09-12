@@ -97,6 +97,7 @@ public:
   int TotGen_U238APA;
   int TotGen_Rn222PDS;
   int TotGen_Neut;
+  int TotGen_CavGam;
 
   //int TotGen_APA ;
   //int TotGen_CPA ;
@@ -515,6 +516,7 @@ public:
     TotGen_U238APA(0),
     TotGen_Rn222PDS(0),
     TotGen_Neut(0),
+    TotGen_CavGam(0),
 
     //TotGen_APA (0),
     //TotGen_CPA (0),
@@ -1062,6 +1064,7 @@ public:
     t_Input->SetBranchAddress("TotGen_U238APA" , &TotGen_U238APA );
     t_Input->SetBranchAddress("TotGen_Rn222PDS", &TotGen_Rn222PDS);
     t_Input->SetBranchAddress("TotGen_Neut"    , &TotGen_Neut    );
+    t_Input->SetBranchAddress("TotGen_CavGam"  , &TotGen_CavGam  );
 
     //t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
     //t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );

@@ -607,6 +607,7 @@ enum GenType{
   kU238_APA=20,
   kRn222_PDS=21,
   kNeutron=22,
+  kCavGam=23,
   //kAPA=2,
   //kCPA=3,
   //kAr39=4,
@@ -651,6 +652,7 @@ static const std::vector<GenType>   AllGenType   = {kOther,
 						    kU238_APA,
 						    kRn222_PDS,
 						    kNeutron,
+						    kCavGam,
                                                     //kAPA,
                                                     //kCPA,
                                                     //kAr39,
@@ -713,6 +715,7 @@ inline GenType ConvertIntToGenType(int i) {
   case 20: return kU238_APA;
   case 21: return kRn222_PDS;
   case 22: return kNeutron;
+  case 23: return kCavGam;
     //  case  2: return kAPA;
     //  case  3: return kCPA;
     //  case  4: return kAr39;
@@ -721,8 +724,8 @@ inline GenType ConvertIntToGenType(int i) {
     //  case  7: return kPolonium;
     //  case  8: return kRadon;
     //  case  9: return kAr42;         
-  case 23: return kAllBackground;
-  case 24: return kAll;
+  case 24: return kAllBackground;
+  case 25: return kAll;
   }
   return kOther;
 }
@@ -753,6 +756,7 @@ public:
     GenName[kU238_APA] =      "APA 238U"      ;
     GenName[kRn222_PDS] =     "PDS 222Rn"     ;
     GenName[kNeutron] =       "Neutron"       ;
+    GenName[kCavGam] =        "Cavern Gamma"  ;
     //GenName[kAPA] =           "APA"           ;
     //GenName[kCPA] =           "CPA"           ;
     //GenName[kAr39] =          "Ar39"          ;
@@ -787,6 +791,7 @@ public:
     ShortGenName[kU238_APA] =      "APA238U"      ;
     ShortGenName[kRn222_PDS] =     "PDS222Rn"     ;
     ShortGenName[kNeutron] =       "Neutron"      ;
+    ShortGenName[kCavGam] =        "CavernGamma"  ;
     //ShortGenName[kAPA] =           "APA"           ;
     //ShortGenName[kCPA] =           "CPA"           ;
     //ShortGenName[kAr39] =          "Ar39"          ;

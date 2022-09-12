@@ -40,6 +40,7 @@ private:
     fTruePurity[kU238_APA ] = 0.;
     fTruePurity[kRn222_PDS] = 0.;
     fTruePurity[kNeutron  ] = 0.;
+    fTruePurity[kCavGam   ] = 0.;
     //fTruePurity[kAPA     ] = 0.;
     //fTruePurity[kCPA     ] = 0.;
     //fTruePurity[kAr39    ] = 0.;

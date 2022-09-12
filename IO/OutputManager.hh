@@ -150,6 +150,7 @@ public:
   double pur_U238APA   ;
   double pur_Rn222PDS  ;
   double pur_Neutron   ;
+  double pur_CavGam    ;
 
   //double pur_APA       ;
   //double pur_CPA       ;
@@ -246,7 +247,7 @@ public:
     fTrees["WireHitClusters"]->Branch("pur_K40CPA"  ,   &pur_K40CPA  ,   "pur_K40CPA/D"    );
     fTrees["WireHitClusters"]->Branch("pur_Ar42CPA" ,   &pur_Ar42CPA ,   "pur_Ar42CPA/D"   );
     fTrees["WireHitClusters"]->Branch("pur_U238CPA" ,   &pur_U238CPA ,   "pur_U238CPA/D"   );
-    fTrees["WireHitClusters"]->Branch("pur_Po218CPA",   &pur_Po218CPA ,   "pur_Po218CPA/D"   );
+    fTrees["WireHitClusters"]->Branch("pur_Po218CPA",   &pur_Po218CPA,   "pur_Po218CPA/D"  );
     fTrees["WireHitClusters"]->Branch("pur_Pb214CPA",   &pur_Pb214CPA,   "pur_Pb214CPA/D"  );
     fTrees["WireHitClusters"]->Branch("pur_Bi214CPA",   &pur_Bi214CPA,   "pur_Bi214CPA/D"  );
     fTrees["WireHitClusters"]->Branch("pur_Pb210CPA",   &pur_Pb210CPA,   "pur_Pb210CPA/D"  );
@@ -255,6 +256,7 @@ public:
     fTrees["WireHitClusters"]->Branch("pur_U238APA" ,   &pur_U238APA ,   "pur_U238APA/D"   );
     fTrees["WireHitClusters"]->Branch("pur_Rn222PDS",   &pur_Rn222PDS,   "pur_Rn222PDS/D"  );
     fTrees["WireHitClusters"]->Branch("pur_Neutron" ,   &pur_Neutron ,   "pur_Neutron/D"   );
+    fTrees["WireHitClusters"]->Branch("pur_CavGam"  ,   &pur_CavGam  ,   "pur_CavGam/D"    );
 
     //fTrees["WireHitClusters"]->Branch("pur_APA"     ,   &pur_APA     ,   "pur_APA/D"       );
     //fTrees["WireHitClusters"]->Branch("pur_CPA"     ,   &pur_CPA     ,   "pur_CPA/D"       );
@@ -421,6 +423,7 @@ public:
     pur_U238APA    = clust->GetPurity(kU238_APA );
     pur_Rn222PDS   = clust->GetPurity(kRn222_PDS);
     pur_Neutron    = clust->GetPurity(kNeutron  );
+    pur_CavGam     = clust->GetPurity(kCavGam   );
 
     //pur_APA        = clust->GetPurity(kAPA     );
     //pur_CPA        = clust->GetPurity(kCPA     );
