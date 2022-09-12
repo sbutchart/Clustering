@@ -211,7 +211,8 @@ int main(int argc, char** argv) {
   int nEvent = TrueInfo->GetEntries();
   int in_Event;
   TrueInfo->SetBranchAddress("Event", &in_Event);
-  TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  //TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  TrueInfo->SetBranchAddress("ENu", &dummy);
 
   std::map<int,int> map_Event_nMarley;
   int nMarleyEvent=0;
