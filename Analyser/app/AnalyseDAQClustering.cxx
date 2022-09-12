@@ -95,6 +95,7 @@ int main(int argc, char** argv){
   double pur_U238APA   ;
   double pur_Rn222PDS  ;
   double pur_Neutron   ;
+  double pur_CavGam    ;
 
   //double pur_APA       ;
   //double pur_CPA       ;
@@ -174,6 +175,7 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_U238APA",    &pur_U238APA   );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Rn222PDS",   &pur_Rn222PDS  );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Neutron",    &pur_Neutron   );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CavGam",    &pur_CavGam   );
 
   //t_Output_triggeredclusteredhits->SetBranchAddress("pur_APA",        &pur_APA       );
   //t_Output_triggeredclusteredhits->SetBranchAddress("pur_CPA",        &pur_CPA       );
@@ -268,8 +270,8 @@ int main(int argc, char** argv){
   h_nhit_sign_wire->SetLineWidth(2);
   h_nhit_back_wire->SetLineWidth(2);
 
-  TH1D* h_sadc_sign_wire = new TH1D("h_sadc_sign_wire", ";SADC;Rate [Hz]", 100, 0, 10000);
-  TH1D* h_sadc_back_wire = new TH1D("h_sadc_back_wire", ";SADC;Rate [Hz]", 100, 0, 10000);
+  TH1D* h_sadc_sign_wire = new TH1D("h_sadc_sign_wire", ";SADC;Rate [Hz]", 100, 0, 50000);
+  TH1D* h_sadc_back_wire = new TH1D("h_sadc_back_wire", ";SADC;Rate [Hz]", 100, 0, 50000);
   h_sadc_sign_wire->SetLineColor(kRed);
   h_sadc_back_wire->SetLineColor(kBlue);
   h_sadc_sign_wire->SetLineStyle(1);
@@ -304,14 +306,14 @@ int main(int argc, char** argv){
   h_nchan_sign_wire->SetLineWidth(2);
   h_nchan_back_wire->SetLineWidth(2);
 
-  TH2D* h_nhit_sadc_sign_wire  = new TH2D("h_nhit_sadc_sign_wire",  ";n Hits;SADC"      ,  50, 0,    50, 100, 0, 10000);
-  TH2D* h_nhit_sadc_back_wire  = new TH2D("h_nhit_sadc_back_wire",  ";n Hits;SADC"      ,  50, 0,    50, 100, 0, 10000);
-  TH2D* h_sadc_time_sign_wire  = new TH2D("h_sadc_time_sign_wire",  ";SADC;Time"        , 100, 0, 10000, 100, 0,   100);
-  TH2D* h_sadc_time_back_wire  = new TH2D("h_sadc_time_back_wire",  ";SADC;Time"        , 100, 0, 10000, 100, 0,   100);
+  TH2D* h_nhit_sadc_sign_wire  = new TH2D("h_nhit_sadc_sign_wire",  ";n Hits;SADC"      ,  50, 0,    50, 100, 0, 50000);
+  TH2D* h_nhit_sadc_back_wire  = new TH2D("h_nhit_sadc_back_wire",  ";n Hits;SADC"      ,  50, 0,    50, 100, 0, 50000);
+  TH2D* h_sadc_time_sign_wire  = new TH2D("h_sadc_time_sign_wire",  ";SADC;Time"        , 100, 0, 50000, 100, 0,   100);
+  TH2D* h_sadc_time_back_wire  = new TH2D("h_sadc_time_back_wire",  ";SADC;Time"        , 100, 0, 50000, 100, 0,   100);
   TH2D* h_time_nhit_sign_wire  = new TH2D("h_time_nhit_sign_wire",  ";Time;n Hits"      , 100, 0,   100,  50, 0,    50);
   TH2D* h_time_nhit_back_wire  = new TH2D("h_time_nhit_back_wire",  ";Time;n Hits"      , 100, 0,   100,  50, 0,    50);
-  TH2D* h_nchan_sadc_sign_wire = new TH2D("h_nchan_sadc_sign_wire", ";n Channels;SADC"  ,  10, 0,    10, 100, 0, 10000);
-  TH2D* h_nchan_sadc_back_wire = new TH2D("h_nchan_sadc_back_wire", ";n Channels;SADC"  ,  10, 0,    10, 100, 0, 10000);
+  TH2D* h_nchan_sadc_sign_wire = new TH2D("h_nchan_sadc_sign_wire", ";n Channels;SADC"  ,  10, 0,    10, 100, 0, 50000);
+  TH2D* h_nchan_sadc_back_wire = new TH2D("h_nchan_sadc_back_wire", ";n Channels;SADC"  ,  10, 0,    10, 100, 0, 50000);
   TH2D* h_nchan_time_sign_wire = new TH2D("h_nchan_time_sign_wire", ";n Channels;Time"  ,  10, 0,    10, 100, 0,   100);
   TH2D* h_nchan_time_back_wire = new TH2D("h_nchan_time_back_wire", ";n Channels;Time"  ,  10, 0,    10, 100, 0,   100);
   TH2D* h_nchan_nhit_sign_wire = new TH2D("h_nchan_nhit_sign_wire", ";n Channels;n Hits",  10, 0,    10,  50, 0,    50);
@@ -343,29 +345,29 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->Project("h_nchan_nhit_back_wire", "NHits:NChan",      Form("Type==0 && Config==%i && NHits>=%i", RequestedConfig, nHitCut)); std::cout << "Projected h_nchan_nhit_back_wire" << std::endl;
   if (h_nhit_sign_wire->GetEntries())
     h_sadc_hits_sign_wire ->Scale(1. / (double) h_nhit_sign_wire->GetEntries());
-  h_nhit_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_sadc_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_time_sign_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_sign_wire     ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nhit_sadc_sign_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_sadc_time_sign_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_time_nhit_sign_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_sadc_sign_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_time_sign_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_nhit_sign_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
+  h_nhit_sign_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_sadc_sign_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_time_sign_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_sign_wire     ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nhit_sadc_sign_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_sadc_time_sign_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_time_nhit_sign_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_sadc_sign_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_time_sign_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_nhit_sign_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
   
   if (h_nhit_back_wire->GetEntries())
     h_sadc_hits_back_wire ->Scale(1. / (double) h_nhit_back_wire->GetEntries());
-  h_nhit_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_sadc_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_time_back_wire      ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_back_wire     ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nhit_sadc_back_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_sadc_time_back_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_time_nhit_back_wire ->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_sadc_back_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_time_back_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  h_nchan_nhit_back_wire->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
+  h_nhit_back_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_sadc_back_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_time_back_wire      ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_back_wire     ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nhit_sadc_back_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_sadc_time_back_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_time_nhit_back_wire ->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_sadc_back_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_time_back_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  h_nchan_nhit_back_wire->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
 
   gPad->SetTicks();
   gPad->SetGridx();
@@ -398,13 +400,13 @@ int main(int argc, char** argv){
   std::map<GenType,TH1D*> h_singled_maxADChit_wire  = GetHistos  ("h_maxADChit_wire" , ";Max hit ADC;Rate [Hz]",  150, 0, 15000);
   std::map<GenType,TH1D*> h_singled_sadc_nhit_wire  = GetHistos  ("h_sadc_hits_wire" , ";ADC;N hit"            ,  100, 0,  5000);
   std::map<GenType,TH1D*> h_singled_nhit_wire       = GetHistos  ("h_nhit_wire"      , ";n Hits;Rate [Hz]"     ,   50, 0,    50);
-  std::map<GenType,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 10000);
+  std::map<GenType,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 50000);
   std::map<GenType,TH1D*> h_singled_time_wire       = GetHistos  ("h_time_wire"      , ";Time;Rate [Hz]"       ,  100, 0,   100);
   std::map<GenType,TH1D*> h_singled_nchan_wire      = GetHistos  ("h_nchan_wire"     , ";n Channels;Rate [Hz]" ,   20, 0,    20);
-  std::map<GenType,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 10000);
-  std::map<GenType,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 10000, 100, 0,   100);
+  std::map<GenType,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 50000);
+  std::map<GenType,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 50000, 100, 0,   100);
   std::map<GenType,TH2D*> h_singled_time_nhit_wire  = Get2DHistos("h_time_nhit_wire" , ";Time;n Hits"          ,  100, 0,   100,  50, 0,    50);
-  std::map<GenType,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 10000);
+  std::map<GenType,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 50000);
   std::map<GenType,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
   std::map<GenType,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
 
@@ -555,10 +557,10 @@ int main(int argc, char** argv){
   // gStyle->SetStatY(0.8);
   // gStyle->SetStatH(0.1);
   // gStyle->SetStatW(0.2);
-  //h_rate_back->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
-  //double scale_mass = 0.12;
-  double scale_mass = 1.0;
-  h_rate_back->Scale(1. / (double) nEvent / ((4492-100)/2e6) / scale_mass ); //4492 ticks, 2e6 Hz, 100 first ticks ignored.
+  h_rate_back->Scale(1. / (double) nEvent / (8500/2e6) / 0.075);
+  //double scale_mass = 0.075;
+  //double scale_mass = 1.0;
+  //h_rate_back->Scale(1. / (double) nEvent / ((4492-100)/2e6) / scale_mass ); //4492 ticks, 2e6 Hz, 100 first ticks ignored.
 
   int nentries = h_rate_back->GetEntries();
   double errorint;
@@ -604,17 +606,17 @@ int main(int argc, char** argv){
   leg->Draw();
   c.Print(OutputFile.c_str());
   
-  ScaleTheseHistos(h_singled_maxADChit_wire , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nhit_wire      , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_sadc_wire      , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_time_wire      , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nchan_wire     , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nhit_sadc_wire , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_sadc_time_wire , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_time_nhit_wire , 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nchan_sadc_wire, 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nchan_time_wire, 1. / (double) nEvent / 2.246e-3 / 0.12);
-  ScaleTheseHistos(h_singled_nchan_nhit_wire, 1. / (double) nEvent / 2.246e-3 / 0.12);
+  ScaleTheseHistos(h_singled_maxADChit_wire , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nhit_wire      , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_sadc_wire      , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_time_wire      , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nchan_wire     , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nhit_sadc_wire , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_sadc_time_wire , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_time_nhit_wire , 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nchan_sadc_wire, 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nchan_time_wire, 1. / (double) nEvent / (8500/2e6) / 0.075);
+  ScaleTheseHistos(h_singled_nchan_nhit_wire, 1. / (double) nEvent / (8500/2e6) / 0.075);
 
   FormatTheseHistos(h_singled_sadc_nhit_wire , 10.);
   FormatTheseHistos(h_singled_maxADChit_wire , 10.);
