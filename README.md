@@ -2,7 +2,7 @@
 Supernova Clustering and triggering code at DUNE.
 
 ## Installation
-To compile it, you need to make sure you have `ROOT` setup, have `cmake` and `boost`. <b>
+To compile it, you need to make sure you have `ROOT` setup, have `cmake` and `boost`. <br>
 On FNAL/CERN machines (change versions as they become updated):
 ```sh
 source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
