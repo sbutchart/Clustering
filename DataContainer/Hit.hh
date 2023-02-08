@@ -2,8 +2,8 @@
 #define HIT_HH
 
 #include "Utils/SimpleGeom.hh"
-
 #include "Utils/Helper.h"
+#include <set>
 
 typedef std::pair<double,double> extent;
 
