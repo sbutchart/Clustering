@@ -2,8 +2,15 @@
 Supernova Clustering and triggering code at DUNE.
 
 ## Installation
-To compile it, you need to make sure you have a ROOT setup (`source <wherever root is>/bin/thisroot.sh`), have `cmake` and `boost`.
-I usually setup a developer version of `dunetpc` and that gives me everything I need on the fnal machines.
+To compile it, you need to make sure you have `ROOT` setup, have `cmake` and `boost`. <br>
+On FNAL/CERN machines (change versions as they become updated):
+```sh
+source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
+setup dunesw v09_65_03d00 -q e20:prof
+setup cmake v3_24_1
+```
+
+Then, one can clone and build the repository:
 ```sh
 git clone <whatever the address of this is>
 cd <wherever you want to build>
