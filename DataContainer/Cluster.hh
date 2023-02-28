@@ -17,16 +17,38 @@ private:
       fTruePosition [d] = 0.;
       fTrueDirection[d] = 0.;
     }
-    fTruePurity[kOther   ] = 0.;
-    fTruePurity[kSNnu    ] = 0.;
-    fTruePurity[kAPA     ] = 0.;
-    fTruePurity[kCPA     ] = 0.;
-    fTruePurity[kAr39    ] = 0.;
-    fTruePurity[kNeutron ] = 0.;
-    fTruePurity[kKrypton ] = 0.;
-    fTruePurity[kPolonium] = 0.;
-    fTruePurity[kRadon   ] = 0.;
-    fTruePurity[kAr42    ] = 0.;
+    fTruePurity[kOther    ] = 0.;
+    fTruePurity[kSNnu     ] = 0.;
+    fTruePurity[kAr39_Lar ] = 0.;
+    fTruePurity[kAr42_Lar ] = 0.;
+    fTruePurity[kK42_Lar  ] = 0.;
+    fTruePurity[kKr85_Lar ] = 0.;
+    fTruePurity[kRn222_Lar] = 0.;
+    fTruePurity[kPo218_Lar] = 0.;
+    fTruePurity[kPb214_Lar] = 0.;
+    fTruePurity[kBi214_Lar] = 0.;
+    fTruePurity[kPb210_Lar] = 0.;
+    fTruePurity[kK40_CPA  ] = 0.;
+    fTruePurity[kAr42_CPA ] = 0.;
+    fTruePurity[kU238_CPA ] = 0.;
+    fTruePurity[kPo218_CPA] = 0.;
+    fTruePurity[kPb214_CPA] = 0.;
+    fTruePurity[kBi214_CPA] = 0.;
+    fTruePurity[kPb210_CPA] = 0.;
+    fTruePurity[kBi210_CPA] = 0.;
+    fTruePurity[kCo60_APA ] = 0.;
+    fTruePurity[kU238_APA ] = 0.;
+    fTruePurity[kRn222_PDS] = 0.;
+    fTruePurity[kNeutron  ] = 0.;
+    fTruePurity[kCavGam   ] = 0.;
+    //fTruePurity[kAPA     ] = 0.;
+    //fTruePurity[kCPA     ] = 0.;
+    //fTruePurity[kAr39    ] = 0.;
+    //fTruePurity[kNeutron ] = 0.;
+    //fTruePurity[kKrypton ] = 0.;
+    //fTruePurity[kPolonium] = 0.;
+    //fTruePurity[kRadon   ] = 0.;
+    //fTruePurity[kAr42    ] = 0.;
   };
   
   Cluster(const Cluster& c):

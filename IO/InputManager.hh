@@ -76,14 +76,37 @@ public:
   int NFlash     ;
   int NFlashNoBT ;
   int TotGen_Marl;
-  int TotGen_APA ;
-  int TotGen_CPA ;
-  int TotGen_Ar39;
+  int TotGen_Ar39Lar;
+  int TotGen_Ar42Lar;
+  int TotGen_K42Lar;
+  int TotGen_Kr85Lar;
+  int TotGen_Rn222Lar;
+  int TotGen_Po218Lar;
+  int TotGen_Pb214Lar;
+  int TotGen_Bi214Lar;
+  int TotGen_Pb210Lar;
+  int TotGen_K40CPA;
+  int TotGen_Ar42CPA;
+  int TotGen_U238CPA;
+  int TotGen_Po218CPA;
+  int TotGen_Pb214CPA;
+  int TotGen_Bi214CPA;
+  int TotGen_Pb210CPA;
+  int TotGen_Bi210CPA;
+  int TotGen_Co60APA;
+  int TotGen_U238APA;
+  int TotGen_Rn222PDS;
   int TotGen_Neut;
-  int TotGen_Kryp;
-  int TotGen_Plon;
-  int TotGen_Rdon;
-  int TotGen_Ar42;   
+  int TotGen_CavGam;
+
+  //int TotGen_APA ;
+  //int TotGen_CPA ;
+  //int TotGen_Ar39;
+  //int TotGen_Neut;
+  //int TotGen_Kryp;
+  //int TotGen_Plon;
+  //int TotGen_Rdon;
+  //int TotGen_Ar42;   
 
 
   int   * vec_Hit_View         ;
@@ -267,14 +290,34 @@ public:
       }
       if((*Hit_Chan)[j] > fAPA_Channel[fNAPA])
         continue;
-      WireHit* wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
-                                (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
-                                (*Hit_True_Energy)[j], (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
-                                0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
-                                0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
-                                0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
-                                (*Hit_True_X)[j],      (*Hit_True_Y)[j],        (*Hit_True_Z)[j],
-                                marley_index,          (*Hit_True_nElec)[j]);
+
+      WireHit* wh;
+
+      if((*Hit_Time)[j]<100){ //ignoring first 100 ticks (pedestral calc. unstable)
+	(*Hit_Time)[j]=-999;
+	(*Hit_RMS)[j]=0;
+	(*Hit_Chan)[j]=0;
+      }
+
+      if( !Hit_True_Energy->empty() && !Hit_True_X->empty() && !Hit_True_Y->empty() && !Hit_True_Z->empty() && !Hit_True_nElec->empty())
+	wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
+				  (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
+				  (*Hit_True_Energy)[j], (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
+				  0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
+				  0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
+				  0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
+				  (*Hit_True_X)[j],      (*Hit_True_Y)[j],        (*Hit_True_Z)[j],
+				  marley_index,          (*Hit_True_nElec)[j]);
+      else
+	wh = new WireHit((*Hit_View)[j],        (*Hit_True_GenType)[j],  (*Hit_Chan)[j],
+				  (*Hit_Time)[j],        (*Hit_SADC)[j],          (*Hit_RMS)[j],
+				  -1,                    (*Hit_True_EvEnergy)[j], (*Hit_True_MainTrID)[j],
+				  0.5*((*Hit_X_start)[j]+(*Hit_X_end)[j]),
+				  0.5*((*Hit_Y_start)[j]+(*Hit_Y_end)[j]),
+				  0.5*((*Hit_Z_start)[j]+(*Hit_Z_end)[j]),
+				  -1,                    -1,                      -1,
+			          marley_index,          -1);
+     	
       if (wh->GetChannel() < 200000 ||
           abs(wh->GetPosition(kX)) < 20000 ||
           abs(wh->GetPosition(kY)) < 20000 ||
@@ -452,14 +495,37 @@ public:
     NFlash     (0),
     NFlashNoBT (0),
     TotGen_Marl(0),
-    TotGen_APA (0),
-    TotGen_CPA (0),
-    TotGen_Ar39(0),
+    TotGen_Ar39Lar(0),
+    TotGen_Ar42Lar(0),
+    TotGen_K42Lar(0),
+    TotGen_Kr85Lar(0),
+    TotGen_Rn222Lar(0),
+    TotGen_Po218Lar(0),
+    TotGen_Pb214Lar(0),
+    TotGen_Bi214Lar(0),
+    TotGen_Pb210Lar(0),
+    TotGen_K40CPA(0),
+    TotGen_Ar42CPA(0),
+    TotGen_U238CPA(0),
+    TotGen_Po218CPA(0),
+    TotGen_Pb214CPA(0),
+    TotGen_Bi214CPA(0),
+    TotGen_Pb210CPA(0),
+    TotGen_Bi210CPA(0),
+    TotGen_Co60APA(0),
+    TotGen_U238APA(0),
+    TotGen_Rn222PDS(0),
     TotGen_Neut(0),
-    TotGen_Kryp(0),
-    TotGen_Plon(0),
-    TotGen_Rdon(0),
-    TotGen_Ar42(0),   
+    TotGen_CavGam(0),
+
+    //TotGen_APA (0),
+    //TotGen_CPA (0),
+    //TotGen_Ar39(0),
+    //TotGen_Neut(0),
+    //TotGen_Kryp(0),
+    //TotGen_Plon(0),
+    //TotGen_Rdon(0),
+    //TotGen_Ar42(0),   
     
     vec_Hit_View         (NULL),
     vec_Hit_Size         (NULL),
@@ -976,15 +1042,38 @@ public:
     // }
   
     
-    t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
-    t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
-    t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
-    t_Input->SetBranchAddress("TotGen_Ar39", &TotGen_Ar39);
-    t_Input->SetBranchAddress("TotGen_Neut", &TotGen_Neut);
-    t_Input->SetBranchAddress("TotGen_Kryp", &TotGen_Kryp);
-    t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
-    t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
-    t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
+    t_Input->SetBranchAddress("TotGen_Marl"    , &TotGen_Marl    );
+    t_Input->SetBranchAddress("TotGen_Ar39Lar" , &TotGen_Ar39Lar );
+    t_Input->SetBranchAddress("TotGen_Ar42Lar" , &TotGen_Ar42Lar );
+    t_Input->SetBranchAddress("TotGen_K42Lar"  , &TotGen_K42Lar  );
+    t_Input->SetBranchAddress("TotGen_Kr85Lar" , &TotGen_Kr85Lar );
+    t_Input->SetBranchAddress("TotGen_Rn222Lar", &TotGen_Rn222Lar);
+    t_Input->SetBranchAddress("TotGen_Po218Lar", &TotGen_Po218Lar);
+    t_Input->SetBranchAddress("TotGen_Pb214Lar", &TotGen_Pb214Lar);
+    t_Input->SetBranchAddress("TotGen_Bi214Lar", &TotGen_Bi214Lar);
+    t_Input->SetBranchAddress("TotGen_Pb210Lar", &TotGen_Pb210Lar);
+    t_Input->SetBranchAddress("TotGen_K40CPA"  , &TotGen_K40CPA  );
+    t_Input->SetBranchAddress("TotGen_Ar42CPA" , &TotGen_Ar42CPA );
+    t_Input->SetBranchAddress("TotGen_U238CPA" , &TotGen_U238CPA );
+    t_Input->SetBranchAddress("TotGen_Po218CPA", &TotGen_Po218CPA);
+    t_Input->SetBranchAddress("TotGen_Pb214CPA", &TotGen_Pb214CPA);
+    t_Input->SetBranchAddress("TotGen_Bi214CPA", &TotGen_Bi214CPA);
+    t_Input->SetBranchAddress("TotGen_Pb210CPA", &TotGen_Pb210CPA);
+    t_Input->SetBranchAddress("TotGen_Bi210CPA", &TotGen_Bi210CPA);
+    t_Input->SetBranchAddress("TotGen_Co60APA" , &TotGen_Co60APA );
+    t_Input->SetBranchAddress("TotGen_U238APA" , &TotGen_U238APA );
+    t_Input->SetBranchAddress("TotGen_Rn222PDS", &TotGen_Rn222PDS);
+    t_Input->SetBranchAddress("TotGen_Neut"    , &TotGen_Neut    );
+    t_Input->SetBranchAddress("TotGen_CavGam"  , &TotGen_CavGam  );
+
+    //t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
+    //t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
+    //t_Input->SetBranchAddress("TotGen_Ar39", &TotGen_Ar39);
+    //t_Input->SetBranchAddress("TotGen_Neut", &TotGen_Neut);
+    //t_Input->SetBranchAddress("TotGen_Kryp", &TotGen_Kryp);
+    //t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
+    //t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
+    //t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
   };
   
 public:
