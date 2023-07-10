@@ -97,16 +97,13 @@ public:
   int TotGen_U238APA;
   int TotGen_Rn222PDS;
   int TotGen_Neut;
-  int TotGen_CavGam;
-
-  //int TotGen_APA ;
-  //int TotGen_CPA ;
-  //int TotGen_Ar39;
-  //int TotGen_Neut;
-  //int TotGen_Kryp;
-  //int TotGen_Plon;
-  //int TotGen_Rdon;
-  //int TotGen_Ar42;   
+  int TotGen_CavNGam;
+  int TotGen_CavwallGam;
+  int TotGen_FoamGam;
+  int TotGen_CryoGam;
+  int TotGen_Rn220Lar;
+  int TotGen_Rn220CPA;
+  int TotGen_Th232APA;
 
 
   int   * vec_Hit_View         ;
@@ -516,16 +513,14 @@ public:
     TotGen_U238APA(0),
     TotGen_Rn222PDS(0),
     TotGen_Neut(0),
-    TotGen_CavGam(0),
-
-    //TotGen_APA (0),
-    //TotGen_CPA (0),
-    //TotGen_Ar39(0),
-    //TotGen_Neut(0),
-    //TotGen_Kryp(0),
-    //TotGen_Plon(0),
-    //TotGen_Rdon(0),
-    //TotGen_Ar42(0),   
+    TotGen_CavNGam(0),
+    TotGen_CavwallGam(0),
+    TotGen_FoamGam(0),
+    TotGen_CryoGam(0),
+    TotGen_Rn220Lar(0),
+    TotGen_Rn220CPA(0),
+    TotGen_Th232APA(0),
+  
     
     vec_Hit_View         (NULL),
     vec_Hit_Size         (NULL),
@@ -1064,16 +1059,14 @@ public:
     t_Input->SetBranchAddress("TotGen_U238APA" , &TotGen_U238APA );
     t_Input->SetBranchAddress("TotGen_Rn222PDS", &TotGen_Rn222PDS);
     t_Input->SetBranchAddress("TotGen_Neut"    , &TotGen_Neut    );
-    t_Input->SetBranchAddress("TotGen_CavGam"  , &TotGen_CavGam  );
+    t_Input->SetBranchAddress("TotGen_CavNGam" , &TotGen_CavNGam );
+    t_Input->SetBranchAddress("TotGen_CavwallGam", &TotGen_CavwallGam);
+    t_Input->SetBranchAddress("TotGen_FoamGam" , &TotGen_FoamGam );
+    t_Input->SetBranchAddress("TotGen_CryoGam" , &TotGen_CryoGam );
+    t_Input->SetBranchAddress("TotGen_Rn220Lar", &TotGen_Rn220Lar);
+    t_Input->SetBranchAddress("TotGen_Rn220CPA", &TotGen_Rn220CPA);
+    t_Input->SetBranchAddress("TotGen_Th232APA", &TotGen_Th232APA);
 
-    //t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
-    //t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
-    //t_Input->SetBranchAddress("TotGen_Ar39", &TotGen_Ar39);
-    //t_Input->SetBranchAddress("TotGen_Neut", &TotGen_Neut);
-    //t_Input->SetBranchAddress("TotGen_Kryp", &TotGen_Kryp);
-    //t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
-    //t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
-    //t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
   };
   
 public:

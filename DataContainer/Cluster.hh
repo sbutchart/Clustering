@@ -40,15 +40,14 @@ private:
     fTruePurity[kU238_APA ] = 0.;
     fTruePurity[kRn222_PDS] = 0.;
     fTruePurity[kNeutron  ] = 0.;
-    fTruePurity[kCavGam   ] = 0.;
-    //fTruePurity[kAPA     ] = 0.;
-    //fTruePurity[kCPA     ] = 0.;
-    //fTruePurity[kAr39    ] = 0.;
-    //fTruePurity[kNeutron ] = 0.;
-    //fTruePurity[kKrypton ] = 0.;
-    //fTruePurity[kPolonium] = 0.;
-    //fTruePurity[kRadon   ] = 0.;
-    //fTruePurity[kAr42    ] = 0.;
+    fTruePurity[kCavNGam  ] = 0.;
+    fTruePurity[kCavwallGam] = 0.;
+    fTruePurity[kFoamGam  ] = 0.;
+    fTruePurity[kCryoGam  ] = 0.;
+    fTruePurity[kRn220_Lar] = 0.;
+    fTruePurity[kRn220_CPA] = 0.;    
+    fTruePurity[kTh232_APA] = 0.;
+    
   };
   
   Cluster(const Cluster& c):

@@ -95,8 +95,13 @@ int main(int argc, char** argv){
   double pur_U238APA   ;
   double pur_Rn222PDS  ;
   double pur_Neutron   ;
-  double pur_CavGam    ;
-
+  double pur_CavNGam    ;
+  double pur_CavwallGam;
+  double pur_FoamGam   ;
+  double pur_CryoGam   ;
+  double pur_Rn220Lar  ;
+  double pur_Rn220CPA  ;
+  double pur_Th232APA  ;
   //double pur_APA       ;
   //double pur_CPA       ;
   //double pur_Ar39      ;
@@ -175,7 +180,16 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_U238APA",    &pur_U238APA   );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Rn222PDS",   &pur_Rn222PDS  );
   t_Output_triggeredclusteredhits->SetBranchAddress("pur_Neutron",    &pur_Neutron   );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CavGam",    &pur_CavGam   );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CavNGam",    &pur_CavNGam   );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CavwallGam", &pur_CavwallGam);
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_FoamGam",    &pur_FoamGam   );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CryoGam",    &pur_CryoGam   );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Rn220Lar",   &pur_Rn220Lar  );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Rn220CPA",   &pur_Rn220CPA  );
+  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Th232APA",   &pur_Th232APA  );
+
+
+
 
   //t_Output_triggeredclusteredhits->SetBranchAddress("pur_APA",        &pur_APA       );
   //t_Output_triggeredclusteredhits->SetBranchAddress("pur_CPA",        &pur_CPA       );

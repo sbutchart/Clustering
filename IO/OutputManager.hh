@@ -150,16 +150,15 @@ public:
   double pur_U238APA   ;
   double pur_Rn222PDS  ;
   double pur_Neutron   ;
-  double pur_CavGam    ;
+  double pur_CavNGam   ;
+  double pur_CavwallGam;
+  double pur_FoamGam   ;
+  double pur_CryoGam   ;
+  double pur_Rn220Lar  ;
+  double pur_Rn220CPA  ;
+  double pur_Th232APA  ;
 
-  //double pur_APA       ;
-  //double pur_CPA       ;
-  //double pur_Ar39      ;
-  //double pur_Neutron   ;
-  //double pur_Krypton   ;
-  //double pur_Polonium  ;
-  //double pur_Radon     ;
-  //double pur_Ar42      ;
+
   double YWidth        ;
   double ZWidth        ;
   double SumPE         ;
@@ -256,16 +255,15 @@ public:
     fTrees["WireHitClusters"]->Branch("pur_U238APA" ,   &pur_U238APA ,   "pur_U238APA/D"   );
     fTrees["WireHitClusters"]->Branch("pur_Rn222PDS",   &pur_Rn222PDS,   "pur_Rn222PDS/D"  );
     fTrees["WireHitClusters"]->Branch("pur_Neutron" ,   &pur_Neutron ,   "pur_Neutron/D"   );
-    fTrees["WireHitClusters"]->Branch("pur_CavGam"  ,   &pur_CavGam  ,   "pur_CavGam/D"    );
+    fTrees["WireHitClusters"]->Branch("pur_CavNGam" ,   &pur_CavNGam ,   "pur_CavNGam/D"   );
+    fTrees["WireHitClusters"]->Branch("pur_CavwallGam", &pur_CavwallGam, "pur_CavwallGam/D");
+    fTrees["WireHitClusters"]->Branch("pur_FoamGam" ,   &pur_FoamGam ,   "pur_FoamGam/D"   );
+    fTrees["WireHitClusters"]->Branch("pur_CryoGam" ,   &pur_CryoGam ,   "pur_CryoGam/D"   );
+    fTrees["WireHitClusters"]->Branch("pur_Rn220Lar",   &pur_Rn220Lar,   "pur_Rn220Lar/D"  );
+    fTrees["WireHitClusters"]->Branch("pur_Rn220CPA",   &pur_Rn220CPA,   "pur_Rn220CPA/D"  );
+    fTrees["WireHitClusters"]->Branch("pur_Th232APA",   &pur_Th232APA,   "pur_Th232APA/D"  );
 
-    //fTrees["WireHitClusters"]->Branch("pur_APA"     ,   &pur_APA     ,   "pur_APA/D"       );
-    //fTrees["WireHitClusters"]->Branch("pur_CPA"     ,   &pur_CPA     ,   "pur_CPA/D"       );
-    //fTrees["WireHitClusters"]->Branch("pur_Ar39"    ,   &pur_Ar39    ,   "pur_Ar39/D"      );
-    //fTrees["WireHitClusters"]->Branch("pur_Neutron" ,   &pur_Neutron ,   "pur_Neutron/D"   );
-    //fTrees["WireHitClusters"]->Branch("pur_Krypton" ,   &pur_Krypton ,   "pur_Krypton/D"   );
-    //fTrees["WireHitClusters"]->Branch("pur_Polonium",   &pur_Polonium,   "pur_Polonium/D"  );
-    //fTrees["WireHitClusters"]->Branch("pur_Radon"   ,   &pur_Radon   ,   "pur_Radon/D"     );
-    //fTrees["WireHitClusters"]->Branch("pur_Ar42"    ,   &pur_Ar42    ,   "pur_Ar42/D"      );
+
     fTrees["WireHitClusters"]->Branch("HitView",        &HitView);
     fTrees["WireHitClusters"]->Branch("GenType",        &GenType);
     fTrees["WireHitClusters"]->Branch("HitChan",        &HitChan);
@@ -423,16 +421,14 @@ public:
     pur_U238APA    = clust->GetPurity(kU238_APA );
     pur_Rn222PDS   = clust->GetPurity(kRn222_PDS);
     pur_Neutron    = clust->GetPurity(kNeutron  );
-    pur_CavGam     = clust->GetPurity(kCavGam   );
+    pur_CavNGam    = clust->GetPurity(kCavNGam  );
+    pur_CavwallGam = clust->GetPurity(kCavwallGam);
+    pur_FoamGam    = clust->GetPurity(kFoamGam  );
+    pur_CryoGam    = clust->GetPurity(kCryoGam  );
+    pur_Rn220Lar   = clust->GetPurity(kRn220_Lar );
+    pur_Rn220CPA   = clust->GetPurity(kRn220_CPA );
+    pur_Th232APA   = clust->GetPurity(kTh232_APA );
 
-    //pur_APA        = clust->GetPurity(kAPA     );
-    //pur_CPA        = clust->GetPurity(kCPA     );
-    //pur_Ar39       = clust->GetPurity(kAr39    );
-    //pur_Neutron    = clust->GetPurity(kNeutron );
-    //pur_Krypton    = clust->GetPurity(kKrypton );
-    //pur_Polonium   = clust->GetPurity(kPolonium);
-    //pur_Radon      = clust->GetPurity(kRadon   );
-    //pur_Ar42       = clust->GetPurity(kAr42    );
 
     HitView.clear();
     GenType.clear();

@@ -607,15 +607,13 @@ enum GenType{
   kU238_APA=20,
   kRn222_PDS=21,
   kNeutron=22,
-  kCavGam=23,
-  //kAPA=2,
-  //kCPA=3,
-  //kAr39=4,
-  //kNeutron=5,
-  //kKrypton=6,
-  //kPolonium=7,
-  //kRadon=8,
-  //kAr42=9,
+  kCavNGam=23,
+  kCavwallGam=24,
+  kFoamGam=25,
+  kCryoGam=26,
+  kRn220_Lar=27,
+  kRn220_CPA=28,
+  kTh232_APA=29,
   kAllBackground,
   kAll
 };
@@ -652,15 +650,13 @@ static const std::vector<GenType>   AllGenType   = {kOther,
 						    kU238_APA,
 						    kRn222_PDS,
 						    kNeutron,
-						    kCavGam,
-                                                    //kAPA,
-                                                    //kCPA,
-                                                    //kAr39,
-                                                    //kNeutron,
-                                                    //kKrypton,
-                                                    //kPolonium,
-                                                    //kRadon,
-                                                    //kAr42,
+						    kCavNGam,
+  						    kCavwallGam,
+                                                    kFoamGam,
+                                                    kCryoGam,
+  						    kRn220_Lar,
+  						    kRn220_CPA,
+  						    kTh232_APA,
                                                     kAllBackground,
                                                     kAll};
 
@@ -715,17 +711,15 @@ inline GenType ConvertIntToGenType(int i) {
   case 20: return kU238_APA;
   case 21: return kRn222_PDS;
   case 22: return kNeutron;
-  case 23: return kCavGam;
-    //  case  2: return kAPA;
-    //  case  3: return kCPA;
-    //  case  4: return kAr39;
-    //  case  5: return kNeutron;
-    //  case  6: return kKrypton;
-    //  case  7: return kPolonium;
-    //  case  8: return kRadon;
-    //  case  9: return kAr42;         
-  case 24: return kAllBackground;
-  case 25: return kAll;
+  case 23: return kCavNGam;
+  case 24: return kCavwallGam;
+  case 25: return kFoamGam;
+  case 26: return kCryoGam;
+  case 27: return kRn220_Lar;
+  case 28: return kRn220_CPA;
+  case 29: return kTh232_APA;      
+  case 30: return kAllBackground;
+  case 31: return kAll;
   }
   return kOther;
 }
@@ -756,15 +750,14 @@ public:
     GenName[kU238_APA] =      "APA 238U"      ;
     GenName[kRn222_PDS] =     "PDS 222Rn"     ;
     GenName[kNeutron] =       "Neutron"       ;
-    GenName[kCavGam] =        "Cavern Gamma"  ;
-    //GenName[kAPA] =           "APA"           ;
-    //GenName[kCPA] =           "CPA"           ;
-    //GenName[kAr39] =          "Ar39"          ;
-    //GenName[kNeutron] =       "Neutron"       ;
-    //GenName[kKrypton] =       "Krypton"       ;
-    //GenName[kPolonium] =      "Polonium"      ;
-    //GenName[kRadon] =         "Radon"         ;
-    //GenName[kAr42] =          "Ar42"          ;
+    GenName[kCavNGam] =       "Cavern N Gamma";
+    GenName[kCavwallGam] =    "Cavern wall Gamma";
+    GenName[kFoamGam] =       "Foam Gamma"    ;
+    GenName[kCryoGam] =       "Cryo Gamma"    ;
+    GenName[kRn220_Lar] =     "Lar 220Rn"     ;
+    GenName[kRn220_CPA] =     "CPA 220Rn"     ;
+    GenName[kTh232_APA] =     "APA 232Th"     ;
+
     GenName[kOther] =         "Noise";
     GenName[kAllBackground] = "AllBackground" ;
     GenName[kAll] =           "All"           ;
@@ -791,15 +784,13 @@ public:
     ShortGenName[kU238_APA] =      "APA238U"      ;
     ShortGenName[kRn222_PDS] =     "PDS222Rn"     ;
     ShortGenName[kNeutron] =       "Neutron"      ;
-    ShortGenName[kCavGam] =        "CavernGamma"  ;
-    //ShortGenName[kAPA] =           "APA"           ;
-    //ShortGenName[kCPA] =           "CPA"           ;
-    //ShortGenName[kAr39] =          "Ar39"          ;
-    //ShortGenName[kNeutron] =       "Neutron"       ;
-    //ShortGenName[kKrypton] =       "Krypton"       ;
-    //ShortGenName[kPolonium] =      "Polonium"      ;
-    //ShortGenName[kRadon] =         "Radon"         ;
-    //ShortGenName[kAr42] =          "Ar42"          ;
+    ShortGenName[kCavNGam] =       "CavN Gamma";
+    ShortGenName[kCavwallGam] =    "CavWall Gamma";
+    ShortGenName[kFoamGam] =       "FoamGamma"    ;
+    ShortGenName[kCryoGam] =       "CryoGamma"    ;
+    ShortGenName[kRn220_Lar] =     "LAr220Rn"     ;
+    ShortGenName[kRn220_CPA] =     "CPA220Rn"     ;
+    ShortGenName[kTh232_APA] =     "APA232Th"     ;
     ShortGenName[kOther] =         "Noise"  ;
     ShortGenName[kAllBackground] = "AllBackground";
     ShortGenName[kAll] =           "All"          ;
