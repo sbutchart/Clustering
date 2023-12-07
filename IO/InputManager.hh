@@ -3,6 +3,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TLeaf.h"
 
 #include <vector>
 #include <iostream>
@@ -30,6 +31,10 @@ public:
     t_Input->GetEntry(i);
   };
 
+  // Dynamic backgrounds
+  std::map<std::string, int> ID_map;
+  bool dynamic = false;
+  std::vector<std::string> AllGenTypeDynamic;
   
   std::string GetInputFile()                       const { return filename; };
   std::string GetInputTree()                       const { return treename; };
@@ -56,6 +61,52 @@ protected:
       std::cerr << "The requested tree (" << treename.c_str() << ") does not exist in file " << filename << std::endl;
       exit(1);
     }
+
+    std::cout << "DYN SN Ana :: load IDs" << std::endl;
+
+    // DYNAMIC BACKGROUNDS
+    std::string delim = "/";
+    std::string tree_name_token = treename.substr(0, treename.find(delim));
+    std::string ID_tree = tree_name_token + "/fIDs";
+
+    if (f_Input->Get( ID_tree.c_str() )) {
+      dynamic = true;
+      TTree *t_IDs = (TTree*)f_Input->Get( ID_tree.c_str() );
+      TObjArray *branchList; 
+      branchList  = t_IDs->GetListOfBranches();
+      int nBranch = t_IDs->GetNbranches();
+      TString IDtreenames[nBranch];
+
+      std::cout << "ID trees: " << nBranch << std::endl;
+      for(int i=0;i<nBranch;i++){
+        IDtreenames[i] = branchList->At(i)->GetName();
+
+        int temp_id;
+        t_IDs->SetBranchAddress(IDtreenames[i], &temp_id);
+        t_IDs->GetEntry(0);
+        std::string delimiter = "_";
+        std::string temp_string = IDtreenames[i].Data();
+        std::string token = temp_string.substr(0, temp_string.find(delimiter));
+        std::pair<std::string, int> temp_pair {token, temp_id};
+        ID_map.insert( temp_pair );
+        AllGenTypeDynamic.push_back(token);
+      }
+      std::pair<std::string, int> temp_pair_allbckg {"AllBackground", 99};
+      ID_map.insert( temp_pair_allbckg );
+      AllGenTypeDynamic.push_back("AllBackground");
+      std::pair<std::string, int> temp_pair_all {"All", 100};
+      ID_map.insert( temp_pair_all );
+      AllGenTypeDynamic.push_back("All");
+
+      for (auto const& x : ID_map){
+        std::cout << x.first << " : " << x.second << std::endl;
+      } 
+
+    } else {
+      std::cerr << "The requested tree 'fIDs' does not exist in file " << filename << std::endl;
+      //exit(1);
+    }
+
   }
 };
 
@@ -257,7 +308,9 @@ public:
   std::vector<double>              * True_Bck_EndY            ;
   std::vector<double>              * True_Bck_EndZ            ;  
   std::vector<double>              * True_Bck_EndT            ;
-  
+   
+  // Dynamic backgrounds
+  std::vector<int> TotGen_dynamic;
 
   void GetWireHits(std::vector<WireHit*>& wire) {
     for(int j = 0; j < NColHit; j++) {
@@ -974,8 +1027,7 @@ public:
     // if(MyTree->GetBranch("SomeBranchName")) {
     //   MyTree->SetBranchAddress("SomeBranchName", &SomeVabiable);
     // }
-  
-    
+      
     t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
     t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
     t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
@@ -985,8 +1037,49 @@ public:
     t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
     t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
     t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
+ 
+    if (dynamic) {
+      TotGen_dynamic.resize(ID_map.size());
+      for (auto const& x : ID_map){
+        std::stringstream ss;
+        ss << "TotGen_" + x.first;
+        t_Input->SetBranchAddress(ss.str().c_str(), &TotGen_dynamic[x.second]);
+      }
+    } 
+
+    // TESTING
+    //std::cout << ConvertIDIntToString(0) << std::endl;
+    //std::cout << ConvertIDStringToInt("All") << std::endl;
+    //t_Input->GetEntry(0);
+    //for (auto const& x : ID_map){
+    //  if (x.second < 99){
+    //    std::cout << TotGen_dynamic[x.second] << std::endl;
+    //  }
+    //}
+    //t_Input->GetEntry(1);
+    //for (auto const& x : ID_map){
+    //  if (x.second < 99){
+    //    std::cout << TotGen_dynamic[x.second] << std::endl;
+    //  }
+    //}
+
   };
   
+  inline std::string ConvertIDIntToString(int i) {
+  std::string key;
+    for (auto &entry : ID_map) {
+      if (entry.second == i) {
+         key = entry.first;
+         break; // to stop searching
+      }
+    }
+    return key;
+  };
+
+  inline int ConvertIDStringToInt(std::string id_name) {
+    return ID_map[id_name];
+  };
+
 public:
   void SetAPAChannelMap(std::map<int,int>& m) { fAPA_Channel = m; };
   std::map<int,int>  GetAPAChannelMap() const { return fAPA_Channel; };
