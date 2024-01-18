@@ -1,2 +1,0 @@
-add_executable(EventDisplay RunEventDisplay.cxx)
-target_link_libraries(EventDisplay Display)

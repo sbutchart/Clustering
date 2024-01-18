@@ -1,5 +1,0 @@
-add_library(RadiologicalCheatGenerator SHARED RadiologicalCheatGenerator.cc)
-target_link_libraries(RadiologicalCheatGenerator ${ROOT_LIBRARIES})
-
-add_executable(RunGenerator RunGenerator.cxx)
-target_link_libraries(RunGenerator RadiologicalCheatGenerator)
