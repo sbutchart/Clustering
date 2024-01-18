@@ -10,6 +10,7 @@
 
 #include "DataContainer/OpticalCluster.hh"
 #include "DataContainer/WireCluster.hh"
+#include "Utils/Helper.h"
 
 class InputManager{
 protected:
@@ -1045,6 +1046,9 @@ public:
         ss << "TotGen_" + x.first;
         t_Input->SetBranchAddress(ss.str().c_str(), &TotGen_dynamic[x.second]);
       }
+
+     // setup some vars in helper that will be used throughout
+     SetDynamicVars(ID_map);
     } 
 
     // TESTING
@@ -1063,21 +1067,6 @@ public:
     //  }
     //}
 
-  };
-  
-  inline std::string ConvertIDIntToString(int i) {
-  std::string key;
-    for (auto &entry : ID_map) {
-      if (entry.second == i) {
-         key = entry.first;
-         break; // to stop searching
-      }
-    }
-    return key;
-  };
-
-  inline int ConvertIDStringToInt(std::string id_name) {
-    return ID_map[id_name];
   };
 
 public:

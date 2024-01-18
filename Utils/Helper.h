@@ -583,6 +583,60 @@ inline void autoColorHists(TPad* pad, int whichColours=kBrewerSet1Palette)
   pad->Draw();
 }
 
+//### Dynamic
+// vars
+inline std::map<std::string, int> dyn_GenType;
+static std::vector<std::string> dyn_AllGenType;
+
+// functions
+inline void setIDMap( std::map<std::string, int> ID_map )
+{
+  dyn_GenType = ID_map;
+}
+
+inline void setAllGenType()
+{
+  for (auto const& x : dyn_GenType)
+  {
+    dyn_AllGenType.push_back(x.first);
+  }
+}
+
+inline std::string ConvertIDIntToString(int i)
+{
+  std::string key;
+  for (auto &entry : dyn_GenType) {
+    if (entry.second == i) {
+       key = entry.first;
+       break; // to stop searching
+    }
+  }
+  return key;
+}
+
+inline int ConvertIDStringToInt(std::string id_name)
+{
+  return dyn_GenType[id_name];
+}
+
+inline void testDynamic()
+{
+ std::cout << "DYNAMIC VARS in HELPER" << std::endl;
+ std::cout << dyn_GenType["All"] << std::endl;
+ std::cout << dyn_AllGenType[2] << std::endl;
+ std::cout << ConvertIDIntToString(2) << std::endl;
+ std::cout << ConvertIDStringToInt("AllBackground") << std::endl;
+}
+
+inline void SetDynamicVars( std::map<std::string, int> ID_map_from_IO )
+{
+  std::cout << "Helper :: Setting dynamic variables..." << std::endl;
+  setIDMap( ID_map_from_IO );
+  setAllGenType();
+  testDynamic();
+} 
+//### Dynamic
+
 enum GenType{
   kOther=0,
   kSNnu=1,
@@ -598,7 +652,6 @@ enum GenType{
   kAll
 };
 
-
 enum Direction {
   kX=0,
   kY,
@@ -607,6 +660,7 @@ enum Direction {
 };
 
 static const std::vector<Direction> AllDirection = {kX,kY,kZ,kT};
+
 static const std::vector<GenType>   AllGenType   = {kOther,
                                                     kSNnu,
                                                     kAPA,
@@ -693,11 +747,23 @@ public:
     ShortGenName[kOther] =         "Other/Noise"   ;
     ShortGenName[kAllBackground] = "AllBackground" ;
     ShortGenName[kAll] =           "All"           ;
+
+    for(auto const& x : dyn_GenType){
+      std::pair temp_pair { x.second, x.first };
+      dyn_GenName.insert( temp_pair );
+    }
+
+    for(auto const& x : dyn_GenType){
+      std::pair temp_pair { x.second, x.first };
+      dyn_ShortGenName.insert( temp_pair );
+    }
+
   };
   std::map<GenType,std::string> GenName;
   std::map<GenType,std::string> ShortGenName;
    
-
+  std::map<int, std::string> dyn_GenName;
+  std::map<int, std::string> dyn_ShortGenName;
 };
 
 
