@@ -214,12 +214,14 @@ public:
     fTrees["WireHitClusters"]->Branch("TrClusterPosY",  &TrClusterPosY,  "TrClusterPosY/D" );
     fTrees["WireHitClusters"]->Branch("TrClusterPosZ",  &TrClusterPosZ,  "TrClusterPosZ/D" );
 
-    for (auto const&x : dyn_purGenType)
+    for (auto &x : dyn_purGenType)
       {
         std::stringstream branch;
-        branch << "pur_" + x.first;
+        branch << "pur_" << x.first;
+        std::cout << branch.str() << std::endl;
         std::stringstream leaf;
-        branch << "pur" + x.first + "/D";
+        leaf << branch.rdbuf() << "/D";
+        std::cout << leaf.str() << std::endl;
         
         fTrees["WireHitClusters"]->Branch(branch.str().c_str(), &x.second, leaf.str().c_str() );
       }
