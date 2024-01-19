@@ -19,17 +19,17 @@ public:
   using Cluster::Print;
 
 protected:
-  virtual void SetTypeFromSumHit(const std::map<GenType,double>& nHit) {
+  virtual void SetTypeFromSumHit(const std::map<std::string,double>& nHit) {
     (void)nHit;
-    std::map<GenType,int> h_type;
+    std::map<std::string,int> h_type;
     for (auto const& it: fHit) {
       h_type[it->GetGenType()]++;
-      if (it->GetGenType() == kSNnu) {
-        fTrueGenType = kSNnu;
+      if (it->GetGenType() == "marley") {
+        fTrueGenType = "marley";
         return;
       }
     }
-    fTrueGenType = kOther;
+//    fTrueGenType = kOther;
     
   };
 

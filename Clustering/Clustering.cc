@@ -64,11 +64,11 @@ void Clustering::RunClustering(){
     nhit_wire_total += vec_WireHit.size();
     nhit_opti_total += vec_OptiHit.size();
 
-    int nneutron = 0;
-    for (auto const& it:vec_WireHit) {
-      if (it->GetGenType() == kNeutron)
-        nneutron++;
-    }
+//    int nneutron = 0;
+//    for (auto const& it:vec_WireHit) {
+//      if (it->GetGenType() == kNeutron)
+//        nneutron++;
+//    }
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());
     // std::random_shuffle(vec_OptHit .begin(), vec_OptHit .end());
     // std::random_shuffle(vec_WireHit.begin(), vec_WireHit.end());

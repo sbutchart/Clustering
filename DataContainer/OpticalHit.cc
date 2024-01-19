@@ -1,4 +1,5 @@
 #include "OpticalHit.hh"
+#include "Utils/Helper.h"
 
 OpticalHit::OpticalHit(int GenType,
                        double X, double Y, double Z,
@@ -6,7 +7,7 @@ OpticalHit::OpticalHit(int GenType,
   Hit(){
   fPeak = PE;
   fChannel = chan;
-  fTrueGenType = ConvertIntToGenType(GenType);
+  fTrueGenType = ConvertIDIntToString(GenType);
   fPosition[kX] = X;
   fPosition[kY] = Y;
   fPosition[kZ] = Z;

@@ -21,14 +21,14 @@ public:
   double GetNElectron     () const { return fNElectron                   ; };
   
 protected:
-  virtual void SetTypeFromSumHit(const std::map<GenType,double>& nHit) {
+  virtual void SetTypeFromSumHit(const std::map<std::string,double>& nHit) {
     (void)nHit;
-    fTrueGenType = kOther;
+//    fTrueGenType = kOther;
     int sign=0;
     for (auto const& it: fHit) {
-      sign+=(it->GetGenType() == kSNnu);
+      sign+=(it->GetGenType() == "marley");
     }
-    if (sign>1) fTrueGenType = kSNnu;
+    if (sign>1) fTrueGenType = "marley";
   };
   
 private:

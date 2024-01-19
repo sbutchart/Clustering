@@ -127,15 +127,15 @@ public:
   int NHitNoBT   ;
   int NFlash     ;
   int NFlashNoBT ;
-  int TotGen_Marl;
-  int TotGen_APA ;
-  int TotGen_CPA ;
-  int TotGen_Ar39;
-  int TotGen_Neut;
-  int TotGen_Kryp;
-  int TotGen_Plon;
-  int TotGen_Rdon;
-  int TotGen_Ar42;   
+//  int TotGen_Marl;
+//  int TotGen_APA ;
+//  int TotGen_CPA ;
+//  int TotGen_Ar39;
+//  int TotGen_Neut;
+//  int TotGen_Kryp;
+//  int TotGen_Plon;
+//  int TotGen_Rdon;
+//  int TotGen_Ar42;   
 
 
   int   * vec_Hit_View         ;
@@ -505,15 +505,15 @@ public:
     NHitNoBT   (0),
     NFlash     (0),
     NFlashNoBT (0),
-    TotGen_Marl(0),
-    TotGen_APA (0),
-    TotGen_CPA (0),
-    TotGen_Ar39(0),
-    TotGen_Neut(0),
-    TotGen_Kryp(0),
-    TotGen_Plon(0),
-    TotGen_Rdon(0),
-    TotGen_Ar42(0),   
+//    TotGen_Marl(0),
+//    TotGen_APA (0),
+//    TotGen_CPA (0),
+//    TotGen_Ar39(0),
+//    TotGen_Neut(0),
+//    TotGen_Kryp(0),
+//    TotGen_Plon(0),
+//    TotGen_Rdon(0),
+//    TotGen_Ar42(0),   
     
     vec_Hit_View         (NULL),
     vec_Hit_Size         (NULL),
@@ -957,7 +957,7 @@ public:
       t_Input->SetBranchAddress("HitSADC"                 , &vec_Hit_SADC         );
       t_Input->SetBranchAddress("HitInt"                  , &vec_Hit_Int          );
       t_Input->SetBranchAddress("HitPeak"                 , &vec_Hit_Peak         );
-      t_Input->SetBranchAddress("GenType"         , &vec_Hit_True_GenType );
+      t_Input->SetBranchAddress("GenType"                 , &vec_Hit_True_GenType );
       // t_Input->SetBranchAddress("Hit_True_MainTrID"        , &vec_Hit_True_MainTrID);
       // t_Input->SetBranchAddress("Hit_True_EvEnergy"        , &vec_Hit_True_EvEnergy);
       // t_Input->SetBranchAddress("Hit_True_X"               , &vec_Hit_True_X       );
@@ -1029,15 +1029,15 @@ public:
     //   MyTree->SetBranchAddress("SomeBranchName", &SomeVabiable);
     // }
       
-    t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
-    t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
-    t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
-    t_Input->SetBranchAddress("TotGen_Ar39", &TotGen_Ar39);
-    t_Input->SetBranchAddress("TotGen_Neut", &TotGen_Neut);
-    t_Input->SetBranchAddress("TotGen_Kryp", &TotGen_Kryp);
-    t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
-    t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
-    t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
+//    t_Input->SetBranchAddress("TotGen_Marl", &TotGen_Marl);
+//    t_Input->SetBranchAddress("TotGen_APA" , &TotGen_APA );
+//    t_Input->SetBranchAddress("TotGen_CPA" , &TotGen_CPA );
+//    t_Input->SetBranchAddress("TotGen_Ar39", &TotGen_Ar39);
+//    t_Input->SetBranchAddress("TotGen_Neut", &TotGen_Neut);
+//    t_Input->SetBranchAddress("TotGen_Kryp", &TotGen_Kryp);
+//    t_Input->SetBranchAddress("TotGen_Plon", &TotGen_Plon);
+//    t_Input->SetBranchAddress("TotGen_Rdon", &TotGen_Rdon);
+//    t_Input->SetBranchAddress("TotGen_Ar42", &TotGen_Ar42);
  
     if (dynamic) {
       TotGen_dynamic.resize(ID_map.size());

@@ -127,19 +127,22 @@ public:
   double RecClusterPosX;
   double RecClusterPosY;
   double RecClusterPosZ;
-  double pur_Other     ;
-  double pur_SNnu      ;
-  double pur_APA       ;
-  double pur_CPA       ;
-  double pur_Ar39      ;
-  double pur_Neutron   ;
-  double pur_Krypton   ;
-  double pur_Polonium  ;
-  double pur_Radon     ;
-  double pur_Ar42      ;
   double YWidth        ;
   double ZWidth        ;
   double SumPE         ;
+
+//  double pur_Other     ;
+//  double pur_SNnu      ;
+//  double pur_APA       ;
+//  double pur_CPA       ;
+//  double pur_Ar39      ;
+//  double pur_Neutron   ;
+//  double pur_Krypton   ;
+//  double pur_Polonium  ;
+//  double pur_Radon     ;
+//  double pur_Ar42      ;
+
+  std::map<std::string, double> dyn_purGenType;
 
   std::vector<double> TimeOrdering_WireClustTime        ;
   std::vector<double> SpaceOrdering_WireClustTime       ;
@@ -210,16 +213,27 @@ public:
     fTrees["WireHitClusters"]->Branch("TrClusterPosX",  &TrClusterPosX,  "TrClusterPosX/D" );
     fTrees["WireHitClusters"]->Branch("TrClusterPosY",  &TrClusterPosY,  "TrClusterPosY/D" );
     fTrees["WireHitClusters"]->Branch("TrClusterPosZ",  &TrClusterPosZ,  "TrClusterPosZ/D" );
-    fTrees["WireHitClusters"]->Branch("pur_Other"   ,   &pur_Other   ,   "pur_Other/D"     );
-    fTrees["WireHitClusters"]->Branch("pur_SNnu"    ,   &pur_SNnu    ,   "pur_SNnu/D"      );
-    fTrees["WireHitClusters"]->Branch("pur_APA"     ,   &pur_APA     ,   "pur_APA/D"       );
-    fTrees["WireHitClusters"]->Branch("pur_CPA"     ,   &pur_CPA     ,   "pur_CPA/D"       );
-    fTrees["WireHitClusters"]->Branch("pur_Ar39"    ,   &pur_Ar39    ,   "pur_Ar39/D"      );
-    fTrees["WireHitClusters"]->Branch("pur_Neutron" ,   &pur_Neutron ,   "pur_Neutron/D"   );
-    fTrees["WireHitClusters"]->Branch("pur_Krypton" ,   &pur_Krypton ,   "pur_Krypton/D"   );
-    fTrees["WireHitClusters"]->Branch("pur_Polonium",   &pur_Polonium,   "pur_Polonium/D"  );
-    fTrees["WireHitClusters"]->Branch("pur_Radon"   ,   &pur_Radon   ,   "pur_Radon/D"     );
-    fTrees["WireHitClusters"]->Branch("pur_Ar42"    ,   &pur_Ar42    ,   "pur_Ar42/D"      );
+
+    for (auto const&x : dyn_purGenType)
+      {
+        std::stringstream branch;
+        branch << "pur_" + x.first;
+        std::stringstream leaf;
+        branch << "pur" + x.first + "/D";
+        
+        fTrees["WireHitClusters"]->Branch(branch.str().c_str(), &x.second, leaf.str().c_str() );
+      }
+
+//    fTrees["WireHitClusters"]->Branch("pur_Other"   ,   &pur_Other   ,   "pur_Other/D"     );
+//    fTrees["WireHitClusters"]->Branch("pur_SNnu"    ,   &pur_SNnu    ,   "pur_SNnu/D"      );
+//    fTrees["WireHitClusters"]->Branch("pur_APA"     ,   &pur_APA     ,   "pur_APA/D"       );
+//    fTrees["WireHitClusters"]->Branch("pur_CPA"     ,   &pur_CPA     ,   "pur_CPA/D"       );
+//    fTrees["WireHitClusters"]->Branch("pur_Ar39"    ,   &pur_Ar39    ,   "pur_Ar39/D"      );
+//    fTrees["WireHitClusters"]->Branch("pur_Neutron" ,   &pur_Neutron ,   "pur_Neutron/D"   );
+//    fTrees["WireHitClusters"]->Branch("pur_Krypton" ,   &pur_Krypton ,   "pur_Krypton/D"   );
+//    fTrees["WireHitClusters"]->Branch("pur_Polonium",   &pur_Polonium,   "pur_Polonium/D"  );
+//    fTrees["WireHitClusters"]->Branch("pur_Radon"   ,   &pur_Radon   ,   "pur_Radon/D"     );
+//    fTrees["WireHitClusters"]->Branch("pur_Ar42"    ,   &pur_Ar42    ,   "pur_Ar42/D"      );
     fTrees["WireHitClusters"]->Branch("HitView",        &HitView);
     fTrees["WireHitClusters"]->Branch("GenType",        &GenType);
     fTrees["WireHitClusters"]->Branch("HitChan",        &HitChan);
@@ -316,7 +330,7 @@ public:
     
     for(auto const& it : clust->GetHit()) {
       OpticalHit* hit = (OpticalHit*)it;
-      PDSHit_GenType  .push_back(hit->GetGenType());
+      PDSHit_GenType  .push_back(hit->GetGenTypeInt());
       PDSHit_X        .push_back(hit->GetPosition(kX));
       PDSHit_Y        .push_back(hit->GetPosition(kY));
       PDSHit_Z        .push_back(hit->GetPosition(kZ));
@@ -354,16 +368,22 @@ public:
     RecClusterPosX = clust->GetRecoPosition(kX);
     RecClusterPosY = clust->GetRecoPosition(kY);
     RecClusterPosZ = clust->GetRecoPosition(kZ);
-    pur_Other      = clust->GetPurity(kOther   );
-    pur_SNnu       = clust->GetPurity(kSNnu    );
-    pur_APA        = clust->GetPurity(kAPA     );
-    pur_CPA        = clust->GetPurity(kCPA     );
-    pur_Ar39       = clust->GetPurity(kAr39    );
-    pur_Neutron    = clust->GetPurity(kNeutron );
-    pur_Krypton    = clust->GetPurity(kKrypton );
-    pur_Polonium   = clust->GetPurity(kPolonium);
-    pur_Radon      = clust->GetPurity(kRadon   );
-    pur_Ar42       = clust->GetPurity(kAr42    );
+
+    for (auto const& x : dyn_AllGenType)
+      {
+        dyn_purGenType[x] = clust->GetPurity(x);
+      }
+ 
+//    pur_Other      = clust->GetPurity(kOther   );
+//    pur_SNnu       = clust->GetPurity(kSNnu    );
+//    pur_APA        = clust->GetPurity(kAPA     );
+//    pur_CPA        = clust->GetPurity(kCPA     );
+//    pur_Ar39       = clust->GetPurity(kAr39    );
+//    pur_Neutron    = clust->GetPurity(kNeutron );
+//    pur_Krypton    = clust->GetPurity(kKrypton );
+//    pur_Polonium   = clust->GetPurity(kPolonium);
+//    pur_Radon      = clust->GetPurity(kRadon   );
+//    pur_Ar42       = clust->GetPurity(kAr42    );
 
     HitView.clear();
     GenType.clear();
@@ -381,7 +401,7 @@ public:
     for(auto const& hit : hits) {
       WireHit* wh = (WireHit*)hit;
       HitView.push_back(wh->GetHitView());
-      GenType.push_back(wh->GetGenType());
+      GenType.push_back(wh->GetGenTypeInt());
       HitChan.push_back(wh->GetHitChan());
       HitTime.push_back(wh->GetHitTime());
       HitSADC.push_back(wh->GetHitSADC());

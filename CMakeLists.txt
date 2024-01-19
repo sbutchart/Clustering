@@ -35,10 +35,10 @@ find_package(Boost REQUIRED)
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/BurstTrigger)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/BurstTrigger)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Algorithm)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Analyser)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Analyser)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/BurstTrigger)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Clustering)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/DataContainer)

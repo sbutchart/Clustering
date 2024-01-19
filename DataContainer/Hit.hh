@@ -77,7 +77,8 @@ public:
   
   size_t  GetChannel     () const { return fChannel;         };
   size_t  GetAPA         () const { return fAPA;             };
-  GenType GetGenType     () const { return fTrueGenType;     };
+  std::string GetGenType () const { return fTrueGenType;     };
+  int GetGenTypeInt      () const { return ConvertIDStringToInt(fTrueGenType);};
   double  GetTrueEnergy  () const { return fTrueEnergy;      };
   int  GetMarleyIndex () const { return fTrueMarleyIndex; };
   
@@ -88,7 +89,8 @@ public:
   void SetPeak        (const double  i) { fPeak            = i; };
   void SetChannel     (const size_t  i) { fChannel         = i; };
   void SetAPA         (const size_t  i) { fAPA             = i; };
-  void SetGenType     (const GenType i) { fTrueGenType     = i; };
+  void SetGenType     (std::string   i) { fTrueGenType     = i; };
+  void SetGenTypeInt  (int           i) { fTrueGenType     = ConvertIDIntToString(i); };
   void SetTrueEnergy  (const double  i) { fTrueEnergy      = i; };
   void SetMarleyIndex (const int     i) { fTrueMarleyIndex = i; };
   
@@ -122,7 +124,7 @@ protected:
   double  fPeak;
   size_t  fChannel;
   size_t  fAPA;
-  GenType fTrueGenType;
+  std::string fTrueGenType;
   double  fTrueEnergy;
   int     fTrueMarleyIndex;
   SimpleGeom fGeom;

@@ -17,16 +17,21 @@ private:
       fTruePosition [d] = 0.;
       fTrueDirection[d] = 0.;
     }
-    fTruePurity[kOther   ] = 0.;
-    fTruePurity[kSNnu    ] = 0.;
-    fTruePurity[kAPA     ] = 0.;
-    fTruePurity[kCPA     ] = 0.;
-    fTruePurity[kAr39    ] = 0.;
-    fTruePurity[kNeutron ] = 0.;
-    fTruePurity[kKrypton ] = 0.;
-    fTruePurity[kPolonium] = 0.;
-    fTruePurity[kRadon   ] = 0.;
-    fTruePurity[kAr42    ] = 0.;
+//    fTruePurity[kOther   ] = 0.;
+//    fTruePurity[kSNnu    ] = 0.;
+//    fTruePurity[kAPA     ] = 0.;
+//    fTruePurity[kCPA     ] = 0.;
+//    fTruePurity[kAr39    ] = 0.;
+//    fTruePurity[kNeutron ] = 0.;
+//    fTruePurity[kKrypton ] = 0.;
+//    fTruePurity[kPolonium] = 0.;
+//    fTruePurity[kRadon   ] = 0.;
+//    fTruePurity[kAr42    ] = 0.;
+   
+      for(auto const& x : dyn_AllGenType){
+        fTruePurity[x] = 0.;
+      }
+
   };
   
   Cluster(const Cluster& c):
@@ -68,7 +73,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-    fTrueGenType     (kOther),
+//    fTrueGenType     (kOther),  what is this doing...?
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -92,7 +97,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-    fTrueGenType     (kOther),
+//    fTrueGenType     (kOther),
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -107,7 +112,7 @@ protected:
     std::map<size_t,size_t> apa;
     std::map<int,size_t> marleyIndices;
     std::set<int> channel;
-    std::map<GenType,double> hittype_peak;
+    std::map<std::string,double> hittype_peak;
     for (auto const& it: fHit) {
       marleyIndices[it->GetMarleyIndex()]++;
       channel.insert(it->GetChannel());
@@ -135,7 +140,7 @@ protected:
 
     SetTypeFromSumHit(hittype_peak);
     
-    for (auto const& d : AllGenType) {
+    for (auto const& d : dyn_AllGenType) {
       fTruePurity[d] = hittype_peak[d] / fSumPeak;
     }
 
@@ -192,11 +197,12 @@ public:
   size_t GetAPA          ()                  const { return fAPA;                          };
   double GetSize         (const Direction d) const { return fSize.at(d);                   };
   extent GetExtent       (const Direction d) const { return fExtent.at(d);                 };
-  double GetPurity       (const GenType   d) const { return fTruePurity.at(d);             };
+  double GetPurity       (std::string     d) const { return fTruePurity.at(d);             };
   double GetTruePosition (const Direction d) const { return fTruePosition.at(d);           };
   double GetTrueDirection(const Direction d) const { return fTrueDirection.at(d);          };
   size_t GetNHit         ()                  const { return fNHit;                         };
-  bool   GetType         ()                  const { return (fTrueGenType==kSNnu);         };
+//this is being used in the OutputManager:
+  bool   GetType         ()                  const { return (fTrueGenType=="marley");         };
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };
@@ -213,7 +219,7 @@ public:
   void SetNChannel     (const size_t d)                    { fNChannel         = d; };
   void SetAPA          (const size_t d)                    { fAPA              = d; };
   void SetSize         (const Direction d, const double s) { fSize         [d] = s; };
-  void SetGenType      (const GenType d)                   { fTrueGenType      = d; };
+  void SetGenType      (std::string   d)                   { fTrueGenType      = d; };
   void SetNHit         (const size_t  d)                   { fNHit             = d; };
   void SetSumPeak      (const double  s)                   { fSumPeak          = s; };
   void SetExtent       (const Direction d, const extent e) { fExtent       [d] = e; };
@@ -226,7 +232,7 @@ public:
   void SetHit          (const std::vector<Hit*>& h)        { fHit              = h; };
 
 protected:
-  virtual void SetTypeFromSumHit(const std::map<GenType,double>&) = 0;
+  virtual void SetTypeFromSumHit(const std::map<std::string,double>&) = 0;
   std::vector<Hit*> fHit;
   size_t fNHit;
   size_t fNChannel;
@@ -236,11 +242,11 @@ protected:
   std::map<Direction,double> fSize;
   std::map<Direction,std::pair<double,double>> fExtent;
   bool fIsSelected;
-  std::map<GenType,double> fTruePurity;
+  std::map<std::string,double> fTruePurity;
   double  fSumPeak;
   double  fRecoEnergy;
   size_t  fAPA;
-  GenType fTrueGenType;
+  std::string fTrueGenType;
   double  fTrueEnergy;
   int     fTrueMarleyIndex;
   std::map<Direction,double> fTruePosition;

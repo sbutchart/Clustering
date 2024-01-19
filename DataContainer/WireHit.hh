@@ -11,15 +11,16 @@ public:
           float cTrDepositedE, float cTrEPart, int   cTrIDPart,
           float cRecPosX,      float cRecPosY, float cRecPosZ,
           float cTrPosX,       float cTrPosY,  float cTrPosZ,
-          int   cMarleyIndex,  float cNelec):
+          int cMarleyIndex,    float cNelec):
+
     Hit() {
     fHitView = cHitView;
-    fTrueGenType = ConvertIntToGenType(cGenType);
+    fTrueGenType = ConvertIDIntToString(cGenType);
     fChannel = cHitChan;
     fPeak = cHitSADC;
     fSize[kT] = cHitRMS;
     fPosition[kT] = cHitTime;
-    if (cGenType == 1)fTrueMarleyIndex = cMarleyIndex;
+    if (cGenType == 0)fTrueMarleyIndex = cMarleyIndex;
     fTrDepositedE = cTrDepositedE;
     fNElectron = cNelec;
     fTrEPart = cTrEPart;
