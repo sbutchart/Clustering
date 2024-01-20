@@ -282,7 +282,7 @@ public:
   double              singles_True_Time                ;
                                                               
   std::vector<int>                 * True_Bck_Mode            ;
-  std::vector<int>                 * True_Bck_EndProcess      ;
+  std::vector<std::string>         * True_Bck_EndProcess      ;
   std::vector<int>                 * True_Bck_Mother          ;
   std::vector<int>                 * True_Bck_ID              ;
   std::vector<double>              * True_Bck_VertX           ;
