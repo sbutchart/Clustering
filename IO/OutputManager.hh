@@ -22,7 +22,7 @@ protected:
   std::map<std::string,TTree*> fTrees;
 
 public:
-  OutputManager(){};
+  OutputManager(){ std::cout << "[OutputManager] Constructor" << std::endl; };
   virtual ~OutputManager(){};
   
   void Fill() {
@@ -214,17 +214,24 @@ public:
     fTrees["WireHitClusters"]->Branch("TrClusterPosY",  &TrClusterPosY,  "TrClusterPosY/D" );
     fTrees["WireHitClusters"]->Branch("TrClusterPosZ",  &TrClusterPosZ,  "TrClusterPosZ/D" );
 
+    std::cout << "[OutputManager] Setting purity branches" << std::endl;
+    for (auto &x : dyn_AllGenType)
+    {
+      std::pair<std::string, double> tmp_pair { x, 0 };
+      dyn_purGenType.insert(tmp_pair);
+    }
+
     for (auto &x : dyn_purGenType)
-      {
-        std::stringstream branch;
-        branch << "pur_" << x.first;
-        std::cout << branch.str() << std::endl;
-        std::stringstream leaf;
-        leaf << branch.rdbuf() << "/D";
-        std::cout << leaf.str() << std::endl;
-        
-        fTrees["WireHitClusters"]->Branch(branch.str().c_str(), &x.second, leaf.str().c_str() );
-      }
+    {
+      std::stringstream branch;
+      branch << "pur_" << x.first;
+      std::cout << branch.str() << std::endl;
+      std::stringstream leaf;
+      leaf << branch.rdbuf() << "/D";
+      std::cout << leaf.str() << std::endl;
+
+      fTrees["WireHitClusters"]->Branch(branch.str().c_str(), &x.second, leaf.str().c_str() );
+    }
 
 //    fTrees["WireHitClusters"]->Branch("pur_Other"   ,   &pur_Other   ,   "pur_Other/D"     );
 //    fTrees["WireHitClusters"]->Branch("pur_SNnu"    ,   &pur_SNnu    ,   "pur_SNnu/D"      );
@@ -371,10 +378,12 @@ public:
     RecClusterPosY = clust->GetRecoPosition(kY);
     RecClusterPosZ = clust->GetRecoPosition(kZ);
 
+    std::cout << "[OutputManager] Getting purity" << std::endl;
     for (auto const& x : dyn_AllGenType)
-      {
-        dyn_purGenType[x] = clust->GetPurity(x);
-      }
+    {
+      dyn_purGenType[x] = clust->GetPurity(x);
+      std::cout << x << " " << clust->GetPurity(x) << std::endl;
+    }
  
 //    pur_Other      = clust->GetPurity(kOther   );
 //    pur_SNnu       = clust->GetPurity(kSNnu    );

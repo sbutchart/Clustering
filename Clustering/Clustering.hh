@@ -34,14 +34,17 @@ public:
   };
 
   void Initialise() {
-    fSOM ->SetOutputFile(fOutputFileName.c_str());
-    fSOM ->Initialise   ();
-    fSOM ->SetOutputOffset(fOutputOffset);
+    //fSOM ->SetOutputFile(fOutputFileName.c_str());
+    //fSOM ->Initialise   ();
+    //fSOM ->SetOutputOffset(fOutputOffset);
     fSNIM->SetInputFile (fInputFileName.c_str());
     fSNIM->SetInputTree (fInputTreeName.c_str());
     fSNIM->LoadTree     ();
     fSNIM->SetAPAChannelMap(fmap_APA_Channel);
     fSNIM->SetNAPA(fNAPA);
+    fSOM ->SetOutputFile(fOutputFileName.c_str());
+    fSOM ->Initialise   ();
+    fSOM ->SetOutputOffset(fOutputOffset);
   };
 
 

@@ -21,7 +21,7 @@ protected:
 public:
   TTree* t_Input;
 
-  InputManager(){};
+  InputManager(){ std::cout << "[InputManager] Constructor" << std::endl; };
   virtual ~InputManager(){};
 
   int GetEntries() const {
@@ -63,8 +63,7 @@ protected:
       exit(1);
     }
 
-    std::cout << "DYN SN Ana :: load IDs" << std::endl;
-
+    std::cout << "[InputManager] Dynamic: Loading IDs" << std::endl;
     // DYNAMIC BACKGROUNDS
     std::string delim = "/";
     std::string tree_name_token = treename.substr(0, treename.find(delim));
@@ -99,6 +98,7 @@ protected:
       ID_map.insert( temp_pair_all );
       AllGenTypeDynamic.push_back("All");
 
+      std::cout << "[InputManager] Loaded Dynamic IDs" << std::endl;
       for (auto const& x : ID_map){
         std::cout << x.first << " : " << x.second << std::endl;
       } 

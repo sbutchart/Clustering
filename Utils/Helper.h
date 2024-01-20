@@ -587,8 +587,7 @@ inline void autoColorHists(TPad* pad, int whichColours=kBrewerSet1Palette)
 //### Dynamic
 // vars
 inline std::map<std::string, int> dyn_GenType;
-static std::vector<std::string> dyn_AllGenType;
-
+inline std::vector<std::string> dyn_AllGenType;
 
 // functions
 inline void setIDMap( std::map<std::string, int> ID_map )
@@ -623,7 +622,7 @@ inline int ConvertIDStringToInt(std::string id_name)
 
 inline void testDynamic()
 {
- std::cout << "DYNAMIC VARS in HELPER" << std::endl;
+ std::cout << "[Helper] Test of dynamic variables" << std::endl;
  std::cout << dyn_GenType["All"] << std::endl;
  std::cout << dyn_AllGenType[2] << std::endl;
  std::cout << ConvertIDIntToString(2) << std::endl;
@@ -632,7 +631,7 @@ inline void testDynamic()
 
 inline void SetDynamicVars( std::map<std::string, int> ID_map_from_IO )
 {
-  std::cout << "Helper :: Setting dynamic variables..." << std::endl;
+  std::cout << "[Helper] Setting dynamic variables..." << std::endl;
   setIDMap( ID_map_from_IO );
   setAllGenType();
   testDynamic();
@@ -724,6 +723,7 @@ inline void PrintProgress(int iter, int nloop){
 class Helper{
 public:
   Helper(){
+  std::cout << "[HELPER] Constructor" << std::endl;
 //    GenName[kSNnu] =          "SN#nu"         ;
 //    GenName[kAPA] =           "APA"           ;
 //    GenName[kCPA] =           "CPA"           ;
