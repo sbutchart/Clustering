@@ -306,9 +306,16 @@ public:
     fTrees["TimingInfo"]->Branch("SpaceOrdering_OptClustTime",         &SpaceOrdering_OptClustTime        );
     fTrees["TimingInfo"]->Branch("Clustering_OptClustTime",            &Clustering_OptClustTime           );
     fTrees["TimingInfo"]->Branch("EnergyReconstruction_OptClustTime",  &EnergyReconstruction_OptClustTime );
-  };
 
-  
+    fTrees["fIDs"] = new TTree("fIDs", "fIDs");
+    for (auto & x : dyn_GenType) {
+      std::stringstream title;
+      title << x.first << "_id";
+      fTrees["fIDs"]->Branch(title.str().c_str(), &x.second);
+      fTrees["fIDs"]->Fill();
+    }
+  };
+ 
   void FillClusterInfo(OpticalCluster* clust) {
     Config         = fCurrentConfig;
     Cluster        = fOpticalClusterCount[fCurrentConfig];
