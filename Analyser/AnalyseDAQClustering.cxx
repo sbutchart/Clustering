@@ -4,6 +4,7 @@
 
 #include "Utils/Helper.h"
 #include "Utils/CLI11.hpp"
+#include "IO/OutputManager.hh"
 
 #include "TFile.h"
 #include "TCanvas.h"
@@ -20,16 +21,16 @@
 
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
   Helper h;
-  TProfile* p_ = new TProfile(name.c_str(), title.c_str(), h.GenName.size(), 0, (double)h.GenName.size());
-  for(auto const& it : h.ShortGenName)
+  TProfile* p_ = new TProfile(name.c_str(), title.c_str(), h.dyn_GenName.size(), 0, (double)h.dyn_GenName.size());
+  for(auto const& it : h.dyn_ShortGenName)
     p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
   return p_;
   
 }
 
-std::map<int, int> GetMapOfHit(std::vector<int> const* GenType){
+std::map<int, int> GetMapOfHit(std::vector<int> const* dyn_GenType){
   std::map<int,int> map_;
-  for(std::vector<int>::const_iterator it=GenType->begin(); it!=GenType->end(); ++it)
+  for(std::vector<int>::const_iterator it=dyn_GenType->begin(); it!=dyn_GenType->end(); ++it)
     map_[*it]++;
   return map_;
 }
@@ -71,16 +72,16 @@ int main(int argc, char** argv){
   double RecClusterPosX;
   double RecClusterPosY;
   double RecClusterPosZ;
-  double pur_Other     ;
-  double pur_SNnu      ;
-  double pur_APA       ;
-  double pur_CPA       ;
-  double pur_Ar39      ;
-  double pur_Neutron   ;
-  double pur_Krypton   ;
-  double pur_Polonium  ;
-  double pur_Radon     ;
-  double pur_Ar42      ;
+//  double pur_Other     ;
+//  double pur_SNnu      ;
+//  double pur_APA       ;
+//  double pur_CPA       ;
+//  double pur_Ar39      ;
+//  double pur_Neutron   ;
+//  double pur_Krypton   ;
+//  double pur_Polonium  ;
+//  double pur_Radon     ;
+//  double pur_Ar42      ;
   
   std::vector<int>    * HitView    = NULL;
   std::vector<int>    * HitGenType = NULL;
@@ -128,16 +129,24 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosX",  &TrClusterPosX );
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosY",  &TrClusterPosY );
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosZ",  &TrClusterPosZ );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Other",      &pur_Other     );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_SNnu",       &pur_SNnu      );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_APA",        &pur_APA       );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CPA",        &pur_CPA       );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar39",       &pur_Ar39      );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Neutron",    &pur_Neutron   );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Krypton",    &pur_Krypton   );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Polonium",   &pur_Polonium  );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Radon",      &pur_Radon     );
-  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar42",       &pur_Ar42      );
+
+//  for (auto & x : dyn_purGenType) {
+//    std::stringstream branch;
+//    branch << "pur_" << x.first;
+//    //std::cout << branch.str() << std::endl;
+//    t_Output_triggeredclusteredhits->SetBranchAddress(branch.str().c_str(), &x.second);
+//      }
+
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Other",      &pur_Other     );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_SNnu",       &pur_SNnu      );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_APA",        &pur_APA       );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_CPA",        &pur_CPA       );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar39",       &pur_Ar39      );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Neutron",    &pur_Neutron   );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Krypton",    &pur_Krypton   );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Polonium",   &pur_Polonium  );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Radon",      &pur_Radon     );
+//  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Ar42",       &pur_Ar42      );
   t_Output_triggeredclusteredhits->SetBranchAddress("HitView",        &HitView       );
   t_Output_triggeredclusteredhits->SetBranchAddress("GenType",        &HitGenType    );
   t_Output_triggeredclusteredhits->SetBranchAddress("HitChan",        &HitChan       );
@@ -209,9 +218,9 @@ int main(int argc, char** argv){
 
   Helper h;
 
-  TH1D* h_rate_back = new TH1D("rates", ";;Rate [Hz]", h.GenName.size(),-0.5, (double)h.GenName.size()-0.5);
+  TH1D* h_rate_back = new TH1D("rates", ";;Rate [Hz]", h.dyn_GenName.size(),-0.5, (double)h.dyn_GenName.size()-0.5);
   h_rate_back->SetLineWidth(2);
-  for(auto const& it : h.ShortGenName)
+  for(auto const& it : h.dyn_ShortGenName)
     h_rate_back->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
   
   TH1D* h_nhit_sign_wire = new TH1D("h_nhit_sign_wire", ";n Hits;Rate [Hz]", 50, 0, 50);
@@ -347,21 +356,21 @@ int main(int argc, char** argv){
   h_maxADChit_back_wire->SetLineWidth(2);
 
   int nBackgroundEventWire=0;
-  int ncluster_sign=0;
+//  int ncluster_sign=0;
   int ncluster_back=0;
 
-  std::map<GenType,TH1D*> h_singled_maxADChit_wire  = GetHistos  ("h_maxADChit_wire" , ";Max hit ADC;Rate [Hz]",  150, 0, 15000);
-  std::map<GenType,TH1D*> h_singled_sadc_nhit_wire  = GetHistos  ("h_sadc_hits_wire" , ";ADC;N hit"            ,  100, 0,  5000);
-  std::map<GenType,TH1D*> h_singled_nhit_wire       = GetHistos  ("h_nhit_wire"      , ";n Hits;Rate [Hz]"     ,   50, 0,    50);
-  std::map<GenType,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 10000);
-  std::map<GenType,TH1D*> h_singled_time_wire       = GetHistos  ("h_time_wire"      , ";Time;Rate [Hz]"       ,  100, 0,   100);
-  std::map<GenType,TH1D*> h_singled_nchan_wire      = GetHistos  ("h_nchan_wire"     , ";n Channels;Rate [Hz]" ,   20, 0,    20);
-  std::map<GenType,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 10000);
-  std::map<GenType,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 10000, 100, 0,   100);
-  std::map<GenType,TH2D*> h_singled_time_nhit_wire  = Get2DHistos("h_time_nhit_wire" , ";Time;n Hits"          ,  100, 0,   100,  50, 0,    50);
-  std::map<GenType,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 10000);
-  std::map<GenType,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
-  std::map<GenType,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
+  std::map<int,TH1D*> h_singled_maxADChit_wire  = GetHistos  ("h_maxADChit_wire" , ";Max hit ADC;Rate [Hz]",  150, 0, 15000);
+  std::map<int,TH1D*> h_singled_sadc_nhit_wire  = GetHistos  ("h_sadc_hits_wire" , ";ADC;N hit"            ,  100, 0,  5000);
+  std::map<int,TH1D*> h_singled_nhit_wire       = GetHistos  ("h_nhit_wire"      , ";n Hits;Rate [Hz]"     ,   50, 0,    50);
+  std::map<int,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 10000);
+  std::map<int,TH1D*> h_singled_time_wire       = GetHistos  ("h_time_wire"      , ";Time;Rate [Hz]"       ,  100, 0,   100);
+  std::map<int,TH1D*> h_singled_nchan_wire      = GetHistos  ("h_nchan_wire"     , ";n Channels;Rate [Hz]" ,   20, 0,    20);
+  std::map<int,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 10000);
+  std::map<int,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 10000, 100, 0,   100);
+  std::map<int,TH2D*> h_singled_time_nhit_wire  = Get2DHistos("h_time_nhit_wire" , ";Time;n Hits"          ,  100, 0,   100,  50, 0,    50);
+  std::map<int,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 10000);
+  std::map<int,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
+  std::map<int,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
 
   TEfficiency* eff_enu  = new TEfficiency("eff_enu",  ";E_{#nu} [MeV]"  ,  50, 0, 50);
   TEfficiency* eff_elep = new TEfficiency("eff_elep", ";E_{e} [MeV]"    ,  50, 0, 50);
@@ -399,7 +408,7 @@ int main(int argc, char** argv){
       double MaxADC=0;
       for (auto const& adc:(*HitSADC))
         if (MaxADC<adc)MaxADC=adc;
-      GenType gen = ConvertIntToGenType(tpe);
+      int gen = tpe;
       for (auto const& it: (*HitSADC)) {
         h_singled_sadc_nhit_wire [gen]->Fill(it);
       }
@@ -419,38 +428,38 @@ int main(int argc, char** argv){
     } else {
       nDetectedEvent[Event][MarleyIndex] = true;
       //map_gentype_nhit_sign = GetMapOfHit(HitGenType);
-      double MaxADC=0;
-      for (auto const& adc:(*HitSADC))
-        if (MaxADC<adc)MaxADC=adc;
-      for (auto const& it: (*HitSADC)) {
-        h_singled_sadc_nhit_wire [kSNnu]->Fill(it);
-      }
-      h_maxADChit_sign_wire           ->Fill(MaxADC   );
-      h_singled_maxADChit_wire [kSNnu]->Fill(MaxADC   );
-      h_singled_nhit_wire      [kSNnu]->Fill(NHits    );
-      h_singled_sadc_wire      [kSNnu]->Fill(SumADC   );
-      h_singled_time_wire      [kSNnu]->Fill(TimeWidth);
-      h_singled_nchan_wire     [kSNnu]->Fill(NChan    );
-      h_singled_nhit_sadc_wire [kSNnu]->Fill(NHits    , SumADC   );
-      h_singled_sadc_time_wire [kSNnu]->Fill(SumADC   , TimeWidth);
-      h_singled_time_nhit_wire [kSNnu]->Fill(TimeWidth, NHits    );
-      h_singled_nchan_sadc_wire[kSNnu]->Fill(NChan    , SumADC   );
-      h_singled_nchan_time_wire[kSNnu]->Fill(NChan    , TimeWidth);
-      h_singled_nchan_nhit_wire[kSNnu]->Fill(NChan    , NHits    );
-      ++ncluster_sign;
+//      double MaxADC=0;
+//      for (auto const& adc:(*HitSADC))
+//        if (MaxADC<adc)MaxADC=adc;
+//      for (auto const& it: (*HitSADC)) {
+//        h_singled_sadc_nhit_wire [kSNnu]->Fill(it);
+//      }
+//      h_maxADChit_sign_wire           ->Fill(MaxADC   );
+//      h_singled_maxADChit_wire [kSNnu]->Fill(MaxADC   );
+//      h_singled_nhit_wire      [kSNnu]->Fill(NHits    );
+//      h_singled_sadc_wire      [kSNnu]->Fill(SumADC   );
+//      h_singled_time_wire      [kSNnu]->Fill(TimeWidth);
+//      h_singled_nchan_wire     [kSNnu]->Fill(NChan    );
+//      h_singled_nhit_sadc_wire [kSNnu]->Fill(NHits    , SumADC   );
+//      h_singled_sadc_time_wire [kSNnu]->Fill(SumADC   , TimeWidth);
+//      h_singled_time_nhit_wire [kSNnu]->Fill(TimeWidth, NHits    );
+//      h_singled_nchan_sadc_wire[kSNnu]->Fill(NChan    , SumADC   );
+//      h_singled_nchan_time_wire[kSNnu]->Fill(NChan    , TimeWidth);
+//      h_singled_nchan_nhit_wire[kSNnu]->Fill(NChan    , NHits    );
+//      ++ncluster_sign;
     }
     // for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
     // for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
 
-    bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
-    if (fillneutron)
-      for (auto const& genhit: map_gentype_nhit_back)
-        p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
-
-    fillneutron=map_gentype_nhit_sign[kNeutron]>0;
-    if (fillneutron)
-      for (auto const& genhit: map_gentype_nhit_sign)
-        p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
+//    bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
+//    if (fillneutron)
+//      for (auto const& genhit: map_gentype_nhit_back)
+//        p_gentype_back_neut_wire->Fill(genhit.first, genhit.second);
+//
+//    fillneutron=map_gentype_nhit_sign[kNeutron]>0;
+//    if (fillneutron)
+//      for (auto const& genhit: map_gentype_nhit_sign)
+//        p_gentype_sign_neut_wire->Fill(genhit.first, genhit.second);
   }
   
   for (auto& it: h_singled_sadc_nhit_wire) {
