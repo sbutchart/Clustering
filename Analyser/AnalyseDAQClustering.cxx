@@ -18,7 +18,6 @@
 #include "TStyle.h"
 #include "TVector3.h"
 
-
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
   Helper h;
   TProfile* p_ = new TProfile(name.c_str(), title.c_str(), h.dyn_GenName.size(), 0, (double)h.dyn_GenName.size());
@@ -49,7 +48,18 @@ int main(int argc, char** argv){
   app.add_option("--hitcut",    nHitCut,         "An extra hit cut that can be applied here. Minimum number of hits a cluster should have to be considered");
   CLI11_PARSE(app, argc, argv);
 
+  if (InputFile == "") {
+    std::cerr << "Need to provide an input file" << std::endl;
+    exit(1);
+  }
+
   TFile *f_Input = new TFile(InputFile.c_str(), "READ");
+     
+  if (!f_Input->IsOpen()) {
+    std::cerr << "The file " << InputFile.c_str() << " does not exist." << std::endl;
+    exit(1);
+  }
+
 
   int    Cluster       ;
   int    Event         ;
@@ -82,7 +92,52 @@ int main(int argc, char** argv){
 //  double pur_Polonium  ;
 //  double pur_Radon     ;
 //  double pur_Ar42      ;
+
+  // DYNAMIC BACKGROUNDS
+  std::map<std::string, int> ID_map;
+  std::vector<std::string> AllGenTypeDynamic;
+  std::cout << "[Analyser] Dynamic: Loading IDs" << std::endl;
+  std::string delim = "/";
+//  std::string tree_name_token = InputFile.substr(0, InputFile.find(delim));
+  std::string ID_tree = "/fIDs";
+    
+  if (f_Input->Get( ID_tree.c_str() )) {
+    TTree *t_IDs = (TTree*)f_Input->Get( ID_tree.c_str() );
+    TObjArray *branchList; 
+    branchList  = t_IDs->GetListOfBranches();
+    int nBranch = t_IDs->GetNbranches();
+    TString IDtreenames[nBranch];
   
+    std::cout << "ID trees: " << nBranch << std::endl;
+    for(int i=0;i<nBranch;i++){
+      IDtreenames[i] = branchList->At(i)->GetName();
+ 
+      int temp_id;
+      t_IDs->SetBranchAddress(IDtreenames[i], &temp_id);
+      t_IDs->GetEntry(0);
+      std::string delimiter = "_";
+      std::string temp_string = IDtreenames[i].Data();
+      std::string token = temp_string.substr(0, temp_string.find(delimiter));
+      std::pair<std::string, int> temp_pair {token, temp_id};
+      ID_map.insert( temp_pair );
+      AllGenTypeDynamic.push_back(token);
+    }
+    std::pair<std::string, int> temp_pair_allbckg {"AllBackground", 99};
+    ID_map.insert( temp_pair_allbckg );
+    AllGenTypeDynamic.push_back("AllBackground");
+    std::pair<std::string, int> temp_pair_all {"All", 100};
+    ID_map.insert( temp_pair_all );
+    AllGenTypeDynamic.push_back("All");
+
+   std::cout << "[Analyser] Loaded Dynamic IDs" << std::endl;
+   for (auto const& x : ID_map){
+     std::cout << x.first << " : " << x.second << std::endl;
+   } 
+ } else {
+   std::cerr << "The requested tree 'fIDs' does not exist in file " << InputFile << std::endl;
+ }
+  
+ 
   std::vector<int>    * HitView    = NULL;
   std::vector<int>    * HitGenType = NULL;
   std::vector<int>    * HitChan    = NULL;
@@ -130,12 +185,12 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosY",  &TrClusterPosY );
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosZ",  &TrClusterPosZ );
 
-//  for (auto & x : dyn_purGenType) {
-//    std::stringstream branch;
-//    branch << "pur_" << x.first;
-//    //std::cout << branch.str() << std::endl;
-//    t_Output_triggeredclusteredhits->SetBranchAddress(branch.str().c_str(), &x.second);
-//      }
+  for (auto & x : AllGenTypeDynamic) {
+    std::stringstream branch;
+    branch << "pur_" << x;
+    //std::cout << branch.str() << std::endl;
+    t_Output_triggeredclusteredhits->SetBranchAddress(branch.str().c_str(), &branch );
+      }
 
 //  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Other",      &pur_Other     );
 //  t_Output_triggeredclusteredhits->SetBranchAddress("pur_SNnu",       &pur_SNnu      );
