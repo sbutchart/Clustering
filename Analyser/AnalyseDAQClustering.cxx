@@ -4,7 +4,7 @@
 
 #include "Utils/Helper.h"
 #include "Utils/CLI11.hpp"
-#include "IO/OutputManager.hh"
+//#include "IO/OutputManager.hh"
 
 #include "TFile.h"
 #include "TCanvas.h"
@@ -96,10 +96,11 @@ int main(int argc, char** argv){
   // DYNAMIC BACKGROUNDS
   std::map<std::string, int> ID_map;
   std::vector<std::string> AllGenTypeDynamic;
+  std::vector<int> pur_dynamic;
   std::cout << "[Analyser] Dynamic: Loading IDs" << std::endl;
   std::string delim = "/";
 //  std::string tree_name_token = InputFile.substr(0, InputFile.find(delim));
-  std::string ID_tree = "/fIDs";
+  std::string ID_tree = "fIDs";
     
   if (f_Input->Get( ID_tree.c_str() )) {
     TTree *t_IDs = (TTree*)f_Input->Get( ID_tree.c_str() );
@@ -185,11 +186,14 @@ int main(int argc, char** argv){
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosY",  &TrClusterPosY );
   t_Output_triggeredclusteredhits->SetBranchAddress("TrClusterPosZ",  &TrClusterPosZ );
 
-  for (auto & x : AllGenTypeDynamic) {
+
+  pur_dynamic.resize(ID_map.size());
+  for (auto & x : ID_map) {
     std::stringstream branch;
-    branch << "pur_" << x;
+    branch << "pur_" << x.first;
     //std::cout << branch.str() << std::endl;
-    t_Output_triggeredclusteredhits->SetBranchAddress(branch.str().c_str(), &branch );
+    double branch_double = static_cast <double> (pur_dynamic[x.second]);
+    t_Output_triggeredclusteredhits->SetBranchAddress(branch.str().c_str(), &branch_double );
       }
 
 //  t_Output_triggeredclusteredhits->SetBranchAddress("pur_Other",      &pur_Other     );
