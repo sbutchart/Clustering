@@ -464,15 +464,16 @@ int main(int argc, char** argv){
         m_gentype[it]++;
       //find gentype contributing most to cluster
       int tpe = GetMax(m_gentype).first;
+      std::cout << "TPE: " << tpe << std::endl;
       ++ncluster_back;
       ++nBackgroundEventWire;
       h_rate_back->Fill(tpe);
       double MaxADC=0;
       for (auto const& adc:(*HitSADC))
         if (MaxADC<adc)MaxADC=adc;
-      //std::string gen = ConvertIDIntToString(tpe);
-      int gen = tpe;
-      std::cout << "Gen: " << gen << std::endl;
+      std::string gen = ConvertIDIntToString(tpe);
+      //int gen = tpe;
+      //std::cout << "Gen: " << gen << std::endl;
       for (auto const& it: (*HitSADC)) {
         h_singled_sadc_nhit_wire [gen]->Fill(it);
       }
@@ -572,8 +573,8 @@ int main(int argc, char** argv){
   gPad->SetGridx(false);
   gPad->SetGridy(false);
 
-  p_gentype_sign_neut_wire->Draw("E");
-  p_gentype_back_neut_wire->Draw("E SAME");
+  //p_gentype_sign_neut_wire->Draw("E");
+  //p_gentype_back_neut_wire->Draw("E SAME");
   c.Print(OutputFile.c_str());
 
   gPad->SetTicks();
@@ -680,8 +681,8 @@ int main(int argc, char** argv){
   leg->Write();
   p_gentype_sign_wire     ->Write();
   p_gentype_back_wire     ->Write();
-  p_gentype_sign_neut_wire->Write();
-  p_gentype_back_neut_wire->Write();
+  //p_gentype_sign_neut_wire->Write();
+  //p_gentype_back_neut_wire->Write();
   h_rate_back             ->Write();
   h_nhit_sign_wire        ->Write();
   h_nhit_back_wire        ->Write();

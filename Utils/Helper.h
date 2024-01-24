@@ -775,6 +775,7 @@ inline std::map<std::string,TH1D*> GetHistos(std::string name, std::string title
   std::vector<int>vec_colors = getColors(0);
   int i=0;
   Helper h;
+  std::cout << "Getting histos" << std::endl;
   for(auto& it : h.dyn_ShortGenName){
     map_h[it.second] = new TH1D(Form("%s_%s",it.second.c_str(), name.c_str()),
                                Form("%s %s",it.second.c_str(), title.c_str()),
@@ -791,6 +792,7 @@ inline std::map<std::string,TH2D*> Get2DHistos(std::string name, std::string tit
                                            int nbinsy, double ybinmin, double ybinmax){
   std::map<std::string,TH2D*> map_h;
   Helper h;
+  std::cout << "Getting 2D histos" << std::endl;
   for(auto& it : h.dyn_ShortGenName){
     map_h[it.second] = new TH2D(Form("%s_%s",it.second.c_str(), name.c_str()),
                                Form("%s %s",it.second.c_str(), title.c_str()),
@@ -804,6 +806,7 @@ inline std::map<std::string,TH2D*> Get2DHistos(std::string name, std::string tit
 
 inline TH1D* GetSimpleHisto(std::string name, std::string title){
   Helper help;
+  std::cout << "Getting simple histos" << std::endl;
   TH1D* h = new TH1D(name.c_str(), title.c_str(), help.dyn_GenName.size(), -0.5, (double)help.dyn_GenName.size()-0.5);
 
   for(auto const& it : help.dyn_ShortGenName)
@@ -817,10 +820,11 @@ inline TLegend* GetNewLegend(double xmin=0.1, double ymin=0.1, double xmax=0.9, 
   // if(histos.size()==0)
   //   histos = GetHistos("","",1,0,1);
   Helper h;
-
+  std::cout << "Getting new legend" << std::endl;
   TLegend* leg = new TLegend(xmin, ymin, xmax, ymax);
-  for(const auto& it : histos)
-    leg->AddEntry(it.second, h.dyn_GenName[it.first].c_str(), "L");
+  for(auto const& it : histos)
+    //std::string leg_name = h.dyn_GenName[ConvertIDStringToInt(it.first)];
+    leg->AddEntry(it.second, it.first.c_str(), "L");
   return leg;
 }
 
