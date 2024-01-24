@@ -769,34 +769,34 @@ public:
 };
 
 
-inline std::map<int,TH1D*> GetHistos(std::string name, std::string title,
+inline std::map<std::string,TH1D*> GetHistos(std::string name, std::string title,
                                          int nbins, double xbinmin, double xbinmax){
-  std::map<int,TH1D*> map_h;
+  std::map<std::string,TH1D*> map_h;
   std::vector<int>vec_colors = getColors(0);
   int i=0;
   Helper h;
   for(auto& it : h.dyn_ShortGenName){
-    map_h[it.first] = new TH1D(Form("%s_%s",it.second.c_str(), name.c_str()),
+    map_h[it.second] = new TH1D(Form("%s_%s",it.second.c_str(), name.c_str()),
                                Form("%s %s",it.second.c_str(), title.c_str()),
                                nbins, xbinmin, xbinmax);
-    map_h[it.first]->SetLineWidth(2);
-    map_h[it.first]->SetStats(0);
-    map_h[it.first]->SetLineColor(vec_colors[i++]);
+    map_h[it.second]->SetLineWidth(2);
+    map_h[it.second]->SetStats(0);
+    map_h[it.second]->SetLineColor(vec_colors[i++]);
   }
   return map_h;
 }
 
-inline std::map<int,TH2D*> Get2DHistos(std::string name, std::string title,
+inline std::map<std::string,TH2D*> Get2DHistos(std::string name, std::string title,
                                            int nbinsx, double xbinmin, double xbinmax,
                                            int nbinsy, double ybinmin, double ybinmax){
-  std::map<int,TH2D*> map_h;
+  std::map<std::string,TH2D*> map_h;
   Helper h;
   for(auto& it : h.dyn_ShortGenName){
-    map_h[it.first] = new TH2D(Form("%s_%s",it.second.c_str(), name.c_str()),
+    map_h[it.second] = new TH2D(Form("%s_%s",it.second.c_str(), name.c_str()),
                                Form("%s %s",it.second.c_str(), title.c_str()),
                                nbinsx, xbinmin, xbinmax,
                                nbinsy, ybinmin, ybinmax);
-    map_h[it.first]->SetStats(0);
+    map_h[it.second]->SetStats(0);
   }
   return map_h;
 }
@@ -812,14 +812,14 @@ inline TH1D* GetSimpleHisto(std::string name, std::string title){
 }
 
 inline TLegend* GetNewLegend(double xmin=0.1, double ymin=0.1, double xmax=0.9, double ymax=0.9,
-                      const std::map<int,TH1D*>& histos=std::map<int,TH1D*>()){
+                      const std::map<std::string,TH1D*>& histos=std::map<std::string,TH1D*>()){
 
   // if(histos.size()==0)
   //   histos = GetHistos("","",1,0,1);
   Helper h;
 
   TLegend* leg = new TLegend(xmin, ymin, xmax, ymax);
-  for(auto const& it : histos)
+  for(const auto& it : histos)
     leg->AddEntry(it.second, h.dyn_GenName[it.first].c_str(), "L");
   return leg;
 }

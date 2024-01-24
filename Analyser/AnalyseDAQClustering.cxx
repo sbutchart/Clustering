@@ -418,18 +418,18 @@ int main(int argc, char** argv){
 //  int ncluster_sign=0;
   int ncluster_back=0;
 
-  std::map<int,TH1D*> h_singled_maxADChit_wire  = GetHistos  ("h_maxADChit_wire" , ";Max hit ADC;Rate [Hz]",  150, 0, 15000);
-  std::map<int,TH1D*> h_singled_sadc_nhit_wire  = GetHistos  ("h_sadc_hits_wire" , ";ADC;N hit"            ,  100, 0,  5000);
-  std::map<int,TH1D*> h_singled_nhit_wire       = GetHistos  ("h_nhit_wire"      , ";n Hits;Rate [Hz]"     ,   50, 0,    50);
-  std::map<int,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 10000);
-  std::map<int,TH1D*> h_singled_time_wire       = GetHistos  ("h_time_wire"      , ";Time;Rate [Hz]"       ,  100, 0,   100);
-  std::map<int,TH1D*> h_singled_nchan_wire      = GetHistos  ("h_nchan_wire"     , ";n Channels;Rate [Hz]" ,   20, 0,    20);
-  std::map<int,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 10000);
-  std::map<int,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 10000, 100, 0,   100);
-  std::map<int,TH2D*> h_singled_time_nhit_wire  = Get2DHistos("h_time_nhit_wire" , ";Time;n Hits"          ,  100, 0,   100,  50, 0,    50);
-  std::map<int,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 10000);
-  std::map<int,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
-  std::map<int,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
+  std::map<std::string,TH1D*> h_singled_maxADChit_wire  = GetHistos  ("h_maxADChit_wire" , ";Max hit ADC;Rate [Hz]",  150, 0, 15000);
+  std::map<std::string,TH1D*> h_singled_sadc_nhit_wire  = GetHistos  ("h_sadc_hits_wire" , ";ADC;N hit"            ,  100, 0,  5000);
+  std::map<std::string,TH1D*> h_singled_nhit_wire       = GetHistos  ("h_nhit_wire"      , ";n Hits;Rate [Hz]"     ,   50, 0,    50);
+  std::map<std::string,TH1D*> h_singled_sadc_wire       = GetHistos  ("h_sadc_wire"      , ";SADC;Rate [Hz]"       ,  100, 0, 10000);
+  std::map<std::string,TH1D*> h_singled_time_wire       = GetHistos  ("h_time_wire"      , ";Time;Rate [Hz]"       ,  100, 0,   100);
+  std::map<std::string,TH1D*> h_singled_nchan_wire      = GetHistos  ("h_nchan_wire"     , ";n Channels;Rate [Hz]" ,   20, 0,    20);
+  std::map<std::string,TH2D*> h_singled_nhit_sadc_wire  = Get2DHistos("h_nhit_sadc_wire" , ";n Hits;SADC"          ,   50, 0,    50, 100, 0, 10000);
+  std::map<std::string,TH2D*> h_singled_sadc_time_wire  = Get2DHistos("h_sadc_time_wire" , ";SADC;Time"            ,  100, 0, 10000, 100, 0,   100);
+  std::map<std::string,TH2D*> h_singled_time_nhit_wire  = Get2DHistos("h_time_nhit_wire" , ";Time;n Hits"          ,  100, 0,   100,  50, 0,    50);
+  std::map<std::string,TH2D*> h_singled_nchan_sadc_wire = Get2DHistos("h_nchan_sadc_wire", ";n Channels;SADC"      ,   10, 0,    10, 100, 0, 10000);
+  std::map<std::string,TH2D*> h_singled_nchan_time_wire = Get2DHistos("h_nchan_time_wire", ";n Channels;Time"      ,   10, 0,    10, 100, 0,   100);
+  std::map<std::string,TH2D*> h_singled_nchan_nhit_wire = Get2DHistos("h_nchan_nhit_wire", ";n Channels;n Hits"    ,   10, 0,    10,  50, 0,    50);
 
   TEfficiency* eff_enu  = new TEfficiency("eff_enu",  ";E_{#nu} [MeV]"  ,  50, 0, 50);
   TEfficiency* eff_elep = new TEfficiency("eff_elep", ";E_{e} [MeV]"    ,  50, 0, 50);
@@ -457,9 +457,12 @@ int main(int argc, char** argv){
       // std::cout << "Event " << Event << std::endl;
       // std::cout << "StartChan " << StartChan << std::endl;
       //map_gentype_nhit_back = GetMapOfHit(HitGenType);
+
+      //filling map of hits by gentype (?)
       std::map<int, int> m_gentype;
       for (auto const& it:(*HitGenType))
         m_gentype[it]++;
+      //find gentype contributing most to cluster
       int tpe = GetMax(m_gentype).first;
       ++ncluster_back;
       ++nBackgroundEventWire;
@@ -467,7 +470,9 @@ int main(int argc, char** argv){
       double MaxADC=0;
       for (auto const& adc:(*HitSADC))
         if (MaxADC<adc)MaxADC=adc;
+      //std::string gen = ConvertIDIntToString(tpe);
       int gen = tpe;
+      std::cout << "Gen: " << gen << std::endl;
       for (auto const& it: (*HitSADC)) {
         h_singled_sadc_nhit_wire [gen]->Fill(it);
       }
@@ -487,6 +492,8 @@ int main(int argc, char** argv){
     } else {
       nDetectedEvent[Event][MarleyIndex] = true;
 //      map_gentype_nhit_sign = GetMapOfHit(HitGenType);
+
+// commenting out marley case for now - NEEDS FIXING
 //      double MaxADC=0;
 //      for (auto const& adc:(*HitSADC))
 //        if (MaxADC<adc)MaxADC=adc;
@@ -507,6 +514,7 @@ int main(int argc, char** argv){
 //      h_singled_nchan_nhit_wire["marley"]->Fill(NChan    , NHits    );
 //      ++ncluster_sign;
     }
+
     // for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
     // for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
 
