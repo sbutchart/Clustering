@@ -486,25 +486,25 @@ int main(int argc, char** argv){
 
     } else {
       nDetectedEvent[Event][MarleyIndex] = true;
-      //map_gentype_nhit_sign = GetMapOfHit(HitGenType);
+//      map_gentype_nhit_sign = GetMapOfHit(HitGenType);
 //      double MaxADC=0;
 //      for (auto const& adc:(*HitSADC))
 //        if (MaxADC<adc)MaxADC=adc;
 //      for (auto const& it: (*HitSADC)) {
-//        h_singled_sadc_nhit_wire [kSNnu]->Fill(it);
+//        h_singled_sadc_nhit_wire ["marley"]->Fill(it);
 //      }
 //      h_maxADChit_sign_wire           ->Fill(MaxADC   );
-//      h_singled_maxADChit_wire [kSNnu]->Fill(MaxADC   );
-//      h_singled_nhit_wire      [kSNnu]->Fill(NHits    );
-//      h_singled_sadc_wire      [kSNnu]->Fill(SumADC   );
-//      h_singled_time_wire      [kSNnu]->Fill(TimeWidth);
-//      h_singled_nchan_wire     [kSNnu]->Fill(NChan    );
-//      h_singled_nhit_sadc_wire [kSNnu]->Fill(NHits    , SumADC   );
-//      h_singled_sadc_time_wire [kSNnu]->Fill(SumADC   , TimeWidth);
-//      h_singled_time_nhit_wire [kSNnu]->Fill(TimeWidth, NHits    );
-//      h_singled_nchan_sadc_wire[kSNnu]->Fill(NChan    , SumADC   );
-//      h_singled_nchan_time_wire[kSNnu]->Fill(NChan    , TimeWidth);
-//      h_singled_nchan_nhit_wire[kSNnu]->Fill(NChan    , NHits    );
+//      h_singled_maxADChit_wire ["marley"]->Fill(MaxADC   );
+//      h_singled_nhit_wire      ["marley"]->Fill(NHits    );
+//      h_singled_sadc_wire      ["marley"]->Fill(SumADC   );
+//      h_singled_time_wire      ["marley"]->Fill(TimeWidth);
+//      h_singled_nchan_wire     ["marley"]->Fill(NChan    );
+//      h_singled_nhit_sadc_wire ["marley"]->Fill(NHits    , SumADC   );
+//      h_singled_sadc_time_wire ["marley"]->Fill(SumADC   , TimeWidth);
+//      h_singled_time_nhit_wire ["marley"]->Fill(TimeWidth, NHits    );
+//      h_singled_nchan_sadc_wire["marley"]->Fill(NChan    , SumADC   );
+//      h_singled_nchan_time_wire["marley"]->Fill(NChan    , TimeWidth);
+//      h_singled_nchan_nhit_wire["marley"]->Fill(NChan    , NHits    );
 //      ++ncluster_sign;
     }
     // for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);

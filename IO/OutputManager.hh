@@ -385,11 +385,11 @@ public:
     RecClusterPosY = clust->GetRecoPosition(kY);
     RecClusterPosZ = clust->GetRecoPosition(kZ);
 
-    std::cout << "[OutputManager] Getting purity" << std::endl;
+    //std::cout << "[OutputManager] Getting purity" << std::endl;
     for (auto const& x : dyn_AllGenType)
     {
       dyn_purGenType[x] = clust->GetPurity(x);
-      std::cout << x << " " << clust->GetPurity(x) << std::endl;
+      //std::cout << x << " " << clust->GetPurity(x) << std::endl;
     }
  
 //    pur_Other      = clust->GetPurity(kOther   );
