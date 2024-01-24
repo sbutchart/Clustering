@@ -133,7 +133,9 @@ int main(int argc, char** argv){
    std::cout << "[Analyser] Loaded Dynamic IDs" << std::endl;
    for (auto const& x : ID_map){
      std::cout << x.first << " : " << x.second << std::endl;
-   } 
+   }
+   // setup some vars in helper that will be used throughout
+   SetDynamicVars(ID_map); 
  } else {
    std::cerr << "The requested tree 'fIDs' does not exist in file " << InputFile << std::endl;
  }
