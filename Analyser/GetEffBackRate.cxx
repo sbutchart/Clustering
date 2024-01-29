@@ -159,19 +159,20 @@ int main(int argc, char** argv) {
   TTree *ClusteredOpticalHit = (TTree*)f_Input->Get("ClusteredOpticalHit");
   TTree *TrueInfo            = (TTree*)f_Input->Get("TrueInfo");
   TH1D* config_histo = new TH1D("config_histo",";Config;Clusters", 200, 0, 200);
-  
-  ClusteredWireHit   ->Project("config_histo", "Config");
+
+  ClusteredWireHit->Project("config_histo", "Config");
   ClusteredOpticalHit->Project("config_histo", "Config");
-
   int nMaxConfig=0;
-  for (int i=1; i<200; ++i) {
-    if (config_histo->GetBinContent(i)>0)
-      ++nMaxConfig;
+  for (int i=0; i<48; ++i) {
+    if (config_histo->GetBinContent(i)>0){}
+    ++nMaxConfig;
   }
-
   std::cout << "This file contains " << nMaxConfig << " configs." << std::endl;
   int nConfig = (Config==-1? nMaxConfig: Config+1);
   int iterConfig = (Config==-1? 0:Config);
+
+  std::cout << nConfig << std::endl;
+  std::cout << iterConfig << std::endl;
   
   if (Config >= nMaxConfig) {
     std::cerr << "Requested config (" << Config << ") doesn't exit (Config can be from 0 to " << nMaxConfig << ")\n";
@@ -180,7 +181,7 @@ int main(int argc, char** argv) {
   
   int nEventOriginally = (int)TrueInfo->GetEntries();
   std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS\n";
- 
+  /* 
   map_TypeToWeight[0] = 1.; //NOISE 
   map_TypeToWeight[1] = 1.; //MARLEY
   map_TypeToWeight[2] = 1.; //CO60
@@ -191,13 +192,17 @@ int main(int argc, char** argv) {
   map_TypeToWeight[7] = 1.; //PO
   map_TypeToWeight[8] = 1.; //RN
   map_TypeToWeight[9] = 1.; //AR42
+  */
+  for(int i=0;i<kAllBackground;++i)
+    map_TypeToWeight[i] = 1;
 
   std::vector<double>* dummy=NULL;
 
   int nEvent = TrueInfo->GetEntries();
   int in_Event;
   TrueInfo->SetBranchAddress("Event", &in_Event);
-  TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  //TrueInfo->SetBranchAddress("MarlTime", &dummy);
+  TrueInfo->SetBranchAddress("ENu", &dummy);
 
   std::map<int,int> map_Event_nMarley;
   int nMarleyEvent=0;
@@ -242,7 +247,7 @@ int main(int argc, char** argv) {
     GetBackgroundRate(c,
                       map_Config_nWireBackCluster,
                       nEventOriginally,
-                      2.246e-3,
+                      (8500/2e6),
                       DetectorScaling,
                       map_Config_WireBackRate[c]);
 
