@@ -518,8 +518,8 @@ int main(int argc, char** argv){
 //      ++ncluster_sign;
     }
 
-    // for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
-    // for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+     for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
+     for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
 
 //    bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
 //    if (fillneutron)

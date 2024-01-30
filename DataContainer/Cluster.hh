@@ -73,7 +73,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-//    fTrueGenType     (kOther),  what is this doing...?
+    fTrueGenType     ("Other"),  //what is this doing...?
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -97,7 +97,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-//    fTrueGenType     (kOther),
+    fTrueGenType     ("Other"),
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -202,7 +202,7 @@ public:
   double GetTrueDirection(const Direction d) const { return fTrueDirection.at(d);          };
   size_t GetNHit         ()                  const { return fNHit;                         };
 //this is being used in the OutputManager:
-  bool   GetType         ()                  const { return (fTrueGenType=="marley");         };
+  bool   GetType         ()                  const { return (fTrueGenType=="marley");      };
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };

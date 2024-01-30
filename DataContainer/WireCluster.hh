@@ -23,7 +23,7 @@ public:
 protected:
   virtual void SetTypeFromSumHit(const std::map<std::string,double>& nHit) {
     (void)nHit;
-//    fTrueGenType = kOther;
+    fTrueGenType = "Other";
     int sign=0;
     for (auto const& it: fHit) {
       sign+=(it->GetGenType() == "marley");

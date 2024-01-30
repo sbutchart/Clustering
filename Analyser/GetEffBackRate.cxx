@@ -193,7 +193,10 @@ int main(int argc, char** argv) {
   map_TypeToWeight[8] = 1.; //RN
   map_TypeToWeight[9] = 1.; //AR42
   */
-  for(int i=0;i<kAllBackground;++i)
+
+  int AllBackgroundID = ConvertIDStringToInt("AllBackground");
+
+  for(int i=0;i<AllBackgroundID;++i)
     map_TypeToWeight[i] = 1;
 
   std::vector<double>* dummy=NULL;
