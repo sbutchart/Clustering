@@ -21,8 +21,11 @@
 TProfile* SetUpTProfileGenType(std::string name, std::string title) {
   Helper h;
   TProfile* p_ = new TProfile(name.c_str(), title.c_str(), h.dyn_GenName.size(), 0, (double)h.dyn_GenName.size());
-  for(auto const& it : h.dyn_ShortGenName)
-    p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
+  for(auto const& it : h.dyn_ShortGenName){
+    if (it.first == 99){p_->GetXaxis()->SetBinLabel((double)h.dyn_GenName.size()-1, it.second.c_str());}
+    else if (it.first == 100){p_->GetXaxis()->SetBinLabel((double)h.dyn_GenName.size(), it.second.c_str());}
+    else{ p_->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());}
+  }
   return p_;
   
 }
@@ -281,8 +284,11 @@ int main(int argc, char** argv){
 
   TH1D* h_rate_back = new TH1D("rates", ";;Rate [Hz]", h.dyn_GenName.size(),-0.5, (double)h.dyn_GenName.size()-0.5);
   h_rate_back->SetLineWidth(2);
-  for(auto const& it : h.dyn_ShortGenName)
-    h_rate_back->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());
+  for(auto const& it : h.dyn_ShortGenName){
+    if (it.first == 99){h_rate_back->GetXaxis()->SetBinLabel((double)h.dyn_GenName.size()-1, it.second.c_str());}
+    else if (it.first == 100){h_rate_back->GetXaxis()->SetBinLabel((double)h.dyn_GenName.size(), it.second.c_str());}
+    else{ h_rate_back->GetXaxis()->SetBinLabel(it.first+1, it.second.c_str());}
+  }
   
   TH1D* h_nhit_sign_wire = new TH1D("h_nhit_sign_wire", ";n Hits;Rate [Hz]", 50, 0, 50);
   TH1D* h_nhit_back_wire = new TH1D("h_nhit_back_wire", ";n Hits;Rate [Hz]", 50, 0, 50);
@@ -466,7 +472,7 @@ int main(int argc, char** argv){
         m_gentype[it]++;
       //find gentype contributing most to cluster
       int tpe = GetMax(m_gentype).first;
-      std::cout << "TPE: " << tpe << std::endl;
+      //std::cout << "TPE: " << tpe << std::endl;
       ++ncluster_back;
       ++nBackgroundEventWire;
       h_rate_back->Fill(tpe);
@@ -518,8 +524,14 @@ int main(int argc, char** argv){
 //      ++ncluster_sign;
     }
 
-     for (auto const& genhit: map_gentype_nhit_sign) p_gentype_sign_wire->Fill(genhit.first, genhit.second);
-     for (auto const& genhit: map_gentype_nhit_back) p_gentype_back_wire->Fill(genhit.first, genhit.second);
+
+     for (auto const& genhit: map_gentype_nhit_sign){
+       p_gentype_sign_wire->Fill(genhit.first, genhit.second);
+     }
+     for (auto const& genhit: map_gentype_nhit_back){
+       std::cout << genhit.first << " " << genhit.second << std::endl;  
+       p_gentype_back_wire->Fill(genhit.first, genhit.second);
+     }
 
 //    bool fillneutron=map_gentype_nhit_sign[kNeutron]>0;
 //    if (fillneutron)
@@ -588,22 +600,24 @@ int main(int argc, char** argv){
   // gStyle->SetStatY(0.8);
   // gStyle->SetStatH(0.1);
   // gStyle->SetStatW(0.2);
-  h_rate_back->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);
+  h_rate_back->Scale(1. / (double) nEvent / 2.246e-3 / 0.12);  //<- WHAT IS THIS !?
 
   int nentries = h_rate_back->GetEntries();
   double errorint;
-  double integral = h_rate_back->IntegralAndError(1,10,errorint);
-  h_rate_back->SetBinContent(11, integral);
-  h_rate_back->SetBinError(11, errorint);
+  //double integral = h_rate_back->IntegralAndError(1,10,errorint);
+  double integral = h_rate_back->IntegralAndError(1,(double)h.dyn_GenName.size(),errorint);
+
+  //h_rate_back->SetBinContent(11, integral);
+  //h_rate_back->SetBinError(11, errorint);
   h_rate_back->SetEntries(nentries);
   h_rate_back->Draw();
   std::cout << "TOTAL Background rate " << integral << std::endl;
   TVector3 BackgroundRate(integral, -1, -1);
 
-  for (int i=3; i<=10; i++){
+  for (int i=1; i<(double)h.dyn_GenName.size()+1; i++){
     std::cout <<h_rate_back->GetXaxis()->GetBinLabel(i) << " : " << h_rate_back->GetBinContent(i) << std::endl;
   }
-  h_rate_back->GetXaxis()->SetRangeUser(2,10);
+  h_rate_back->GetXaxis()->SetRangeUser(1,(double)h.dyn_GenName.size());
   c.Print(OutputFile.c_str());
 
   h_maxADChit_sign_wire->Draw();
