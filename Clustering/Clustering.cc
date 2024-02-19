@@ -25,7 +25,7 @@ void Clustering::RunClustering(){
 
   size_t nhit_wire_total=0;
   size_t nhit_opti_total=0;
-  
+ 
   for (fCurrentEvent=fOffset; fCurrentEvent<fNEvent+fOffset; ++fCurrentEvent) {
 
     PrintProgress(fCurrentEvent,fNEvent);
@@ -139,7 +139,7 @@ void Clustering::RunClustering(){
         vec_OptiCluster[i]=NULL;
       }
     }
-    
+
     for(size_t j = 0; j < vec_WireHit.size(); j++) {
       delete vec_WireHit[j];
       vec_WireHit[j] = NULL;

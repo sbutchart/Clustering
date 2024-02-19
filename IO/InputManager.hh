@@ -345,6 +345,8 @@ public:
   };
   
   void GetOpticalHits(std::vector<OpticalHit*>& opti) {
+    std::cout << "[InputManager] GetOpticalHits" << std::endl;
+
     for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
       if (PDS_OpHit_True_Index != NULL) {
