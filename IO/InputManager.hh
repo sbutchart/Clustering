@@ -226,6 +226,7 @@ public:
   std::vector<double> 	           * PDS_OpHit_PE             ;
   std::vector<double> 	           * PDS_OpHit_FastToTotal    ;
   std::vector<int>                 * PDS_OpHit_True_GenType   ;
+  std::vector<int>                 * PDS_OpHit_True_Index     ;
   std::vector<double>              * PDS_OpHit_True_Energy    ;
   std::vector<int>                 * PDS_OpHit_True_TrackID   ;
   std::vector<int>                 * PDS_OpHit_True_GenTypeAll;
@@ -346,6 +347,9 @@ public:
   void GetOpticalHits(std::vector<OpticalHit*>& opti) {
     for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
+      if (PDS_OpHit_True_Index != NULL) {
+        marley_index=(*PDS_OpHit_True_Index)[j];
+      }
       OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
                                       (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
                                       (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
@@ -431,6 +435,7 @@ public:
     delete PDS_OpHit_PE             ; PDS_OpHit_PE              = NULL;
     delete PDS_OpHit_FastToTotal    ; PDS_OpHit_FastToTotal     = NULL;
     delete PDS_OpHit_True_GenType   ; PDS_OpHit_True_GenType    = NULL;
+    delete PDS_OpHit_True_Index     ; PDS_OpHit_True_Index 	= NULL;
     delete PDS_OpHit_True_Energy    ; PDS_OpHit_True_Energy     = NULL;
     delete PDS_OpHit_True_TrackID   ; PDS_OpHit_True_TrackID    = NULL;
     delete PDS_OpHit_True_GenTypeAll; PDS_OpHit_True_GenTypeAll = NULL;
@@ -603,6 +608,7 @@ public:
     PDS_OpHit_PE             (NULL),
     PDS_OpHit_FastToTotal    (NULL),
     PDS_OpHit_True_GenType   (NULL),
+    PDS_OpHit_True_Index     (NULL),
     PDS_OpHit_True_Energy    (NULL),
     PDS_OpHit_True_TrackID   (NULL),
     PDS_OpHit_True_GenTypeAll(NULL),
@@ -900,6 +906,7 @@ public:
       t_Input->SetBranchAddress("PDS_OpHit_PE"             , &PDS_OpHit_PE             );
       t_Input->SetBranchAddress("PDS_OpHit_FastToTotal"    , &PDS_OpHit_FastToTotal    );
       t_Input->SetBranchAddress("PDS_OpHit_True_GenType"   , &PDS_OpHit_True_GenType   );
+      t_Input->SetBranchAddress("PDS_OpHit_True_Index"     , &PDS_OpHit_True_Index     );
       t_Input->SetBranchAddress("PDS_OpHit_True_Energy"    , &PDS_OpHit_True_Energy    );
       t_Input->SetBranchAddress("PDS_OpHit_True_TrackID"   , &PDS_OpHit_True_TrackID   );
       t_Input->SetBranchAddress("PDS_OpHit_True_GenTypeAll", &PDS_OpHit_True_GenTypeAll);
