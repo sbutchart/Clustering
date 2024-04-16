@@ -39,6 +39,10 @@ std::vector<Configuration> GetConfigurationTextFile(std::string InputFile) {
     c.fBackgroundRateError = BkgdErr;
     c.fName = title;
     c.fLegendEntry = title;
+    std::cout << "Config: " << Config << std::endl;
+    std::cout << "Time Window: " << TimeWindow << std::endl;
+    std::cout << "Eff: " << Eff << " +/- " << EffErr << std::endl;
+    std::cout << "Bkg Rate: " << Bkgd << " +/- " << BkgdErr << std::endl;
     //if (Eff>0 && Bkgd>0) conf.push_back(c);
     if (Bkgd>0) conf.push_back(c);
   }

@@ -346,12 +346,19 @@ public:
   void GetOpticalHits(std::vector<OpticalHit*>& opti) {
     for(size_t j = 0; j < PDS_OpHit_OpChannel->size(); j++) {
       int marley_index=0;
+      if (PDS_OpHit_True_Index != NULL) {
+        marley_index = (*PDS_OpHit_True_Index)[j];
+      }
+      std::cout << "OpHit_OpChannel: " << j << std::endl;
       OpticalHit* oh = new OpticalHit((*PDS_OpHit_True_GenType)[j],
                                       (*PDS_OpHit_X)[j],        (*PDS_OpHit_Y)[j],     (*PDS_OpHit_Z)[j],
                                       (*PDS_OpHit_PeakTime)[j], (*PDS_OpHit_Width)[j], (*PDS_OpHit_PE)[j],
                                       (*PDS_OpHit_OpChannel)[j]);
+      
       oh->SetTrueEnergy((*True_ENu)[marley_index]);
+      std::cout << "Setting true energy: " << (*True_ENu)[marley_index] << std::endl;
       oh->SetMarleyIndex(marley_index);
+      std::cout << "Setting marley index: " << marley_index;
 
       if (oh->GetChannel() < 200000 ||
           abs(oh->GetPosition(kX)) < 20000 ||

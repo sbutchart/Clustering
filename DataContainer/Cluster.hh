@@ -17,16 +17,6 @@ private:
       fTruePosition [d] = 0.;
       fTrueDirection[d] = 0.;
     }
-//    fTruePurity[kOther   ] = 0.;
-//    fTruePurity[kSNnu    ] = 0.;
-//    fTruePurity[kAPA     ] = 0.;
-//    fTruePurity[kCPA     ] = 0.;
-//    fTruePurity[kAr39    ] = 0.;
-//    fTruePurity[kNeutron ] = 0.;
-//    fTruePurity[kKrypton ] = 0.;
-//    fTruePurity[kPolonium] = 0.;
-//    fTruePurity[kRadon   ] = 0.;
-//    fTruePurity[kAr42    ] = 0.;
    
       for(auto const& x : dyn_AllGenType){
         fTruePurity[x] = 0.;
@@ -73,7 +63,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-    fTrueGenType     ("Other"),  //what is this doing...?
+    fTrueGenType     ("Other"),
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -97,7 +87,7 @@ protected:
     fSumPeak         (0),
     fRecoEnergy      (0),
     fAPA             (0),
-    fTrueGenType     ("Other"),
+    fTrueGenType     (),
     fTrueEnergy      (0),
     fTrueMarleyIndex (-1),
     fTruePosition    (),
@@ -113,17 +103,22 @@ protected:
     std::map<int,size_t> marleyIndices;
     std::set<int> channel;
     std::map<std::string,double> hittype_peak;
+
     for (auto const& it: fHit) {
       marleyIndices[it->GetMarleyIndex()]++;
       channel.insert(it->GetChannel());
       fSumPeak += it->GetPeak();
+
       for (auto const& d : AllDirection) {
         fPosition[d] += it->GetPosition(d) * it->GetPeak();
         fTruePosition[d] += it->GetTruePosition(d) * it->GetPeak();
         all_pos[d].insert(it->GetPosition(d));
       }
+
       apa[it->GetAPA()] += it->GetPeak();
       hittype_peak[it->GetGenType()] += it->GetPeak();
+      //std::cout << "Gen Type of hit: " << it->GetGenType().c_str() << std::endl;
+      //std::cout << "Peak: " << hittype_peak[it->GetGenType()].second << std::endl;
     }
     size_t max = 0;
     for (auto const& it:marleyIndices){
@@ -140,7 +135,12 @@ protected:
 
     SetTypeFromSumHit(hittype_peak);
     
+    //std::cout << "SetTypeFromSumHit: " << SetTypeFromSumHit(hittype_peak).c_str() << std::endl;
+ 
     for (auto const& d : dyn_AllGenType) {
+      //std::cout << "GenType: " << d << std::endl;
+      //std::cout << "hittype_peak: " << hittype_peak[d] << std::endl;
+      //std::cout << "fSumPeak: " << fSumPeak << std::endl;
       fTruePurity[d] = hittype_peak[d] / fSumPeak;
     }
 
@@ -201,8 +201,10 @@ public:
   double GetTruePosition (const Direction d) const { return fTruePosition.at(d);           };
   double GetTrueDirection(const Direction d) const { return fTrueDirection.at(d);          };
   size_t GetNHit         ()                  const { return fNHit;                         };
+
 //this is being used in the OutputManager:
   bool   GetType         ()                  const { return (fTrueGenType=="marley");      };
+
   double GetFirstHitTime ()                  const { return fExtent.at(kT).first;          };
   double GetLastHitTime  ()                  const { return fExtent.at(kT).second;         };
   double GetTimeWidth    ()                  const { return fSize.at(kT);                  };

@@ -18,7 +18,7 @@
 #include "Utils/Helper.h"
 
 //for now: assume input file contains all configs. in future: read in no. of configs without skipping over those with 0 clusters
-//
+
 std::map<int,double> map_TypeToWeight;
 
 double getWeight(const int ClusterType) {
@@ -39,7 +39,7 @@ int getClusterType(const std::vector<int>* vec_GenType) {
   int largestCount = 0;
   for(auto const& it : map_GenTypeToCount) {
  
-    //find marley gentype and exclude it
+    //find marley gentype and exclude it - why?
  
     std::string it_GenType = ConvertIDIntToString(it.first);
     
@@ -71,8 +71,7 @@ void FillEventCountMap(int nhit,
   int               in_MarleyIndex;
   std::vector<int>* in_GenType = NULL; //input to getClusterType
  
-  //ClusteredHit either ClusteredWireHit or ClusteredOpticalHit
- 
+  //ClusteredHit will either be ClusteredWireHit or ClusteredOpticalHit
   ClusteredHit->SetBranchAddress("Event",        &in_Event      );
   ClusteredHit->SetBranchAddress("Config",       &in_Config     );
   ClusteredHit->SetBranchAddress("Type",         &in_Type       );
@@ -92,7 +91,7 @@ void FillEventCountMap(int nhit,
     ClusteredHit->GetEntry(i);
     PrintProgress(i, ClusteredHit->GetEntries());
 
-    //what is this step doing ?
+    //if size of element in_GenType is less than min. number of hits per cluster ?
     if ((int)in_GenType->size() < nhit) continue;
     
     if (in_Type == 1) {
@@ -108,6 +107,89 @@ void FillEventCountMap(int nhit,
   return;
   
 }
+
+
+void FillMarleyEventCountMap(int nhit,
+                             TTree* ClusteredHit,
+                             std::map<int,std::map<int,std::map<int,int>>>& map_ConfigEventIndex_nSignCluster){
+
+  int               in_Event;
+  int               in_Config;
+  double            in_Type;
+  int               in_MarleyIndex;
+  std::vector<int>* in_GenType = NULL; //input to getClusterType
+
+  ClusteredHit->SetBranchAddress("Event",        &in_Event      );
+  ClusteredHit->SetBranchAddress("Config",       &in_Config     );
+  ClusteredHit->SetBranchAddress("Type",         &in_Type       );
+  ClusteredHit->SetBranchAddress("MarleyIndex",  &in_MarleyIndex);
+
+  if (ClusteredHit->GetListOfBranches()->FindObject("GenType")) {
+    //GenType in case of wire hits
+    ClusteredHit->SetBranchAddress("GenType", &in_GenType);
+  } else {
+    //Hit_GenType in case of optical hits
+    ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
+  }
+
+  CurrentProg = 0;
+
+  for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
+    ClusteredHit->GetEntry(i);
+    PrintProgress(i, ClusteredHit->GetEntries());
+
+    if ((int)in_GenType->size() < nhit) continue;
+
+    if (in_Type == 1) {
+      map_ConfigEventIndex_nSignCluster[in_Config][in_Event][in_MarleyIndex]++;
+    }
+  }
+  return;
+
+}
+
+
+void FillBackgroundEventCountMap(int nhit,
+                       TTree* ClusteredHit,
+                       std::map<int,double>& map_Config_nBackCluster){
+
+  int               in_Event;
+  int               in_Config;
+  double            in_Type;
+  std::vector<int>* in_GenType = NULL; //input to getClusterType
+
+  //ClusteredHit will either be ClusteredWireHit or ClusteredOpticalHit
+  ClusteredHit->SetBranchAddress("Event",        &in_Event      );
+  ClusteredHit->SetBranchAddress("Config",       &in_Config     );
+  ClusteredHit->SetBranchAddress("Type",         &in_Type       );
+
+  if (ClusteredHit->GetListOfBranches()->FindObject("GenType")) {
+    //GenType in case of wire hits
+    ClusteredHit->SetBranchAddress("GenType", &in_GenType);
+  } else {
+    //Hit_GenType in case of optical hits
+    ClusteredHit->SetBranchAddress("Hit_GenType", &in_GenType);
+  }
+
+  CurrentProg = 0;
+
+  for(int i = 0; i < ClusteredHit->GetEntries(); i++) {
+    ClusteredHit->GetEntry(i);
+    PrintProgress(i, ClusteredHit->GetEntries());
+
+    if ((int)in_GenType->size() < nhit) continue;
+
+    if (in_Type != 1) {
+      //find gentype for background clusters, find weight and add it to count (?)
+      int    ClusterType = getClusterType(in_GenType);
+      double weight = getWeight(ClusterType);
+      map_Config_nBackCluster[in_Config] += weight;
+    }
+  }
+  return;
+
+}
+
 
 
 void GetEfficiency(const int Config,
@@ -166,14 +248,17 @@ void GetBackgroundRate(const int Config,
 
 int main(int argc, char** argv) {
 
-  std::string InputFile  = "";
+  std::string BkgInputFile  = "";
+  std::string MarleyInputFile = "";
   std::string OutputFile = "BackEff.txt";
   int Config = -1;
   int nHit = -1;
   double DetectorScaling = 0.12;
   CLI::App app{"A program to calculate the efficiency of the clustering and the background rate"};
 
-  app.add_option("-i,--input",   InputFile,       "Input filename (root file, the output file of RunDAQClustering)")->required();
+  //app.add_option("-i,--input",   InputFile,       "Input filename (root file, the output file of RunDAQClustering)")->required();
+  app.add_option("-b, --background", BkgInputFile,  "Input filename for backgrounds (root file, the output of RunDAQClustering)")->required();
+  app.add_option("-m, --marley", MarleyInputFile, "Input filename for MARLEY (root file, the output of RunDAQClustering)")->required();
   app.add_option("-c,--config",  Config,          "What configuration of the clustering to analyse, default runs over all configs");
   app.add_option("-o,--output",  OutputFile,      "Output file name (text file, default: BackEff.txt)");
   app.add_option("-s,--scaling", DetectorScaling, "Detector scaling to go from workspace to 10kT. Default is 0.12 which corresponds to the ratio of volume of the 1x2x6 and the 10kT");
@@ -185,10 +270,22 @@ int main(int argc, char** argv) {
     std::cout << "For now, use all the cluster without any restriction on the number of hits." << std::endl;
   }
 
-  TFile *f_Input = new TFile(InputFile.c_str(), "READ");
-  TTree *ClusteredWireHit    = (TTree*)f_Input->Get("ClusteredWireHit");
-  TTree *ClusteredOpticalHit = (TTree*)f_Input->Get("ClusteredOpticalHit");
-  TTree *TrueInfo            = (TTree*)f_Input->Get("TrueInfo");
+  
+  TFile *f_Input_Bkg = new TFile(BkgInputFile.c_str(), "READ");
+  TTree *BkgClusteredWireHit    = (TTree*)f_Input_Bkg->Get("ClusteredWireHit");
+  TTree *BkgClusteredOpticalHit = (TTree*)f_Input_Bkg->Get("ClusteredOpticalHit");
+  TTree *BkgTrueInfo            = (TTree*)f_Input_Bkg->Get("TrueInfo");
+
+  TFile *f_Input_Marl = new TFile(MarleyInputFile.c_str(), "READ");
+  TTree *MarlClusteredWireHit    = (TTree*)f_Input_Marl->Get("ClusteredWireHit");
+  TTree *MarlClusteredOpticalHit = (TTree*)f_Input_Marl->Get("ClusteredOpticalHit");
+  TTree *MarlTrueInfo            = (TTree*)f_Input_Marl->Get("TrueInfo");
+
+
+  //TFile *f_Input = new TFile(InputFile.c_str(), "READ");
+  //TTree *ClusteredWireHit    = (TTree*)f_Input->Get("ClusteredWireHit");
+  //TTree *ClusteredOpticalHit = (TTree*)f_Input->Get("ClusteredOpticalHit");
+  //TTree *TrueInfo            = (TTree*)f_Input->Get("TrueInfo");
   //TH1D* config_histo = new TH1D("config_histo",";Config;Clusters", 200, 0, 200);
 
 
@@ -200,14 +297,14 @@ int main(int argc, char** argv) {
   std::string delim = "/";
   std::string ID_tree = "fIDs";
   
-  if (f_Input->Get( ID_tree.c_str() )) {
-    TTree *t_IDs = (TTree*)f_Input->Get( ID_tree.c_str() );
+  if (f_Input_Bkg->Get( ID_tree.c_str() )) {
+    TTree *t_IDs = (TTree*)f_Input_Bkg->Get( ID_tree.c_str() );
     TObjArray *branchList;
     branchList  = t_IDs->GetListOfBranches();
     int nBranch = t_IDs->GetNbranches();
     TString IDtreenames[nBranch];
 
-    std::cout << "ID trees: " << nBranch << std::endl;
+    //std::cout << "ID trees: " << nBranch << std::endl;
     for(int i=0;i<nBranch;i++){
       IDtreenames[i] = branchList->At(i)->GetName();
 
@@ -228,15 +325,15 @@ int main(int argc, char** argv) {
     ID_map.insert( temp_pair_all );
     AllGenTypeDynamic.push_back("All");
 
-    std::cout << "[Analyser] Loaded Dynamic IDs" << std::endl;
-    for (auto const& x : ID_map){
-      std::cout << x.first << " : " << x.second << std::endl;
-    }
+    //std::cout << "[Analyser] Loaded Dynamic IDs" << std::endl;
+    //for (auto const& x : ID_map){
+    //  std::cout << x.first << " : " << x.second << std::endl;
+    //}
 
 
     SetDynamicVars(ID_map); 
   } else {
-    std::cerr << "The requested tree 'fIDs' does not exist in file " << InputFile << std::endl;
+    std::cerr << "The requested tree 'fIDs' does not exist in file " << BkgInputFile << std::endl;
   }
 
 
@@ -254,17 +351,17 @@ int main(int argc, char** argv) {
   //if Config=-1, iterConfig=0, else iterConfig = Config
   int iterConfig = (Config==-1? 0:Config);
 
-  std::cout << nConfig << std::endl;
-  std::cout << iterConfig << std::endl;
+  //std::cout << nConfig << std::endl;
+  //std::cout << iterConfig << std::endl;
   
   if (Config > nMaxConfig) {
     std::cerr << "Requested config (" << Config << ") doesn't exist (Config can be from 0 to " << nMaxConfig << ")\n";
     exit(1);
   }
   
-  int nEventOriginally = (int)TrueInfo->GetEntries();
-  std::cout << "THERE WERE " << nEventOriginally << " EVENTS IN THE ORIGINAL SAMPLE AND " << nConfig << " CONFIGURATIONS\n";
-
+  int nBkgEventOriginally = (int)BkgTrueInfo->GetEntries();
+  std::cout << "THERE WERE " << nBkgEventOriginally << " EVENTS IN THE BACKGROUND SAMPLE AND " << nConfig << " CONFIGURATIONS\n";
+ 
   int AllBackgroundID = ConvertIDStringToInt("AllBackground");
   //std::cout << "AllBackground GenType: " << AllBackgroundID;
 
@@ -275,35 +372,51 @@ int main(int argc, char** argv) {
 
   std::vector<double>* dummy=NULL;
 
-  int nEvent = TrueInfo->GetEntries();
+  int nMarlEvent = MarlTrueInfo->GetEntries();
   int in_Event;
-  TrueInfo->SetBranchAddress("Event", &in_Event);
-  //TrueInfo->SetBranchAddress("MarlTime", &dummy);
-  TrueInfo->SetBranchAddress("ENu", &dummy);
+  MarlTrueInfo->SetBranchAddress("Event", &in_Event);
+  //MarlTrueInfo->SetBranchAddress("MarlTime", &dummy);
+  MarlTrueInfo->SetBranchAddress("ENu", &dummy);
+
+
+  //find the marley events
 
   std::map<int,int> map_Event_nMarley;
   int nMarleyEvent=0;
-  for(int i = 0; i < nEvent; i++) {
-    TrueInfo->GetEntry(i);
+  for(int i = 0; i < nMarlEvent; i++) {
+    MarlTrueInfo->GetEntry(i);
     map_Event_nMarley[in_Event] = (int)dummy->size();
     nMarleyEvent += (int)dummy->size();
   }
   
   std::cout << "There were " << nMarleyEvent << " Marley events in " << map_Event_nMarley.size() << " Larsoft events." << std::endl;
 
+
   //OVERALL EFFICIENCIES AND BACKGROUND RATES.
-  std::map<int,double> map_Config_nWireBackCluster;
-  std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nWireSignCluster;
-  FillEventCountMap(nHit, ClusteredWireHit,
-                    map_Config_nWireBackCluster,
-                    map_ConfigEventIndex_nWireSignCluster);
+  std::map<int,double> map_Config_nWireBackCluster; //no. of background wire clusters in each config, used to calculate overall BKG rate
+  std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nWireSignCluster; //no. of signal wire clusters per event index (?) per config, used to calculate SN efficiency
 
-  std::map<int,double> map_Config_nOpticalBackCluster;
-  std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nOpticalSignCluster;
-  FillEventCountMap(nHit, ClusteredOpticalHit,
-                    map_Config_nOpticalBackCluster,
-                    map_ConfigEventIndex_nOpticalSignCluster);
 
+//  FillEventCountMap(nHit, ClusteredWireHit,
+//                    map_Config_nWireBackCluster,
+//                    map_ConfigEventIndex_nWireSignCluster);
+
+  FillMarleyEventCountMap(nHit, MarlClusteredWireHit, map_ConfigEventIndex_nWireSignCluster);
+
+  FillBackgroundEventCountMap(nHit, BkgClusteredWireHit, map_Config_nWireBackCluster);
+
+  std::map<int,double> map_Config_nOpticalBackCluster; //used for BKG rate
+  std::map<int,std::map<int,std::map<int,int>>> map_ConfigEventIndex_nOpticalSignCluster; //used for SN efficiencies
+
+//  FillEventCountMap(nHit, ClusteredOpticalHit,
+//                    map_Config_nOpticalBackCluster,
+//                    map_ConfigEventIndex_nOpticalSignCluster);
+
+  FillMarleyEventCountMap(nHit, MarlClusteredOpticalHit, map_ConfigEventIndex_nOpticalSignCluster);
+
+  FillBackgroundEventCountMap(nHit, BkgClusteredOpticalHit, map_Config_nOpticalBackCluster);
+
+  //maps of efficiencies and bkg rates for each config
   std::map<int,std::pair<double,double>> map_Config_WireEff;
   std::map<int,std::pair<double,double>> map_Config_WireBackRate;
   std::map<int,std::pair<double,double>> map_Config_OpticalEff;
@@ -312,26 +425,32 @@ int main(int argc, char** argv) {
   for (int c=iterConfig; c<48; ++c) {
     std::cout << "N background wire clusters " << map_Config_nWireBackCluster[c] << " in config " << c << std::endl;
     std::cout << "N background opti clusters " << map_Config_nOpticalBackCluster[c] << " in config " << c << std::endl;
+
+    //SN efficiency - wires
     GetEfficiency(c,
                   map_ConfigEventIndex_nWireSignCluster,
                   map_Event_nMarley,
                   map_Config_WireEff[c]);
 
+    //SN efficiency - optical
     GetEfficiency(c,
                   map_ConfigEventIndex_nOpticalSignCluster,
                   map_Event_nMarley,
                   map_Config_OpticalEff[c]);
 
+    //background rate - wires
     GetBackgroundRate(c,
                       map_Config_nWireBackCluster,
-                      nEventOriginally,
+                      nBkgEventOriginally,
                       (8500/2e6),
                       DetectorScaling,
                       map_Config_WireBackRate[c]);
 
+    //background rate - optical
+    //NOT WORKING!!
     GetBackgroundRate(c,
                       map_Config_nOpticalBackCluster,
-                      nEventOriginally,
+                      nBkgEventOriginally,
                       3.2e-3*3.,
                       DetectorScaling,
                       map_Config_OpticalBackRate[c]);
