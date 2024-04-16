@@ -256,7 +256,7 @@ void SetMaxHisto(std::map<T,TH1D*>& map_, double fact=1.) {
 template<typename T>
 inline void FormatTheseHistos(std::map<T,TH1D*> h_, double scale=1.2) {
   SetMaxHisto(h_, scale);
-  std::vector<int>vec_colors = getColors(0);
+  std::vector<int>vec_colors = getColors(2);
   int i=0;
   for (auto& it: h_) {
     TH1D* histo = it.second;
@@ -277,7 +277,7 @@ inline void FormatTheseHistos(std::map<T,TH2D*> h_) {
 
 template<typename T>
 inline void FormatTheseHistos(std::map<T,TEfficiency*> h_) {
-  std::vector<int>vec_colors = getColors(0);
+  std::vector<int>vec_colors = getColors(2);
   int i=0;
   for (auto& it: h_) {
     TEfficiency* histo = it.second;
@@ -288,7 +288,7 @@ inline void FormatTheseHistos(std::map<T,TEfficiency*> h_) {
 
 template<typename T>
 inline void FormatTheseHistos(std::map<T,TProfile*> h_) {
-  std::vector<int>vec_colors = getColors(0);
+  std::vector<int>vec_colors = getColors(2);
   int i=0;
   for (auto& it: h_) {
     TProfile* histo = it.second;
@@ -772,7 +772,7 @@ public:
 inline std::map<std::string,TH1D*> GetHistos(std::string name, std::string title,
                                          int nbins, double xbinmin, double xbinmax){
   std::map<std::string,TH1D*> map_h;
-  std::vector<int>vec_colors = getColors(0);
+  std::vector<int>vec_colors = getColors(2);
   int i=0;
   Helper h;
   std::cout << "Getting histos" << std::endl;
