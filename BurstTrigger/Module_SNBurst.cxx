@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
   app.add_option("--output-pdf",     OutputPdfFile,   "Output file name (pdf file containing the histos)")->required();
   CLI11_PARSE(app, argc, argv);
 
+  //get list of configs from input file
   std::vector<Configuration> Configs  = GetConfigurationTextFile(InputTextFile);
   std::vector<Configuration> Configs2 = GetConfigurationRootFile(InputRootFile);
   Configs.insert(Configs.end(), Configs2.begin(), Configs2.end());

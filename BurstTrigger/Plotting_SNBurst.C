@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
   std::vector<int> vec_Colors = getColors(2);
   TLegend* leg = new TLegend(0.1,0.1,0.9,0.9);
   
+  //fake rate plot
   Configs[0].fTH1DFakeRate_Cut->SetMinimum(1e-8);
   Configs[0].fTH1DFakeRate_Cut->Draw();
   int i=1;
@@ -74,6 +75,7 @@ int main(int argc, char** argv) {
   gPad->RedrawAxis();
   c->Print(OutputFile.c_str());
   
+  //trigger efficiency vs no. of interactions/10kT
   gPad->SetLogy(false);
   Configs[0].fTH1DEfficiency_Burst->Draw("");
   gPad->SetLogx(true);
@@ -84,14 +86,19 @@ int main(int argc, char** argv) {
   gPad->RedrawAxis();
   c->Print(OutputFile.c_str());
   
+  //trigger efficiency vs. distance
   Configs[0].fTH1DEfficiency_Distance->Draw();
   for (auto const& it: Configs) {
     it.fTH1DEfficiency_Distance->Draw("SAME");
+    it.fTH1DEfficiency_Distance->GetXaxis()->SetRangeUser(10, 100);
     i++;
   }
+  gPad->SetLogx(false);
   gPad->RedrawAxis();
   c->Print(OutputFile.c_str());
-  
+
+
+  //SN probability vs. distance  
   gPad->SetLogy(true);
   TH1D  *hSNProbabilityVDistance = (TH1D*)Configs[0].fDistanceProbability->Clone();
   hSNProbabilityVDistance->GetXaxis()->SetRange(0,50);

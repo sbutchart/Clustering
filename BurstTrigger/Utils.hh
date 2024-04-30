@@ -44,7 +44,8 @@ std::vector<Configuration> GetConfigurationTextFile(std::string InputFile) {
     std::cout << "Eff: " << Eff << " +/- " << EffErr << std::endl;
     std::cout << "Bkg Rate: " << Bkgd << " +/- " << BkgdErr << std::endl;
     //if (Eff>0 && Bkgd>0) conf.push_back(c);
-    if (Bkgd>0) conf.push_back(c);
+    //if (Bkgd>0) conf.push_back(c);
+    conf.push_back(c);
   }
   return conf;
   

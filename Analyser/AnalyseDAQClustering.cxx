@@ -464,7 +464,7 @@ int main(int argc, char** argv){
       // std::cout << "Entry " << i << std::endl;
       // std::cout << "Event " << Event << std::endl;
       // std::cout << "StartChan " << StartChan << std::endl;
-      //map_gentype_nhit_back = GetMapOfHit(HitGenType);
+      map_gentype_nhit_back = GetMapOfHit(HitGenType);
 
       //filling map of hits by gentype (?)
       std::map<int, int> m_gentype;

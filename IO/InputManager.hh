@@ -127,16 +127,6 @@ public:
   int NHitNoBT   ;
   int NFlash     ;
   int NFlashNoBT ;
-//  int TotGen_Marl;
-//  int TotGen_APA ;
-//  int TotGen_CPA ;
-//  int TotGen_Ar39;
-//  int TotGen_Neut;
-//  int TotGen_Kryp;
-//  int TotGen_Plon;
-//  int TotGen_Rdon;
-//  int TotGen_Ar42;   
-
 
   int   * vec_Hit_View         ;
   int   * vec_Hit_Size         ;
@@ -516,15 +506,6 @@ public:
     NHitNoBT   (0),
     NFlash     (0),
     NFlashNoBT (0),
-//    TotGen_Marl(0),
-//    TotGen_APA (0),
-//    TotGen_CPA (0),
-//    TotGen_Ar39(0),
-//    TotGen_Neut(0),
-//    TotGen_Kryp(0),
-//    TotGen_Plon(0),
-//    TotGen_Rdon(0),
-//    TotGen_Ar42(0),   
     
     vec_Hit_View         (NULL),
     vec_Hit_Size         (NULL),
