@@ -285,7 +285,7 @@ public:
     
   void FillHistograms() {
     FillHistograms(fFakeRate_Cut, fTH1DFakeRate_Cut,
-                   "FakeRate_Cut", "N clusters cut", "Fake rate [Hz]");
+                   "FakeRate_Cut", "Cluster cut threshold", "Fake rate [Hz]");
     FillHistograms(fEfficiency_Burst, fTH1DEfficiency_Burst,
                    "Efficiency_Burst", "N SN interactions / 10 kT", "Triggering efficiency");
     FillHistograms(fLatency_Burst, fTH1DLatency_Burst,

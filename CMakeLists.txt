@@ -12,7 +12,8 @@ find_program(LSB_RELEASE_EXEC lsb_release)
 find_package(TBB REQUIRED)
 
 include(${ROOT_USE_FILE})
-string(CONCAT CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -Wall -Wextra -Werror -Wno-error=deprecated-copy")
+set(CMAKE_CXX_STANDARD 17)
+string(CONCAT CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -Wall -Wextra -Werror -Wno-error=deprecated-copy -Wno-error=deprecated-declarations")
 #grabs the distribution
 execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
   OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT

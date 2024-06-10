@@ -11,6 +11,7 @@
 #include "TLegend.h"
 #include "TCanvas.h"
 #include "TLine.h"
+#include "TLatex.h"
 #include "TStyle.h"
 #include "TText.h"
 #include "TROOT.h"
@@ -57,6 +58,8 @@ int main(int argc, char** argv) {
   Configs[0].fTH1DFakeRate_Cut->Draw();
   int i=1;
   gPad->SetLogy();
+  gPad->SetGridx();
+  gPad->SetGridy();
   for (auto const& it: Configs) {
     it.fTH1DFakeRate_Cut       ->SetLineColor(vec_Colors[i]);
     it.fTH1DEfficiency_Burst   ->SetLineColor(vec_Colors[i]);
@@ -77,29 +80,57 @@ int main(int argc, char** argv) {
   
   //trigger efficiency vs no. of interactions/10kT
   gPad->SetLogy(false);
+  gPad->SetLogx(false);
+  gPad->SetGridx();
+  gPad->SetGridy();
   Configs[0].fTH1DEfficiency_Burst->Draw("");
-  gPad->SetLogx(true);
   for (auto const& it: Configs) {
     it.fTH1DEfficiency_Burst->Draw("SAME");
+    it.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(1, 100);
     i++;
   }
   gPad->RedrawAxis();
   c->Print(OutputFile.c_str());
   
+
   //trigger efficiency vs. distance
+  gPad->SetGridx();
+  gPad->SetGridy();
   Configs[0].fTH1DEfficiency_Distance->Draw();
   for (auto const& it: Configs) {
     it.fTH1DEfficiency_Distance->Draw("SAME");
-    it.fTH1DEfficiency_Distance->GetXaxis()->SetRangeUser(10, 100);
+    it.fTH1DEfficiency_Distance->GetXaxis()->SetRangeUser(1, 70);
     i++;
   }
+
+  //SN1987 line
+  TLine *LMC = new TLine(51.4, 0, 51.4, 1.05);
+  LMC->SetLineColor(1);
+  LMC->SetLineWidth(3);
+  LMC->Draw();
+  TLatex LMC_label;
+  LMC_label.SetTextSize(0.03);
+  LMC_label.SetTextAlign(13);
+  LMC_label.DrawLatex(52, 0.99, "SN 1987A");
+
+  //SN1054 line
+  //TLine *M1 = new TLine(2.0, 0, 2.0, 1.05);
+  //M1->SetLineColor(1);
+  //M1->SetLineWidth(3);
+  //M1->Draw();
+  //TLatex M1_label;
+  //M1_label.SetTextSize(0.03);
+  //M1_label.SetTextAlign(13);
+  //M1_label.DrawLatex(2.5, 0.99, "SN 1054 (M1)");
+
+
   gPad->SetLogx(false);
   gPad->RedrawAxis();
   c->Print(OutputFile.c_str());
 
 
   //SN probability vs. distance  
-  gPad->SetLogy(true);
+  gPad->SetLogy(false);
   TH1D  *hSNProbabilityVDistance = (TH1D*)Configs[0].fDistanceProbability->Clone();
   hSNProbabilityVDistance->GetXaxis()->SetRange(0,50);
   hSNProbabilityVDistance->SetLineWidth(4);

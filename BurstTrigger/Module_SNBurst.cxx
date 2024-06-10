@@ -11,6 +11,7 @@
 #include "TGraph.h"
 #include "TH1D.h"
 #include "TLine.h"
+#include "TLatex.h"
 #include "TMath.h"
 #include "TString.h"
 #include "TTree.h"
@@ -135,6 +136,8 @@ int main(int argc, char** argv) {
     ThisConfig.fTH1DEfficiency_Distance->SetLineColor(2);
     ThisConfig.fTH1DCoverage           ->SetLineColor(2);
     ThisConfig.fTH1DFakeRate_Cut->SetMinimum(1e-10);
+    
+    //fake rate plot
     gPad->SetLogx(false);
     gPad->SetLogy(true);
     ThisConfig.fTH1DFakeRate_Cut       ->Draw();
@@ -145,16 +148,27 @@ int main(int argc, char** argv) {
     l_perMonth_2->Draw();
     can.Print(OutputPdfFile.c_str());
 
+    //efficiency vs. n interations
     gPad->SetLogy(false);
     gPad->SetLogx(false);
-    ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(0,50);
+    ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(0,100);
     ThisConfig.fTH1DEfficiency_Burst->Draw();
     can.Print(OutputPdfFile.c_str());
 
-    ThisConfig.fTH1DEfficiency_Burst->GetXaxis()->SetRangeUser(10,1000);
+    //efficiency vs. distance
+    ThisConfig.fTH1DEfficiency_Distance->GetXaxis()->SetRangeUser(1,80);
     ThisConfig.fTH1DEfficiency_Distance->Draw();
+    TLine *LMC = new TLine(51.4, 0, 51.4, 1.05);
+    LMC->SetLineColor(1);
+    LMC->SetLineWidth(3);
+    LMC->Draw();
+    TLatex LMC_label;
+    LMC_label.SetTextSize(0.03);
+    LMC_label.SetTextAlign(13);
+    LMC_label.DrawLatex(52, 0.99, "SN 1987A");
     can.Print(OutputPdfFile.c_str());
 
+    //probability x trigger efficiency
     ThisConfig.fDistanceProbability->SetLineColor(kBlue);
     ThisConfig.fDistanceProbability->SetLineWidth(3);
     gPad->SetLogy(false);
