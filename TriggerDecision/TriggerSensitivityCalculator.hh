@@ -49,19 +49,18 @@ public:
     Method_                   (Method),
     StatisticalTest_          (nullptr){
 
-    SignalPDF_     = (TH1D*)InputSignalFile_    ->Get(Form("PDF_Background_1_config%i",Config_));
+    SignalPDF_     = (TH1D*)InputSignalFile_    ->Get(Form("PDF_Background_marley_config%i",Config_));
     BackgroundPDF_ = (TH1D*)InputBackgroundFile_->Get(Form("PDF_Background_config%i",  Config_));
     SignalPDF_    ->SetDirectory(NULL);
     BackgroundPDF_->SetDirectory(NULL);
     TVectorD* effs = (TVectorD*)InputSignalFile_->Get("Efficiencies");
     Efficiency_ = (*effs)[Config_];
-
     assert(BackgroundPDF_->Integral() != 0);
     assert(SignalPDF_    ->Integral() != 0);
     
     BackgroundPDF_->Scale(1./0.12); // Detector scaling got lost somewhere
     BackgroundPDF_->Scale(TimeWindow);
-
+   
     BackgroundRate_ = BackgroundPDF_->Integral();
     
     SignalPDF_->Scale(nSNEvent_ * Efficiency_ / SignalPDF_->Integral());
@@ -70,8 +69,7 @@ public:
     OutputFile_->cd();
     OutputTree_ = new TTree("Throws", "Throws");
     OutputTree_->Branch("BackgroundTestStatistics3", &BackgroundStatistic_);
-    OutputTree_->Branch("SignalTestStatistics",     &SignalStatistic_     );
-
+    OutputTree_->Branch("SignalTestStatistics",     &SignalStatistic_     );  
 
     if (Method_ == "Likelihood") {
       StatisticalTest_ = std::make_unique<LikelihoodTest>();

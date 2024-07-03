@@ -19,7 +19,7 @@ int GetGenType(vector<int> GenType) {
     counts[it]++;
   }
   int max=-1;
-  int type=-1;
+  int type=ConvertIDStringToInt("Other");
   for (auto const& it: counts) {
     if (it.second>max){
       max = it.second;
@@ -45,10 +45,73 @@ int main(int argc, char** argv) {
   app.add_option("-n,--nconfig", nConfig, "Number of configurations in the input file")->required();
   CLI11_PARSE(app, argc, argv);
 
+  unique_ptr<TChain> InputChain     = make_unique<TChain>(InputChainName    .c_str());
+  unique_ptr<TChain> InputTrueChain = make_unique<TChain>(InputTrueChainName.c_str());
+
+  string line;
+  ifstream myfile (InputListFile);
+  if (myfile.is_open()){
+    cout << "Parsing list of files...\n";
+    while ( getline (myfile,line) ){
+      InputChain->Add(line.c_str());
+      InputTrueChain->Add(line.c_str());
+    }
+  } else {
+    cerr << "File " << InputListFile << " doesnt exist.\n";
+    throw;
+  }
+
+  //DYNAMIC BACKGROUNDS
+  std::map<std::string, int> ID_map;
+  std::vector<std::string> AllGenTypeDynamic;
+  std::vector<int> pur_dynamic;
+  std::cout << "[Analyser] Dynamic: Loading IDs" << std::endl;
+  std::string delim = "/";
+  std::string ID_tree = "fIDs";
+
+  if (InputChain->GetFile()->Get( ID_tree.c_str() )) {
+    TTree *t_IDs = (TTree*)InputChain->GetFile()->Get( ID_tree.c_str() );
+    TObjArray *branchList; 
+    branchList  = t_IDs->GetListOfBranches();
+    int nBranch = t_IDs->GetNbranches();
+    TString IDtreenames[nBranch];
+  
+    std::cout << "ID trees: " << nBranch << std::endl;
+    for(int i=0;i<nBranch;i++){
+      IDtreenames[i] = branchList->At(i)->GetName();
+ 
+      int temp_id;
+      t_IDs->SetBranchAddress(IDtreenames[i], &temp_id);
+      t_IDs->GetEntry(0);
+      std::string delimiter = "_";
+      std::string temp_string = IDtreenames[i].Data();
+      std::string token = temp_string.substr(0, temp_string.find(delimiter));
+      std::pair<std::string, int> temp_pair {token, temp_id};
+      ID_map.insert( temp_pair );
+      AllGenTypeDynamic.push_back(token);
+    }
+    std::pair<std::string, int> temp_pair_allbckg {"AllBackground", 99};
+    ID_map.insert( temp_pair_allbckg );
+    AllGenTypeDynamic.push_back("AllBackground");
+    std::pair<std::string, int> temp_pair_all {"All", 100};
+    ID_map.insert( temp_pair_all );
+    AllGenTypeDynamic.push_back("All");
+
+   std::cout << "[Analyser] Loaded Dynamic IDs" << std::endl;
+   for (auto const& x : ID_map){
+     std::cout << x.first << " : " << x.second << std::endl;
+   }
+  
+   // setup some vars in helper that will be used throughout
+   SetDynamicVars(ID_map); 
+ } else {
+   std::cerr << "The requested tree 'fIDs' does not exist in file " << InputListFile << std::endl;
+ }
+
   map<int,map<int,shared_ptr<TH1D>>> PDF_Background_config;// [config][type]
   for (int iConfig=0; iConfig<nConfig; ++iConfig) {
-    for (int iBack=0; iBack<10; ++iBack) {
-      PDF_Background_config[iConfig][iBack] = make_shared<TH1D>(("PDF_Background_"+to_string(iBack)+"_config"+to_string(iConfig)).c_str(), "PDF;SADC;", 20, 0, 200); 
+    for (auto const& x : ID_map ) {  
+      PDF_Background_config[iConfig][x.second] = make_shared<TH1D>(("PDF_Background_"+x.first+"_config"+to_string(iConfig)).c_str(), "PDF;SADC;", 20, 0, 200); 
     }
   }
   
@@ -65,27 +128,11 @@ int main(int argc, char** argv) {
   double SumADC=0;
   int MarleyIndex=0;
 
-  vector<int>    *GenType = NULL;
+  vector<int> *GenType = NULL;
   vector<double> *ENu     = NULL;
   vector<double> *Time    = NULL;
   int Event_true = 0;
-  
-  unique_ptr<TChain> InputChain     = make_unique<TChain>(InputChainName    .c_str());
-  unique_ptr<TChain> InputTrueChain = make_unique<TChain>(InputTrueChainName.c_str());
-  
-  string line;
-  ifstream myfile (InputListFile);
-  if (myfile.is_open()){
-    cout << "Parsing list of files...\n";
-    while ( getline (myfile,line) ){
-      InputChain->Add(line.c_str());
-      InputTrueChain->Add(line.c_str());
-    }
-  } else {
-    cerr << "File " << InputListFile << " doesnt exist.\n";
-    throw;
-  }
-  
+
   InputChain->SetBranchAddress("Config",        &Config     );
   InputChain->SetBranchAddress("Event",         &Event      );
   InputChain->SetBranchAddress(Feature.c_str(), &SumADC     );
@@ -95,13 +142,13 @@ int main(int argc, char** argv) {
   InputTrueChain->SetBranchAddress("ENu",      &ENu       );
   InputTrueChain->SetBranchAddress("MarlTime", &Time      );
   InputTrueChain->SetBranchAddress("Event",    &Event_true);
+
   size_t nMarleyEventGenerated=0;
   size_t nBackgroundEventGenerated=0;
 
   unique_ptr<TFile> OutputFile = make_unique<TFile>(OutputFileName.c_str(), "RECREATE");
   OutputFile->cd();
-
-  
+ 
   TTree* sum_adc_enu = new TTree("mapping", "mapping");
   double enu_tree=0, sum_adc_tree=0, time_tree=0;
   int config_tree=0;
@@ -145,10 +192,11 @@ int main(int argc, char** argv) {
       std::cout << "number of config is inconsistent! change nconfig to be Config+1\n";
       throw;
     }
-      
-    
+
+
     int type = GetGenType(*GenType);
-    if (type == 1) {
+    string type_str = ConvertIDIntToString(type); 
+    if (type_str == "marley") {
       nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
       sum_adc_tree = SumADC/100;
       enu_tree    = enu_mapping [InputChain->GetFile()->GetName()][Event][MarleyIndex];
@@ -173,9 +221,9 @@ int main(int argc, char** argv) {
       PDF_Background_config_perfile[InputChain->GetFile()][Config][type]->Fill(SumADC/100.);
     } else {
       for (int iConfig=0; iConfig<nConfig; ++iConfig) {
-        for (int iBack=0; iBack<10; ++iBack) {
+        for (auto const& x : ID_map ) {
           // std::cout << "Creating for " << InputChain->GetFile()->GetName() << " " << iConfig << " " << iBack << "\n";
-          PDF_Background_config_perfile[InputChain->GetFile()][iConfig][iBack] = make_shared<TH1D>(("PDF_Background_perfile"+to_string(iBack)+"_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
+          PDF_Background_config_perfile[InputChain->GetFile()][iConfig][x.second] = make_shared<TH1D>(("PDF_Background_perfile"+x.first+"_config"+to_string(iConfig)+"_file_"+InputChain->GetFile()->GetName()).c_str(), "PDF;SADC;", 20, 0, 200);
         }
       }
     }
