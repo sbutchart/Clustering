@@ -4,6 +4,9 @@ target_link_libraries(SmartTriggerStatisticalTests Clustering)
 add_executable(DumpForStatisticalTrigger DumpForStatisticalTrigger.cxx)
 target_link_libraries(DumpForStatisticalTrigger Clustering)
 
+add_executable(SignalBackgroundPDFs SignalBackgroundPDFs.cxx)
+target_link_libraries(SignalBackgroundPDFs Clustering)
+
 # file(GLOB python_src
 #   "*.py")
 

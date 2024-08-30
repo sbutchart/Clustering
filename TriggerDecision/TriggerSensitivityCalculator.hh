@@ -55,6 +55,8 @@ public:
     BackgroundPDF_->SetDirectory(NULL);
     TVectorD* effs = (TVectorD*)InputSignalFile_->Get("Efficiencies");
     Efficiency_ = (*effs)[Config_];
+    std::cout << "SN efficiency: " << Efficiency_ << std::endl;
+
     assert(BackgroundPDF_->Integral() != 0);
     assert(SignalPDF_    ->Integral() != 0);
     
@@ -62,6 +64,7 @@ public:
     BackgroundPDF_->Scale(TimeWindow);
    
     BackgroundRate_ = BackgroundPDF_->Integral();
+    std::cout << "Background rate: " << BackgroundRate_ << std::endl;
     
     SignalPDF_->Scale(nSNEvent_ * Efficiency_ / SignalPDF_->Integral());
     SignalPDF_->Add(BackgroundPDF_);

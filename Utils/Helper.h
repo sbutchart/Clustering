@@ -46,7 +46,7 @@ inline double GetMinNonZeroBinContent(const TH1D* h_){
   
 }
 inline void PlotThese2Histos(TH1D* h1_, TH1D* h2_, TCanvas& c_, std::string filename,
-                             bool logx=false, bool logy=false, double maxv=10, double minv=0.1){
+                             bool logx=false, bool logy=false, const char* title="", double maxv=10, double minv=0.1){
   
   std::vector<double> max = {h1_->GetBinContent(h1_->GetMaximumBin()),
                              h2_->GetBinContent(h2_->GetMaximumBin()),
@@ -55,6 +55,7 @@ inline void PlotThese2Histos(TH1D* h1_, TH1D* h2_, TCanvas& c_, std::string file
                              GetMinNonZeroBinContent(h2_),
                              minv};
   double ScaleMax=1.2, ScaleMin=0.;
+ 
   if (logy) {
     ScaleMax = 5;
     ScaleMin = 0.1;
@@ -68,10 +69,11 @@ inline void PlotThese2Histos(TH1D* h1_, TH1D* h2_, TCanvas& c_, std::string file
   h1_->SetStats(0);
   h2_->SetStats(0);
   h1_->SetMaximum((*std::max_element(max.begin(),max.end()))*ScaleMax);
+  //h1_->SetMaximum(0.6);
   h1_->SetMinimum((*std::min_element(min.begin(),min.end()))*ScaleMin);
   gPad->SetLogx(logx);
   gPad->SetLogy(logy);
-  h1_->SetTitle("");
+  h1_->SetTitle(title);
   h1_->Draw();
   h2_->Draw("SAME");
   c_.Print(filename.c_str());

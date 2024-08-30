@@ -85,16 +85,6 @@ int main(int argc, char** argv){
   double RecClusterPosX;
   double RecClusterPosY;
   double RecClusterPosZ;
-//  double pur_Other     ;
-//  double pur_SNnu      ;
-//  double pur_APA       ;
-//  double pur_CPA       ;
-//  double pur_Ar39      ;
-//  double pur_Neutron   ;
-//  double pur_Krypton   ;
-//  double pur_Polonium  ;
-//  double pur_Radon     ;
-//  double pur_Ar42      ;
 
   // DYNAMIC BACKGROUNDS
   std::map<std::string, int> ID_map;
@@ -326,8 +316,8 @@ int main(int argc, char** argv){
   h_sadc_hits_sign_wire->SetLineWidth(2);
   h_sadc_hits_back_wire->SetLineWidth(2);
 
-  TH1D* h_nchan_sign_wire = new TH1D("h_nchan_sign_wire", ";Time;Rate [Hz]", 20, 0, 20);
-  TH1D* h_nchan_back_wire = new TH1D("h_nchan_back_wire", ";Time;Rate [Hz]", 20, 0, 20);
+  TH1D* h_nchan_sign_wire = new TH1D("h_nchan_sign_wire", ";N channels;Rate [Hz]", 20, 0, 20);
+  TH1D* h_nchan_back_wire = new TH1D("h_nchan_back_wire", ";N channels;Rate [Hz]", 20, 0, 20);
   h_nchan_sign_wire->SetLineColor(kRed);
   h_nchan_back_wire->SetLineColor(kBlue);
   h_nchan_sign_wire->SetLineStyle(1);
