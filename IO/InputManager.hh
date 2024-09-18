@@ -349,9 +349,9 @@ public:
                                       (*PDS_OpHit_OpChannel)[j]);
       
       oh->SetTrueEnergy((*True_ENu)[marley_index]);
-      std::cout << "Setting true energy: " << (*True_ENu)[marley_index] << std::endl;
+      //std::cout << "Setting true energy: " << (*True_ENu)[marley_index] << std::endl;
       oh->SetMarleyIndex(marley_index);
-      std::cout << "Setting marley index: " << marley_index;
+      //std::cout << "Setting marley index: " << marley_index;
 
       if (oh->GetChannel() < 200000 ||
           abs(oh->GetPosition(kX)) < 20000 ||
