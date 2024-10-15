@@ -130,6 +130,7 @@ int main(int argc, char** argv) {
 
   vector<int> *GenType = NULL;
   vector<double> *ENu     = NULL;
+  vector<double> *ENu_Lep = NULL;
   vector<double> *Time    = NULL;
   int Event_true = 0;
 
@@ -140,6 +141,7 @@ int main(int argc, char** argv) {
   InputChain->SetBranchAddress("MarleyIndex",   &MarleyIndex);
   
   InputTrueChain->SetBranchAddress("ENu",      &ENu       );
+  InputTrueChain->SetBranchAddress("ENu_Lep",  &ENu_Lep   );
   InputTrueChain->SetBranchAddress("MarlTime", &Time      );
   InputTrueChain->SetBranchAddress("Event",    &Event_true);
 
@@ -150,14 +152,16 @@ int main(int argc, char** argv) {
   OutputFile->cd();
  
   TTree* sum_adc_enu = new TTree("mapping", "mapping");
-  double enu_tree=0, sum_adc_tree=0, time_tree=0;
+  double enu_tree=0, enu_lep_tree=0, sum_adc_tree=0, time_tree=0;
   int config_tree=0;
   sum_adc_enu->Branch("Time",          &time_tree   );
   sum_adc_enu->Branch("ENu",           &enu_tree    );
+  sum_adc_enu->Branch("ENu_Lep",       &enu_lep_tree);
   sum_adc_enu->Branch(Feature.c_str(), &sum_adc_tree);
   sum_adc_enu->Branch("Config",        &config_tree );
 
   map<string, map<int, map<int, double> > > enu_mapping;//[filename(ouch)][event][marleyindex] -> enu
+  map<string, map<int, map<int, double> > > enu_lep_mapping; //[filename][event][marleyindex] -> enu_lep
   map<string, map<int, map<int, double> > > time_mapping;//[filename(ouch)][event][marleyindex] -> time
   
   for (int iEntry = 0; iEntry<InputTrueChain->GetEntries(); ++iEntry) {
@@ -166,6 +170,10 @@ int main(int argc, char** argv) {
     int i=0;
     for (auto const& enu: (*ENu)) {
       enu_mapping[InputTrueChain->GetFile()->GetName()][Event_true][i++] = enu;
+    }
+    i=0;
+    for (auto const& enu_lep: (*ENu_Lep)) {
+      enu_lep_mapping[InputTrueChain->GetFile()->GetName()][Event_true][i++] = enu_lep;
     }
     i=0;
     for (auto const& timeit: (*Time)) {
@@ -200,6 +208,7 @@ int main(int argc, char** argv) {
       nMarleyEventDetected[Config][InputChain->GetFile()][Event].insert(MarleyIndex);
       sum_adc_tree = SumADC/100;
       enu_tree    = enu_mapping [InputChain->GetFile()->GetName()][Event][MarleyIndex];
+      enu_lep_tree = enu_lep_mapping [InputChain->GetFile()->GetName()][Event][MarleyIndex];
       time_tree   = time_mapping[InputChain->GetFile()->GetName()][Event][MarleyIndex];
       config_tree = Config;
       sum_adc_enu->Fill();
