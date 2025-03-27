@@ -7,6 +7,13 @@ target_link_libraries(DumpForStatisticalTrigger Clustering)
 add_executable(SignalBackgroundPDFs SignalBackgroundPDFs.cxx)
 target_link_libraries(SignalBackgroundPDFs Clustering)
 
+add_executable(TPPDFs TPPDFs.cxx)
+target_link_libraries(TPPDFs Clustering)
+
+add_executable(DumpTP DumpTP.cxx)
+target_link_libraries(DumpTP Clustering)
+
+
 # file(GLOB python_src
 #   "*.py")
 
