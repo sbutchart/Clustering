@@ -13,6 +13,8 @@ target_link_libraries(TPPDFs Clustering)
 add_executable(DumpTP DumpTP.cxx)
 target_link_libraries(DumpTP Clustering)
 
+add_executable(SmartTriggerStatisticalTestsTA RunSmartTriggerStatisticalTestsTA.cxx)
+target_link_libraries(SmartTriggerStatisticalTestsTA Clustering)
 
 # file(GLOB python_src
 #   "*.py")
