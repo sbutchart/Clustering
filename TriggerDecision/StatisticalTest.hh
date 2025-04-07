@@ -67,11 +67,17 @@ protected:
     for (int iBin=0; iBin<=test.GetNcells(); ++iBin) {
       double pdfi  = PDF_->GetBinContent(iBin);
       double testi = test.GetBinContent(iBin);
+
+      int iBin_1 = iBin - 1;
+      int iBin_2 = iBin - 2;
+      double pdfi_1 = PDF_->GetBinContent(iBin_1);
+      double pdfi_2 = PDF_->GetBinContent(iBin_2);
+
       if (pdfi == 0 && testi == 0) {
         continue;
       } else if (pdfi != 0 && testi == 0) {
         llh += -2 * pdfi;
-      } else if (pdfi == 0 && testi != 0) {
+      } else if (pdfi == 0 && pdfi_1 == 0 && pdfi_2 == 0 && testi != 0) {
         llh += -100;
       } else {
         double contrib = -2 * (testi * TMath::Log(testi / pdfi) + (pdfi - testi));

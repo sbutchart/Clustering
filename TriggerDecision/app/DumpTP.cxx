@@ -125,11 +125,6 @@ int main(int argc, char** argv) {
 
   double scaleBackground = 1. / 2.2e-3 / nEventsGeneratedS / 0.12;
   double scaleSignal = 1.;
-
-
-  PDF_Background_notype->Fill(7000,1.);
-  PDF_Background_notype->Fill(8000,1.);
-  PDF_Background_notype->Fill(9000,1.);
  
   PDF_Background_notype->Scale(scaleBackground);
   PDF_Background_notype->Write();
