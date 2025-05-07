@@ -39,7 +39,6 @@ int main(int argc, char** argv) {
   string sline;
   ifstream mysfile (InputSignalFile);
   if (mysfile.is_open()){
-    cout << "Parsing list of files...\n";
     while ( getline (mysfile,sline) ){
       InputSignalChain->Add(sline.c_str());
       InputTrueSignalChain->Add(sline.c_str());
@@ -52,7 +51,6 @@ int main(int argc, char** argv) {
   string bline;
   ifstream mybfile (InputBackgroundFile);
   if (mybfile.is_open()){
-    cout << "Parsing list of files...\n";
     while ( getline (mybfile,bline) ){
       InputBackgroundChain->Add(bline.c_str());
       InputTrueBackgroundChain->Add(bline.c_str());
@@ -62,7 +60,7 @@ int main(int argc, char** argv) {
     throw;
   }
 
-  std::cout << "Parsed list." << std::endl;
+  std::cout << "Parsed input files." << std::endl;
   
   //map<int,shared_ptr<TH1D>> PDF_Background_notype;
   shared_ptr<TH1D> PDF_Background_notype;
@@ -77,13 +75,12 @@ int main(int argc, char** argv) {
   ULong_t SumADCB=0;
   int Event_true = 0;
   
-  //InputChain->SetBranchAddress(Feature.c_str(), &SumADC);
   InputSignalChain->SetBranchAddress("adc_integral", &SumADCS);
   InputBackgroundChain->SetBranchAddress("adc_integral", &SumADCB);
   //std::cout << "Set ADC integral branch" << std::endl;
 
   //InputTrueChain->SetBranchAddress("en",       &ENu       );
-  InputSignalChain->SetBranchAddress("Event",    &Event_true);
+  InputTrueSignalChain->SetBranchAddress("Event",    &Event_true);
   //std::cout << "Set true event branch" << std::endl;
 
   int nEventsGeneratedS = InputTrueSignalChain->GetMaximum("Event");
@@ -92,27 +89,33 @@ int main(int argc, char** argv) {
   int nEventsGeneratedB = InputTrueBackgroundChain->GetMaximum("Event");
   std::cout << "Number of background events: " << nEventsGeneratedB << std::endl;
 
-  std::cout << "GetEntries: " << std::endl;
+  //std::cout << "GetEntries: " << std::endl;
   int nEntriesS = InputSignalChain->GetEntries("adc_integral");
-  std::cout << "nEntriesS: " << nEntriesS << std::endl;
+  //std::cout << "nEntriesS: " << nEntriesS << std::endl;
 
   int nEntriesB = InputBackgroundChain->GetEntries("adc_integral");
-  std::cout << "nEntriesB: " << nEntriesB << std::endl;
+  //std::cout << "nEntriesB: " << nEntriesB << std::endl;
 
-  std::cout << "Create and open output file:" << std::endl;
   unique_ptr<TFile> OutputFile = make_unique<TFile>(OutputFileName.c_str(), "RECREATE");
   OutputFile->cd();
 
-  //std::cout << "GetMaximum: " << std::endl;
   //int nEntries = InputChain->GetEntries();
-  //int nEntries = 500;
-  
-  std::cout << "GetEntry loop..." << std::endl;
+  double nDetected = 0;
+
+  //std::cout << "GetEntry loop..." << std::endl;
   for (int iEntry=0; iEntry<nEntriesS; ++iEntry) {
     InputSignalChain->GetEntry(iEntry);
     //PrintProgress(iEntry,nEntries);
     PDF_Signal->Fill(SumADCS);
+    int NoSTPs = InputSignalChain->GetEntry(iEntry);
+    if (NoSTPs !=0) {
+      nDetected++;
+    }
    }
+
+  std::cout << "No of generated events for which TAs found: " << nDetected << std::endl;
+  double eff = nDetected / nEventsGeneratedS;
+  std::cout << "Efficiency: " << eff << std::endl;
 
   for (int iEntry=0; iEntry<nEntriesB; ++iEntry) {
     InputBackgroundChain->GetEntry(iEntry);
@@ -124,7 +127,7 @@ int main(int argc, char** argv) {
   std::cout << "Scaling." << std::endl;
 
   double scaleBackground = 1. / 2.2e-3 / nEventsGeneratedS / 0.12;
-  double scaleSignal = 1.;
+  double scaleSignal = 1. * eff;
  
   PDF_Background_notype->Scale(scaleBackground);
   PDF_Background_notype->Write();

@@ -70,14 +70,16 @@ protected:
 
       int iBin_1 = iBin - 1;
       int iBin_2 = iBin - 2;
+      int iBin_3 = iBin - 3;
       double pdfi_1 = PDF_->GetBinContent(iBin_1);
       double pdfi_2 = PDF_->GetBinContent(iBin_2);
+      double pdfi_3 = PDF_->GetBinContent(iBin_3);
 
       if (pdfi == 0 && testi == 0) {
         continue;
       } else if (pdfi != 0 && testi == 0) {
         llh += -2 * pdfi;
-      } else if (pdfi == 0 && pdfi_1 == 0 && pdfi_2 == 0 && testi != 0) {
+      } else if (pdfi == 0 && pdfi_1 == 0 && pdfi_2 == 0 && pdfi_3 == 0 && testi != 0) {
         llh += -100;
       } else {
         double contrib = -2 * (testi * TMath::Log(testi / pdfi) + (pdfi - testi));
